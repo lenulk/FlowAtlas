@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FlowAtlas MVP</title>
+  <link rel="stylesheet" href="/style.css">
+  <script type="module" src="/app.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand"><span class="brand-mark">F</span> FlowAtlas <span class="tag">MVP</span></div>
+    <span class="top-note">Action → API → code → service</span>
+  </header>
+  <main>
+    <section class="intro">
+      <div>
+        <p class="eyebrow">LOCAL DEMO · EVIDENCE FIRST</p>
+        <h1>จากหนึ่งการคลิก<br>ไปถึงเส้นทางการรัน</h1>
+        <p class="lead">ลองทำงานกับร้านค้าตัวอย่าง แล้วดูว่าแต่ละการกระทำผ่าน API โค้ด และบริการสต็อกอย่างไร ทุกเส้นเชื่อมแสดงที่มาของข้อสรุป</p>
+      </div>
+      <div class="legend" aria-label="ประเภทหลักฐาน">
+        <div><span class="line observed"></span><strong>สังเกตจริง</strong><small>ข้อมูลจากการรันครั้งนี้</small></div>
+        <div><span class="line inferred"></span><strong>อนุมาน</strong><small>จับคู่จากโค้ด</small></div>
+        <div><span class="line unknown"></span><strong>ยังไม่ทราบ</strong><small>ไม่มี trace เพียงพอ</small></div>
+      </div>
+    </section>
+
+    <section class="workspace">
+      <div class="actions card">
+        <div class="section-heading"><span class="step">01</span><div><h2>เลือกการกระทำ</h2><p>แต่ละปุ่มสร้างรหัส action ใหม่</p></div></div>
+        <div class="product">
+          <div class="product-art" aria-hidden="true"><span>ATLAS<br>NOTEBOOK</span></div>
+          <div><span class="product-label">DEMO PRODUCT</span><h3>Atlas Notebook</h3><p>สมุดโน้ตตัวอย่าง · ฿290</p></div>
+        </div>
+        <div class="buttons">
+          <button data-action="view-product" data-path="/api/product" data-method="GET"><span>1</span> ดูสินค้า <b>↗</b></button>
+          <button data-action="check-stock" data-path="/api/check-stock" data-method="POST"><span>2</span> ตรวจสต็อก <b>↗</b></button>
+          <button data-action="place-order" data-path="/api/place-order" data-method="POST"><span>3</span> สั่งซื้อ <b>↗</b></button>
+        </div>
+        <div id="result" class="result" role="status">เลือกการกระทำเพื่อเริ่ม trace</div>
+      </div>
+
+      <div class="trace card">
+        <div class="section-heading"><span class="step">02</span><div><h2>แผนที่การรัน</h2><p id="trace-subtitle">รอการกระทำแรก</p></div></div>
+        <div id="empty" class="empty"><div class="empty-icon">⌁</div><p>แผนที่จะปรากฏที่นี่</p><small>เริ่มด้วยปุ่มทางซ้าย</small></div>
+        <div id="trace-content" hidden>
+          <div class="trace-meta"><code id="action-id"></code><a id="json-link" target="_blank" rel="noopener">ดู JSON ↗</a></div>
+          <div class="map-wrap"><svg id="map" role="img" aria-label="แผนที่การรัน"></svg></div>
+          <h3 class="evidence-title">หลักฐานของแต่ละเส้นเชื่อม</h3>
+          <div id="evidence"></div>
+        </div>
+      </div>
+    </section>
+    <p class="footnote">ข้อมูลเก็บในหน่วยความจำของเครื่องนี้ สูงสุด 100 actions · บริการสต็อกเป็นบริการจำลอง · <a href="/flowatlas/actions" target="_blank" rel="noopener">รายการ actions ทั้งหมด ↗</a></p>
+  </main>
+</body>
+</html>
