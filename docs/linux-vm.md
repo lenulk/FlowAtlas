@@ -94,4 +94,8 @@ node scripts/run-tests.mjs test/register-app.test.mjs
 
 ## ขอบเขตที่ยังไม่ได้ตรวจ
 
+รอบ diagnostics วันที่ 1 ตุลาคม 2026 ใช้ Git bundle `59084282a98123da43dee5785987056de9d5b082` clone ลง `/home/test/FlowAtlas-qa-5908428` แล้วใช้ portable Node 24.18.0 เดิม: main 56/56 (`2026-09-30T20-12-18-506Z`), isolated source 1/1 (`2026-09-30T20-12-27-693Z`), Chromium inspector journey/restart 1/1 (`2026-09-30T20-12-27-995Z`) ผ่าน ไม่มี failed/skipped และไม่พบ writer lock หลังจบ Source digest ทุกชุดตรง host Windows; main เริ่มจาก clean commit ส่วนรอบหลัง runner เพิ่ม TEST-RUNS ทำให้ dirty แต่ source คงเดิม
+
+นำ raw TAP/JSON และภาพกลับเข้าโครงการด้วย archive `reports/vm/flowatlas-5908428-results.tgz` ตรวจ SHA-256 `45d2842e565a772bd2fdda3fb7bb0aea3425a2862419bd07a0eca64918e004f6` ตรง VM ก่อน extract และตรวจภาพด้วยตาแล้ว ผลนี้เพิ่มหลักฐาน fixtures บน commit เดียวกัน ยังไม่ได้ปิดสาเหตุ intermittent บน Windows/OneDrive หรือยืนยัน external business app
+
 ยังไม่ยืนยัน Linux GUI desktop, browser engine อื่น, มือถือจริง/touch, Linux distro/architecture อื่น, Node 20/22, filesystem ที่แชร์กับ Windows/OneDrive, power loss, production load หรือ OpenTelemetry/Playwright capture การใช้ Playwright ทดสอบ UI ไม่ใช่การเพิ่ม browser trace recorder ให้ผลิตภัณฑ์

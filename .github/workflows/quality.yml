@@ -1,0 +1,73 @@
+name: FlowAtlas quality
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: quality-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: ${{ matrix.os }} / Node ${{ matrix.node }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, windows-2025]
+        node: ['22.23.3', '24.21.0']
+    defaults:
+      run:
+        shell: pwsh
+    env:
+      FLOWATLAS_PLAYWRIGHT_PACKAGE: ${{ github.workspace }}/tools/qa/node_modules/playwright/package.json
+      FLOWATLAS_BROWSER_CHANNEL: chromium
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: ${{ matrix.node }}
+          package-manager-cache: false
+      - name: Install pinned QA tools
+        run: npm ci --prefix tools/qa --ignore-scripts --no-audit --no-fund
+      - name: Install Chromium
+        run: node tools/qa/node_modules/playwright/cli.js install --with-deps chromium
+      - name: Main regression
+        env:
+          FLOWATLAS_TEST_PURPOSE: CI main regression
+        run: node scripts/run-tests.mjs
+      - name: Isolated source regression
+        if: ${{ !cancelled() }}
+        env:
+          FLOWATLAS_TEST_PURPOSE: CI isolated source regression
+        run: node scripts/run-tests.mjs scripts/source-check.mjs
+      - name: Inspector browser journey and replay
+        if: ${{ !cancelled() }}
+        env:
+          FLOWATLAS_TEST_PURPOSE: CI Chromium inspector journey and replay
+        run: node scripts/run-tests.mjs scripts/inspector-browser-check.mjs
+      - name: Independent browser journey
+        if: ${{ !cancelled() }}
+        env:
+          FLOWATLAS_TEST_PURPOSE: CI Chromium independent browser journey
+        run: node scripts/run-tests.mjs scripts/independent-browser-check.mjs
+      - name: Save evidence including failed runs
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: evidence-${{ matrix.os }}-node-${{ matrix.node }}-${{ github.sha }}
+          if-no-files-found: error
+          retention-days: 14
+          path: |
+            reports/tests/
+            reports/vm/inspector-browser-*/
+            reports/browser/independent-browser-*/
+            docs/TEST-RUNS.md

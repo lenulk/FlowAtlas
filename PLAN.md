@@ -104,6 +104,8 @@ Release levels: Alpha = ติดตั้งและ trace เส้นทา�
 
 เริ่ม FA-01: เพิ่ม diagnostics ของ storage error อย่างจำกัด, เก็บ repro ของกรณี 503, ตรวจว่าผลก่อนหน้าอยู่ครบและเขียนต่อหลัง recovery ได้ แล้วทำ FA-02 ให้การทดสอบ release ใช้โค้ด revision เดียวกันบน Windows/Linux เมื่อฐานนี้ผ่านจึงทำ package/doctor ใน FA-03
 
+ความคืบหน้าวันที่ 1 ตุลาคม: ส่งมอบ local diagnostics ของ FA-01 แล้วใน `5908428`; Windows/Linux main 56/56 และ source/browser gates ผ่านบน source digest เดียวกัน แต่ intermittent หลังคืนไฟล์เดิมยังไม่ทำซ้ำ จึงยังเปิด investigation ไว้ เริ่ม FA-02 เพิ่ม [CI matrix](docs/ci.md) สำหรับตรวจต่อเนื่อง ไม่ถือว่าตั้ง workflow แล้วผ่าน hosted gates หรือใช้งานจริงสมบูรณ์ ผู้ใช้ให้เดินทุกงานที่จำเป็นต่อจนถึงเป้าหมาย ระยะในแผนเป็น milestone ไม่ใช่จุดหยุดงาน
+
 ## แหล่งอ้างอิงและข้อจำกัดทางเทคนิค
 
 - [OpenTelemetry Node.js](https://opentelemetry.io/docs/languages/js/getting-started/nodejs/): instrumentation ต้องเริ่มก่อน app code การรองรับอัตโนมัติขึ้นกับไลบรารีที่ instrument ได้; ไม่ยืนยัน business functions ทุกตัว แผน FA-05 เป็นการออกแบบต่อยอดที่ยังต้องทดสอบ

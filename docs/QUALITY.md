@@ -320,3 +320,11 @@
 - ผลนี้ยังไม่ใช่ repro ของ intermittent หลังคืนไฟล์; ต้องตรวจ default parallel integration และเก็บ cause หากเกิดอีกครั้ง ก่อนปิดประเด็นเดิม
 - Default Windows parallel regression ผ่าน 56/56 (`2026-09-30T20-06-43-000Z`), failed/skipped 0; ไม่พบ recovery 503 หลังคืนไฟล์ในรอบนี้ จึงส่งมอบ diagnostics แต่ยังเปิด investigation ของอาการเดิมไว้ ไม่เพิ่ม retries เพื่อกลบปัญหา
 - ขั้นตอน Linux QA: Python ทั้งระบบ/bundled ไม่มี paramiko, ใช้ OpenSSH ที่มีและ host key เดิม; sandbox ปฏิเสธ network ก่อนต่อพอร์ต จึงใช้ escalation ที่อนุญาตแล้ว ต่อ VM สำเร็จ ระบบเป็น Linux และไม่มี Node ใน PATH ปกติ (ใช้ portable runtime เดิมใน QA)
+- Linux จาก clean bundle commit `5908428`: main 56/56, isolated source 1/1, Chromium inspector/restart 1/1; source digest ตรง Windows main/source/Edge browser ทุกชุด ตรวจ archive checksum และภาพแล้ว ไม่มี writer lock ค้าง รายละเอียดใน TEST-RUNS; นี่เป็นหลักฐานบนเครื่อง/VM จริงของ fixtures ยังไม่ใช่ real-app/user trial
+
+## รอบ 30 — CI compatibility และการพัฒนาต่อเนื่อง
+
+- เกณฑ์: hosted Windows/Linux รัน main, isolated source และ browser journey ตามลำดับบน source เดียวกัน เก็บรายงานแม้ failure, pin QA dependencies และ action SHA; ยังไม่ประกาศรองรับ Node รุ่นใหม่จนมีผลจริง
+- เพิ่ม workflow `quality.yml` matrix Node 22.23.3/24.21.0 บน windows-2025/ubuntu-24.04 จากรุ่น LTS ใน official Node index; Playwright 1.63.0 แยก tools/qa พร้อม lockfile ไม่เพิ่ม runtime dependency ของ app; permissions contents:read, checkout ไม่เก็บ credentials
+- npm package-lock-only และ npm ci ของ QA tools ผ่าน; Node bundled ไม่มี module yaml ในพาธที่ลอง จึงไม่อ้างว่าคำสั่งนั้นตรวจ YAML สำเร็จ
+- ผู้ใช้ให้พัฒนาต่อจนใช้งานจริงและ push GitHub; การตั้ง heartbeat รายชั่วโมงถูก automatic approval review ปฏิเสธ เพราะยังไม่มี authorization ตารางเวลาโดยตรงและมี repeated repository side effects ส่งคำถามอนุญาตตารางเวลาแล้ว ยังไม่มี automation ถูกสร้าง ไม่ใช้วิธีอื่นเลี่ยงการปฏิเสธ งานที่อนุญาตในรอบปัจจุบันทำต่อได้

@@ -704,3 +704,38 @@
 - Python bundled ก็ไม่มี paramiko; จะใช้ OpenSSH ที่มีอยู่และตรวจ host key จาก reports/ssh/known_hosts แทน ไม่ติดตั้ง dependency เพิ่ม
 - OpenSSH ใน sandbox ตอบ Permission denied ก่อนเชื่อมพอร์ต 22; ยังไม่ใช่ผลทดสอบหรือปัญหาของ VM ขอ network escalation ตามการอนุญาต SSH เดิมของผู้ใช้
 - หลัง escalation SSH ตรวจ host key เดิมผ่านและแสดง FLOWATLAS_SSH_READY/Linux; `command -v node` ไม่พบใน PATH จึง exit 1 ใช้ Node portable ที่ติดตั้งไว้ใน QA แทน ไม่มี credential บันทึกลงโครงการ
+
+## 2026-09-30T20-12-22-162Z
+
+- จุดประสงค์: Windows clean source 5908428 isolated source
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: 59084282a98123da43dee5785987056de9d5b082; dirty: false
+- หลักฐาน: `reports/tests/2026-09-30T20-12-22-162Z.tap` และ `.json`
+
+## 2026-09-30T20-13-59-617Z
+
+- จุดประสงค์: Windows source 5908428 Edge independent browser journey
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: 59084282a98123da43dee5785987056de9d5b082; dirty: true
+- หลักฐาน: `reports/tests/2026-09-30T20-13-59-617Z.tap` และ `.json`
+
+## 2026-10-01 — ตรวจและนำเข้าหลักฐาน Linux revision เดียวกัน
+
+- ส่ง Git bundle ของ 59084282a98123da43dee5785987056de9d5b082 ผ่าน SSH host key เดิม; SHA-256 bundle b097eb0cc54eba1ff4738a2c5f19678a38d18f2065844299712d74aac222a675 ตรง VM แล้ว clone ลง QA ใหม่ ไม่มีการเขียนทับ checkout เก่า
+- Linux main 56/56 (`2026-09-30T20-12-18-506Z`), isolated source 1/1 (`2026-09-30T20-12-27-693Z`), Chromium inspector 1/1 (`2026-09-30T20-12-27-995Z`), failed/skipped 0 ทุกชุด; ไม่พบ writer lock หลังจบ
+- Archive กลับเข้า host SHA-256 45d2842e565a772bd2fdda3fb7bb0aea3425a2862419bd07a0eca64918e004f6 ตรง VM; ตรวจ entry อยู่ใน reports/tests หรือ reports/vm ไม่มี path escape และไม่มีไฟล์ปลายทางเดิม ก่อน extract
+- ตรวจ runner source digest ของทั้งสาม Linux runs ตรง Windows full 2026-09-30T20-06-43-000Z; VM main dirty=false ส่วนชุดหลัง dirty=true เพราะ runner เพิ่ม TEST-RUNS แต่ source digest เดิม
+- ตรวจภาพ inspector-graph/inspector-restart ด้วยตาแล้ว อ่าน graph/evidence/history ได้; automated result มี 3 actions, restart history อยู่ครบและ browser pageerror 0
+- Windows source 1/1 (`2026-09-30T20-12-22-162Z`) และ Edge browser 1/1 (`2026-09-30T20-13-59-617Z`) ผ่านแยกชุด บน source เดียวกัน; ยังไม่ใช่ผล CI hosted หรือการทดลองกับผู้ใช้จริง
+
+## 2026-10-01 — ตรวจ QA dependencies และข้อจำกัด automation
+
+- `npm install --prefix tools/qa --package-lock-only --ignore-scripts --no-audit --no-fund` ผ่าน แล้ว `npm ci` ผ่าน (2 packages) สำหรับ Playwright 1.63.0; ไม่แก้ dependencies ของ app
+- อ่าน official GitHub action repositories และตรวจ tags ด้วย git ls-remote เพื่อ pin SHA ใน workflow; Node LTS index ระบุ 22.23.3/24.21.0 เป็นรุ่นล่าสุดของแต่ละสาย ณตรวจ
+- automation_update สำหรับ heartbeat รายชั่วโมงถูก automatic approval review ปฏิเสธ: ตารางเวลาที่ทำ side effects ซ้ำยังไม่ได้รับคำอนุญาตชัดเจน ยังไม่สร้างงาน ส่งคำถามอนุญาตแล้วและทำงานปัจจุบันต่อ
+
+## 2026-10-01 — ตรวจเครื่องมืออ่าน CI configuration
+
+- Node bundled ไม่มี module yaml ที่พาธที่ลอง (`MODULE_NOT_FOUND`); ยังไม่ได้ parse workflow ด้วยคำสั่งนี้ จะตรวจ YAML จาก runtime ที่มีจริงหรือ hosted Actions validation
