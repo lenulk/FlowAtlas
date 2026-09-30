@@ -3,7 +3,7 @@ export { captureProjectVersion } from './project-sources.mjs';
 
 // Explicit instrumentation for Node apps. Does not patch global fetch or capture bodies.
 export function createFlowAtlasClient({ collectorUrl = 'http://127.0.0.1:4173', projectId, codeDigest,
-  service = projectId, timeoutMs = 500 } = {}) {
+  service = projectId, timeoutMs = 500, sessionToken = process.env.FLOWATLAS_SESSION_TOKEN ?? null } = {}) {
   const collector = new URL(collectorUrl);
   if (collector.protocol !== 'http:' || !['127.0.0.1', 'localhost', '[::1]'].includes(collector.hostname)
     || collector.username || collector.password || collector.pathname !== '/' || collector.search || collector.hash) {
@@ -12,7 +12,8 @@ export function createFlowAtlasClient({ collectorUrl = 'http://127.0.0.1:4173', 
   if (typeof projectId !== 'string' || !/^[a-z][a-z0-9_-]{0,63}$/.test(projectId)
     || typeof codeDigest !== 'string' || !/^[a-f0-9]{64}$/.test(codeDigest)
     || typeof service !== 'string' || !service.trim() || service.length > 200
-    || !Number.isInteger(timeoutMs) || timeoutMs < 1 || timeoutMs > 5000) throw new Error('Invalid FlowAtlas adapter config');
+    || !Number.isInteger(timeoutMs) || timeoutMs < 1 || timeoutMs > 5000
+    || (sessionToken !== null && (typeof sessionToken !== 'string' || !/^[A-Za-z0-9_-]{43}$/.test(sessionToken)))) throw new Error('Invalid FlowAtlas adapter config');
   const base = collector.origin;
 
   return { async start({ id = randomUUID(), name, clientTime = null } = {}) {
@@ -30,7 +31,7 @@ export function createFlowAtlasClient({ collectorUrl = 'http://127.0.0.1:4173', 
         if (!complete) return;
         try {
           const response = await fetch(`${base}/flowatlas/ingest`, { method: 'POST',
-            headers: { 'content-type': 'application/json' },
+            headers: { 'content-type': 'application/json', ...(sessionToken === null ? {} : { authorization: `Bearer ${sessionToken}` }) },
             body: JSON.stringify({ ...event, projectId, actionId: id }),
             signal: AbortSignal.timeout(timeoutMs), redirect: 'error' });
           await response.arrayBuffer();

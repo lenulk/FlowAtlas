@@ -2,6 +2,8 @@
 
 เรียกผ่าน CLI ได้แล้ว: `node scripts/cli.mjs --help`, `doctor`, `inspect` และ `register` ดู [วิธีติดตั้ง/แพ็กเกจ QA](docs/install.md), [แผนไปถึงการใช้งานจริง](PLAN.md) และ [CI](docs/ci.md) การผ่าน doctor ยืนยัน preflight ตามรายการที่ตรวจ ยังต้องตรวจ running integration
 
+`inspect` และ standalone collector ใช้ [session access](docs/session-access.md): ใส่ pairing code จาก interactive terminal ใน viewer ก่อนอ่านประวัติ/กราฟ/source การรัน collector กับ target แยกกันต้องใช้ environment credential เดียวกัน; ไม่ใส่รหัสใน URL หรือไฟล์
+
 FlowAtlas เชื่อมการกระทำหนึ่งครั้งของผู้ใช้บนเว็บเข้ากับคำขอ API เส้นทางการรัน โค้ดที่เกี่ยวข้อง และบริการภายนอก แล้วแสดงเป็นแผนที่และคำอธิบายที่ตรวจสอบหลักฐานย้อนหลังได้ ข้อมูลชุดเดียวกันต้องอ่านได้ด้วยโปรแกรมเพื่อให้ AI coding agent สอบถามต่อได้
 
 เป้าหมายคือเครื่องมือที่เรียกใช้เมื่ออยากตรวจการทำงานของแอป ปัจจุบันมีคำสั่งเดียวสำหรับแอป Node.js ที่ลงทะเบียนและติดตั้งตัวเชื่อมแล้ว; เปิด URL ของแอป กด action และเปิด FlowAtlas จากลิงก์ที่แอปแสดง เครื่องมือยังไม่สามารถเห็นฟังก์ชันภายในของแอปใด ๆ โดยไม่ติดตั้งตัวเชื่อม

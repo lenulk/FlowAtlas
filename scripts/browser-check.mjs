@@ -82,6 +82,7 @@ for (const [name, status, outcome, symbol] of [
     const link = details.locator('a'); assert.match(await link.innerText(), new RegExp(symbol));
     const popupEvent = context.waitForEvent('page'); await link.click(); const source = await popupEvent;
     await source.waitForLoadState();
+    await source.waitForFunction((name) => document.body.textContent.includes(`async function ${name}(`), symbol);
     assert.match(await source.locator('body').innerText(), new RegExp(`async function ${symbol}\\(`));
     await source.close();
     await screenshot(viewer, name);

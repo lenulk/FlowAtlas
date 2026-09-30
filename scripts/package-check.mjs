@@ -2,8 +2,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { spawn } from 'node:child_process';
-import { randomUUID } from 'node:crypto';
-import { existsSync, realpathSync } from 'node:fs';
+import { randomUUID, randomBytes } from 'node:crypto';
+import { existsSync, realpathSync, readFileSync } from 'node:fs';
 import { dirname, join, relative, isAbsolute } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
@@ -18,10 +18,13 @@ test('installed package CLI records three actions, preserves history and closes 
   const { getCodeVersion } = await import(pathToFileURL(join(installed, 'src', 'flowatlas.mjs')));
   assert.equal(getCodeVersion(installed).commit, null, 'Package must not inherit parent Git identity');
   let child;
+  let credential;
+  const read = (url) => fetch(url, { headers: { authorization: `Bearer ${credential}` } });
   const launch = async () => {
+    credential = randomBytes(32).toString('base64url');
     child = spawn(process.execPath, [join(installed, 'scripts', 'cli.mjs'), '--workspace', workspace, 'inspect'], {
       cwd: installed, stdio: ['pipe', 'pipe', 'pipe'], env: { ...process.env,
-        FLOWATLAS_COLLECTOR_PORT: '0', FLOWATLAS_INVENTORY_PORT: '0' },
+        FLOWATLAS_SESSION_TOKEN: credential, FLOWATLAS_COLLECTOR_PORT: '0', FLOWATLAS_INVENTORY_PORT: '0' },
     });
     let output = '';
     child.stdout.on('data', (chunk) => { output += chunk; });
@@ -51,10 +54,11 @@ test('installed package CLI records three actions, preserves history and closes 
   const graphs = [];
   try {
     const first = await launch();
-    const previous = await (await fetch(`${first.collector}/flowatlas/actions`)).json();
+    assert.equal((await fetch(`${first.collector}/flowatlas/actions`)).status, 401);
+    const previous = await (await read(`${first.collector}/flowatlas/actions`)).json();
     assert.ok(previous.length <= 3, 'Use a fresh fixture workspace or one prior package-check run');
     const previousGraphs = await Promise.all(previous.map(async ({ id }) =>
-      (await fetch(`${first.collector}/flowatlas/actions/${id}`)).json()));
+      (await read(`${first.collector}/flowatlas/actions/${id}`)).json()));
     for (const [name, route, method, status] of [
       ['view-message', '/api/message', 'GET', 200], ['send-message', '/api/send', 'POST', 200],
       ['fail-message', '/api/fail', 'POST', 503],
@@ -62,21 +66,24 @@ test('installed package CLI records three actions, preserves history and closes 
       const id = randomUUID();
       assert.equal((await post(first.app, '/action-start', { id, name })).status, 201);
       assert.equal((await fetch(`${first.app}${route}`, { method, headers: { 'x-flowatlas-action-id': id } })).status, status);
-      const graph = await (await fetch(`${first.collector}/flowatlas/actions/${id}`)).json();
+      const graph = await (await read(`${first.collector}/flowatlas/actions/${id}`)).json();
       assert.equal(graph.outcome, status === 200 ? 'success' : 'error');
       assert.equal(graph.codeVersion.commit, null);
       assert.deepEqual(graph.edges.map((edge) => edge.status), ['observed', 'observed', 'observed', 'unknown']);
-      const source = await fetch(`${first.collector}/flowatlas/source?actionId=${id}&file=server.mjs&sha256=${graph.codeVersion.files['server.mjs']}`);
+      const source = await read(`${first.collector}/flowatlas/source?actionId=${id}&file=server.mjs&sha256=${graph.codeVersion.files['server.mjs']}`);
       assert.equal(source.status, 200);
       assert.match(await source.text(), /async function viewMessage/);
       graphs.push(graph);
     }
     await stop();
+    assert.equal(readFileSync(join(workspace, 'data/actions/state.json'), 'utf8').includes(credential), false);
+    const oldCredential = credential;
     await assert.rejects(fetch(first.app)); await assert.rejects(fetch(first.collector));
     assert.equal(existsSync(join(workspace, 'data', 'actions', '.writer.lock')), false);
     const restarted = await launch();
-    assert.equal((await (await fetch(`${restarted.collector}/flowatlas/actions`)).json()).length, previous.length + 3);
-    for (const graph of [...previousGraphs, ...graphs]) assert.deepEqual(await (await fetch(`${restarted.collector}/flowatlas/actions/${graph.id}`)).json(), graph);
+    assert.equal((await fetch(`${restarted.collector}/flowatlas/actions`, { headers: { authorization: `Bearer ${oldCredential}` } })).status, 401);
+    assert.equal((await (await read(`${restarted.collector}/flowatlas/actions`)).json()).length, previous.length + 3);
+    for (const graph of [...previousGraphs, ...graphs]) assert.deepEqual(await (await read(`${restarted.collector}/flowatlas/actions/${graph.id}`)).json(), graph);
     await stop();
     assert.equal(existsSync(join(workspace, 'data', 'actions', '.writer.lock')), false);
     if (workspace !== installed) {

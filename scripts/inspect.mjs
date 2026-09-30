@@ -7,6 +7,7 @@ import { realpathSync, lstatSync } from 'node:fs';
 import { startServers } from '../src/server.mjs';
 import { readProjectConfig } from '../src/project-sources.mjs';
 import { resolveWorkspace } from '../src/workspace.mjs';
+import { sessionToken, showPairing } from '../src/session-access.mjs';
 
 const root = resolveWorkspace(dirname(dirname(fileURLToPath(import.meta.url))));
 const usage = 'Usage: node scripts/inspect.mjs [--project ID] [--entry registered-file] [--config local-path] [--data-dir local-path] [--app-url local-origin]';
@@ -87,8 +88,9 @@ async function runInspector(args = process.argv.slice(2)) {
   if (!inside(projectRoot, entryPath) || lstatSync(entryPath).isSymbolicLink()
     || !lstatSync(entryPath).isFile() || !/\.(mjs|cjs|js)$/.test(entry)) throw new Error('Entry must be a Node source file inside the registered project');
   const dataDir = flags['--data-dir'] ?? 'data/actions';
+  const credential = sessionToken(process.env.FLOWATLAS_SESSION_TOKEN);
   const servers = await startServers({ port: Number(process.env.FLOWATLAS_COLLECTOR_PORT ?? 4173),
-    inventoryPort: Number(process.env.FLOWATLAS_INVENTORY_PORT ?? 4174), dataDir, projects: config, workspace: root });
+    inventoryPort: Number(process.env.FLOWATLAS_INVENTORY_PORT ?? 4174), dataDir, projects: config, workspace: root, sessionToken: credential });
   const collectorUrl = `http://127.0.0.1:${servers.port}`;
   let target, input;
   let stopping;
@@ -102,7 +104,7 @@ async function runInspector(args = process.argv.slice(2)) {
   process.once('SIGTERM', onSignal);
   try {
     target = spawn(process.execPath, [entryPath], { cwd: projectRoot,
-      env: { ...process.env, FLOWATLAS_URL: collectorUrl, FLOWATLAS_PROJECT_ID: project.id,
+      env: { ...process.env, FLOWATLAS_URL: collectorUrl, FLOWATLAS_PROJECT_ID: project.id, FLOWATLAS_SESSION_TOKEN: credential,
         PORT: process.env.FLOWATLAS_APP_PORT ?? '0', EXTERNAL_PORT: process.env.FLOWATLAS_EXTERNAL_PORT ?? '0' },
       stdio: ['pipe', 'pipe', 'pipe'] });
     const targetExited = once(target, 'exit');
@@ -111,6 +113,7 @@ async function runInspector(args = process.argv.slice(2)) {
     if (target.exitCode !== null || target.signalCode !== null) throw new Error('App exited during startup');
     target.stdout.pipe(process.stdout);
     console.log(`FlowAtlas: ${collectorUrl}`);
+    showPairing(credential);
     console.log(`App: ${readyUrl}`);
     console.log(`Project: ${project.id}; history: ${dataDir}`);
     console.log('Click an action in the app, then open its FlowAtlas link. Type stop to close both servers.');

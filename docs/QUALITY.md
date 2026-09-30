@@ -370,3 +370,18 @@
 - Regression ก่อนแก้ผ่าน 3/4 (`2026-09-30T21-14-11-853Z`): target exit 9 แต่ CLI คืน 0 เพราะ exit branch เรียก cleanup โดยไม่รายงานความล้มเหลว
 - แยก unexpected target exit ออกจาก exit ที่เกิดระหว่าง stop; ให้ error ผ่าน cleanup และ CLI failure path เดิม ไม่ restart แอปหรือ retry business requests
 - หลังแก้ Windows focused ผ่าน 12/12 (2026-09-30T21-14-38-013Z), failed/skipped 0; รวม CLI crash exit 9→1, startup error, explicit stop, registration action และ workspace persistence ไม่ทดสอบ auto-restart ซึ่งยังไม่มี
+
+## รอบ 37 — session access ก่อน real-app pilot
+
+- Regression ก่อนแก้ 0/3 (2026-09-30T21-17-05-538Z): bearer/Origin/Host ไม่มี enforcement อ่าน history และส่ง requests ได้โดยไม่มีสิทธิ์
+- เพิ่ม allowlisted loopback Host/port, exact same-origin checks และ timing-safe bearer check ก่อน parse/write; CLI/server สร้าง credential ใหม่ใน memory ส่งให้ target ผ่าน environment; redirected output ซ่อนรหัส ไม่มี cookie/URL token
+- Viewer pairing เก็บ credential ใน memory เท่านั้น; source/JSON เปิดผ่าน authorized fetch แล้วแสดงเป็น text ใน popup; reload/new tab ต้อง pair ใหม่ adapter ส่งรหัสเฉพาะ collector ไม่เพิ่มใน outbound business headers
+- Server focused 3/3 (2026-09-30T21-18-15-656Z) ผ่าน; ยังรอ browser/package/end-to-end และ privacy canary checks ไม่อ้างว่า FA-06 ครบทั้งหมด
+- Windows secure CLI/adapter focused ผ่าน 15/15 (2026-09-30T21-21-30-891Z); browser attempt 2026-09-30T21-22-25-632Z ไม่ผ่าน 0/1 ก่อนเริ่มแอป เพราะ local Playwright Chromium binary ไม่มี เพิ่มช่องเลือก installed browser channel สำหรับ QA; CI ยังใช้ pinned Chromium ตามเดิม ไม่กลบ failure เป็น skip
+- Patch เอกสารครั้งแรกใช้ exact line ที่ไม่มี backticks หลัง PowerShell string interpolation จึงถูกปฏิเสธ; ตรวจไฟล์จริงแล้วแก้เฉพาะ QA browser option ไม่มีการแก้ source จาก patch ที่ไม่ผ่าน
+- Package attempt ไม่ได้เริ่ม: npm shim ใน PATH ชี้ runtime ที่หาย ไม่ใช่แอป regression; ต้องใช้ npm ของ Node installation จริงและเก็บผลใหม่ ไม่แก้ global npm configuration
+- Edge secure inspector 1/1 (2026-09-30T21-23-17-401Z) และ combined browser journeys 2/2 (2026-09-30T21-24-37-309Z) ผ่าน; pairing/reject wrong code/source/graph/logout/reload/restart และ independent fixture เดิม; รหัสไม่อยู่ใน URL/cookies/localStorage/sessionStorage ช่อง password ว่างก่อน screenshot; inspected restart image graph/history อ่านได้ ไม่มี secret
+- Main regression 69/69 (2026-09-30T21-25-11-226Z) ผ่านก่อนเพิ่ม fixture bearer integration และ frame header; focused integration หลังเปลี่ยน fixture 12/12 (2026-09-30T21-27-52-886Z) รวม standalone CLI default auth, explicit bearer fixture และ outage business behavior ผ่าน ไม่อ้างว่าชุด 69 ใช้ source digest สุดท้าย
+- Offline package 1/1 (2026-09-30T21-31-28-841Z) ผ่าน: capture 3 actions/source/restart, token ไม่เข้า state และ credential เก่าอ่าน session ใหม่ไม่ได้; isolated source 1/1 (2026-09-30T21-32-07-228Z) ผ่าน ยังรอ hosted CI สำหรับ commit ใหม่
+- Review หุ้ม Playwright operations ที่รับ credential เพื่อไม่ให้ error call-log แสดงรหัส; รหัสอยู่ใน process memory/environment และถือว่า target app เชื่อถือได้ ไม่ป้องกัน same-user malware หรือพิสูจน์การคลิกของมนุษย์ ไม่มี per-project roles/export policy/OTel privacy จึงยังไม่ปิด FA-06 ทั้งหมด
+- พบ hypothesis ใน code inspection: URL parsing ของ HTTP handler อยู่ก่อน try/catch อาจทำให้ malformed request target ล้ม process; ยังไม่มี repro เก็บเป็นงาน input-boundary รอบถัดไปก่อน real-app pilot

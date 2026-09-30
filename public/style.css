@@ -527,3 +527,8 @@ h1 {
   }
   .history-heading { flex-direction:column }
 }
+body.session-pending .history, body.session-pending .workspace, body.session-pending .footnote { display: none; }
+#session-panel { padding: 24px; margin-bottom: 24px; }
+#session-form { display: flex; gap: 12px; align-items: end; flex-wrap: wrap; }
+#session-form label { display: grid; gap: 8px; }
+#session-code { width: min(360px, 75vw); padding: 10px; font: inherit; }

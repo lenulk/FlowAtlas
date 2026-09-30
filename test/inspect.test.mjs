@@ -5,10 +5,11 @@ import { once } from 'node:events';
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync, existsSync } from 'node:fs';
 import { dirname, join, relative, isAbsolute } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { randomUUID } from 'node:crypto';
+import { randomUUID, randomBytes } from 'node:crypto';
 import { createTargetApp, targetFiles } from '../scripts/create-target-app.mjs';
 
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
+const credential = randomBytes(32).toString('base64url');
 test('one command starts a registered app and collector, records an action, then closes cleanly', async () => {
   const parent = join(root, 'reports', 'storage'); mkdirSync(parent, { recursive: true });
   const directory = mkdtempSync(join(parent, 'inspect-'));
@@ -17,7 +18,7 @@ test('one command starts a registered app and collector, records an action, then
   writeFileSync(config, JSON.stringify({ projects: [{ id: 'message-app', root: relative(root, target), files: targetFiles }] }));
   const child = spawn(process.execPath, ['scripts/inspect.mjs', '--project', 'message-app',
     '--config', relative(root, config), '--data-dir', relative(root, join(directory, 'state'))], {
-    cwd: root, env: { ...process.env, FLOWATLAS_COLLECTOR_PORT: '0', FLOWATLAS_INVENTORY_PORT: '0' },
+    cwd: root, env: { ...process.env, FLOWATLAS_SESSION_TOKEN: credential, FLOWATLAS_COLLECTOR_PORT: '0', FLOWATLAS_INVENTORY_PORT: '0' },
     stdio: ['pipe', 'pipe', 'pipe'] });
   let output = '';
   child.stdout.on('data', (data) => { output += data; });
@@ -44,7 +45,9 @@ test('one command starts a registered app and collector, records an action, then
     const result = await response.json();
     assert.equal(result.complete, true);
     assert.equal(result.viewerUrl, `${collector}/?actionId=${id}`);
-    const graph = await (await fetch(`${collector}/flowatlas/actions/${id}`)).json();
+    assert.equal(output.includes(credential), false, 'Redirected CLI output must not contain the credential');
+    assert.equal((await fetch(`${collector}/flowatlas/actions/${id}`)).status, 401);
+    const graph = await (await fetch(`${collector}/flowatlas/actions/${id}`, { headers: { authorization: `Bearer ${credential}` } })).json();
     assert.equal(graph.outcome, 'success');
     assert.equal(graph.codeVersion.projectId, 'message-app');
     assert.equal(graph.nodes.length, 5);

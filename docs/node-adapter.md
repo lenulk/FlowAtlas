@@ -18,7 +18,7 @@ node scripts/create-target-app.mjs
 node scripts/inspect.mjs --project message-app
 ```
 
-คำสั่งแสดง URL ทั้งสองและรอ `stop` เพื่อปิดพร้อมกัน ถ้าต้องการแยกการรันเอง ให้เปิดสองเทอร์มินัลในโฟลเดอร์ FlowAtlas:
+คำสั่งแสดง URL ทั้งสองและ pairing code ใน interactive terminal ใส่รหัสใน viewer ก่อนอ่านกราฟ/source และรอ `stop` เพื่อปิดพร้อมกัน ถ้าต้องการแยกการรันเอง ให้กำหนด `FLOWATLAS_SESSION_TOKEN` ค่าเดียวกันทั้งสองเทอร์มินัลตาม [session access](session-access.md) แล้วเปิดสองเทอร์มินัลในโฟลเดอร์ FlowAtlas:
 
 ```powershell
 # เทอร์มินัลแรก: collector + แผนที่
@@ -93,7 +93,7 @@ async function viewMessage(browserActionId) {
 - Adapter ไม่ตาม HTTP redirects เพื่อไม่ให้ correlation ไปยังปลายทางที่ไม่ได้กำหนด; แอปที่ต้องตาม redirects ต้องกำหนด integration เพิ่ม ไม่ถือว่าทดสอบแล้ว
 - action-start ของ registered project ต้องส่ง codeDigest ตรง snapshot ของ collector (409 เมื่อไม่ตรง) event ต่อมาต้องมี projectId เดียวกัน; restart ทั้ง collector/target หลังเปลี่ยนไฟล์ที่ลงทะเบียน
 - ใช้ project ID เดิมกับแอปเดิมเสมอ กราฟเก่ายังคง snapshot เดิม ถ้าถอน registration จะอ่านกราฟ JSON เก่าได้ แต่ source ไม่พร้อมใช้งาน และเติม event ไม่ได้ ไม่มี source archive ทุกเวอร์ชัน
-- ไม่มี authentication, symbol verification จาก runtime หรือ OpenTelemetry spans; เหตุการณ์ยังเชื่อ sender บนเครื่อง ใช้กับแอปตัวอย่างในเครื่องที่เชื่อถือได้
+- CLI ใช้ session bearer และ origin/host checks ตาม [session access](session-access.md); adapter อ่านรหัสจาก environment และส่งเฉพาะ collector ไม่ส่งไป business downstream ยังไม่มี symbol verification จาก runtime หรือ OpenTelemetry spans; ผู้ถือรหัสยังเป็นผู้รายงานเหตุการณ์ ต้องใช้กับแอปที่เจ้าของเครื่องเชื่อถือ
 - In-app browser ที่ใช้ QA ปฏิเสธเปิด source link โดยตรง; Linux Chromium headless เปิด source popup ของทั้งสาม handler ได้ และ source ที่เปลี่ยนหลัง capture ตอบ 409 ตามจริง ยังไม่ยืนยันสาเหตุที่ IAB block
 
 รายละเอียด persistence/recovery อยู่ใน [storage.md](storage.md) และผลทดสอบอยู่ใน [QUALITY.md](QUALITY.md)

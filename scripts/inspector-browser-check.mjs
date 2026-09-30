@@ -3,7 +3,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createRequire } from 'node:module';
 import { spawn } from 'node:child_process';
-import { randomUUID } from 'node:crypto';
+import { randomUUID, randomBytes } from 'node:crypto';
 import { mkdirSync, writeFileSync, existsSync } from 'node:fs';
 import { dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -19,11 +19,13 @@ const config = join(work, 'config.json');
 const dataDir = join(work, 'state');
 writeFileSync(config, JSON.stringify({ projects: [{ id: 'message-app', root: relative(root, target), files: targetFiles }] }, null, 2));
 let current;
+let credential;
 async function launch() {
+  credential = randomBytes(32).toString('base64url');
   const child = spawn(process.execPath, ['scripts/inspect.mjs', '--project', 'message-app',
     '--config', relative(root, config), '--data-dir', relative(root, dataDir)], {
     cwd: root, stdio: ['pipe', 'pipe', 'pipe'],
-    env: { ...process.env, FLOWATLAS_COLLECTOR_PORT: '0', FLOWATLAS_INVENTORY_PORT: '0' },
+    env: { ...process.env, FLOWATLAS_SESSION_TOKEN: credential, FLOWATLAS_COLLECTOR_PORT: '0', FLOWATLAS_INVENTORY_PORT: '0' },
   });
   let output = '';
   child.stdout.on('data', (chunk) => { output += chunk; });
@@ -64,7 +66,7 @@ test('on-demand command supports a complete browser journey and persisted replay
   assert.ok(process.env.FLOWATLAS_PLAYWRIGHT_PACKAGE, 'Set FLOWATLAS_PLAYWRIGHT_PACKAGE to Playwright package.json');
   const require = createRequire(resolve(process.env.FLOWATLAS_PLAYWRIGHT_PACKAGE));
   const { chromium } = require('playwright');
-  const browser = await chromium.launch({ headless: true });
+  const browser = await chromium.launch({ headless: true, channel: process.env.FLOWATLAS_BROWSER_CHANNEL || undefined });
   const browserErrors = [], actions = [];
   const createContext = async () => {
     const context = await browser.newContext({ viewport: { width: 1365, height: 900 } });
@@ -73,6 +75,22 @@ test('on-demand command supports a complete browser journey and persisted replay
     return context;
   };
   let context = await createContext();
+  const enterPairing = async (page, value) => {
+    // Playwright fill errors can include the input; keep it out of TAP artifacts.
+    try { await page.locator('#session-code').fill(value); }
+    catch { throw new Error('Cannot enter the session pairing code'); }
+  };
+  const pair = async (page) => {
+    await page.locator('#session-panel').waitFor({ state: 'visible' });
+    assert.equal(await page.locator('#trace-content').isVisible(), false);
+    await enterPairing(page, credential);
+    await page.locator('#session-form button').click();
+    await page.locator('#session-panel').waitFor({ state: 'hidden' });
+    assert.equal(await page.locator('#session-code').inputValue(), '');
+    assert.equal((await page.evaluate(() => localStorage.length + sessionStorage.length)), 0);
+    assert.equal(page.url().includes(credential), false);
+    assert.equal((await context.cookies()).length, 0);
+  };
   try {
     console.log('Inspector: starting app and collector');
     let { app, collector } = await launch();
@@ -94,9 +112,11 @@ test('on-demand command supports a complete browser journey and persisted replay
       const viewerOpened = context.waitForEvent('page');
       await page.locator('#viewer').click();
       const viewer = await viewerOpened;
+      await pair(viewer);
       await viewer.locator('#trace-content').waitFor({ state: 'visible' });
       const id = await viewer.locator('#action-id').innerText();
-      const graphResponse = await context.request.get(`${collector}/flowatlas/actions/${id}`);
+      const graphResponse = await context.request.get(`${collector}/flowatlas/actions/${id}`, { headers: { authorization: `Bearer ${credential}` } })
+        .catch(() => { throw new Error('Authorized graph request failed'); });
       assert.equal(graphResponse.status(), 200);
       const graph = await graphResponse.json();
       assert.equal(graph.name, name); assert.equal(graph.outcome, outcome);
@@ -110,6 +130,7 @@ test('on-demand command supports a complete browser journey and persisted replay
       const sourceOpened = context.waitForEvent('page');
       await handler.locator('a').click(); const source = await sourceOpened;
       await source.waitForLoadState();
+      await source.waitForFunction((name) => document.body.textContent.includes(`async function ${name}(`), symbol);
       assert.match(await source.locator('body').innerText(), new RegExp(`async function ${symbol}\\(`));
       await source.close();
       if (name === 'fail-message') await viewer.screenshot({ path: join(evidence, 'inspector-graph.png'), fullPage: true });
@@ -127,12 +148,26 @@ test('on-demand command supports a complete browser journey and persisted replay
     context = await createContext();
     const viewer = await context.newPage();
     assert.equal((await viewer.goto(`${collector}/?actionId=${actions[0].id}`)).status(), 200);
+    await viewer.locator('#session-panel').waitFor({ state: 'visible' });
+    await enterPairing(viewer, randomBytes(32).toString('base64url'));
+    await viewer.locator('#session-form button').click();
+    await viewer.waitForFunction(() => document.querySelector('#session-message').textContent.includes('เชื่อมต่อไม่สำเร็จ'));
+    assert.equal(await viewer.locator('#trace-content').isVisible(), false);
+    await pair(viewer);
     await viewer.locator('#trace-content').waitFor({ state: 'visible' });
     assert.equal(await viewer.locator('#action-id').innerText(), actions[0].id);
     await viewer.locator('#history-status').waitFor();
     await viewer.waitForFunction(() => document.querySelectorAll('#history-list tr').length === 3);
     assert.equal(await viewer.locator('#history-list tr').count(), 3);
     await viewer.screenshot({ path: join(evidence, 'inspector-restart.png'), fullPage: true });
+    await viewer.locator('#session-lock').click();
+    await viewer.locator('#session-panel').waitFor({ state: 'visible' });
+    assert.equal(await viewer.locator('#history-list tr').count(), 0);
+    assert.equal(await viewer.locator('#map .map-node').count(), 0);
+    await pair(viewer);
+    await viewer.reload();
+    await viewer.locator('#session-panel').waitFor({ state: 'visible' });
+    assert.equal(await viewer.locator('#trace-content').isVisible(), false);
     assert.deepEqual(browserErrors, []);
     writeFileSync(join(evidence, 'result.json'), JSON.stringify({ platform: process.platform,
       browser: browser.version(), actions, restored: true, browserErrors }, null, 2) + '\n');

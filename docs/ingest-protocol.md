@@ -35,8 +35,8 @@ fixture เก็บ action IDs ในเครื่องเพื่อทำ
 
 ## ขอบเขตความเชื่อมั่น
 
-ตัวรับเชื่อเหตุการณ์จากโปรเซสในเครื่องที่ส่งมา ยังไม่มีการพิสูจน์ตัวตนหรือการตรวจสอบว่า client เป็นมนุษย์คลิกจริง `traceparent` ที่ส่งต่อได้รับการ echo กลับจากบริการจำลอง เพื่อแสดงว่าค่าถึงปลายทาง แต่บริการนั้นยังไม่มี span ภายใน ข้อมูลที่ไม่เห็นจึงคงเป็น `unknown`
+CLI ตรวจ session bearer และ Origin/Host ก่อนรับเหตุการณ์ตาม [session access](session-access.md); ยังเชื่อเนื้อหาที่ผู้ถือรหัสรายงาน ไม่ตรวจว่า client เป็นมนุษย์คลิกจริง `traceparent` ที่ส่งต่อได้รับการ echo กลับจากบริการจำลอง เพื่อแสดงว่าค่าถึงปลายทาง แต่บริการนั้นยังไม่มี span ภายใน ข้อมูลที่ไม่เห็นจึงคงเป็น `unknown`
 
-ตัวรับรู้จัก file hash ของ collector และไฟล์ที่ลงทะเบียนแบบ explicit สำหรับ project อื่นภายในโฟลเดอร์โครงการ ไม่รับ root/path registration จาก HTTP โปรโตคอลยังไม่ใช่ OTLP/OpenTelemetry ingestion และต้องเพิ่มการตรวจสิทธิ์ผู้ส่งก่อนใช้ในระบบที่ไม่เชื่อถือทุก process ในเครื่อง
+ตัวรับรู้จัก file hash ของ collector และไฟล์ที่ลงทะเบียนแบบ explicit สำหรับ project อื่นภายในโฟลเดอร์โครงการ ไม่รับ root/path registration จาก HTTP โปรโตคอลยังไม่ใช่ OTLP/OpenTelemetry ingestion และยังไม่มี role separation สำหรับระบบหลายผู้ใช้
 
-ส่งเฉพาะ metadata ที่จำเป็น ห้ามใส่ request body, token, cookie หรือข้อมูลส่วนตัวใน event ตัวรับฟังเฉพาะ `127.0.0.1` และไม่มี authentication
+ส่งเฉพาะ metadata ที่จำเป็น ห้ามใส่ request body, token, cookie หรือข้อมูลส่วนตัวใน event ตัวรับฟังเฉพาะ `127.0.0.1`; ส่ง bearer ใน header สำหรับ session ที่เปิดจาก CLI ห้ามส่ง credential ใน event/URL

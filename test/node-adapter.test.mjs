@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createServer } from 'node:http';
+import { randomBytes } from 'node:crypto';
 import { createFlowAtlasClient } from '../src/node-adapter.mjs';
 
 async function serve(t, handle) {
@@ -12,7 +13,9 @@ async function serve(t, handle) {
 
 test('adapter propagates context and reports only allowlisted metadata while returning the actual response', async (t) => {
   const events = [];
+  const token = randomBytes(32).toString('base64url');
   const collector = await serve(t, async (request, response) => {
+    assert.equal(request.headers.authorization === `Bearer ${token}`, true);
     let body = ''; for await (const chunk of request) body += chunk;
     events.push(JSON.parse(body)); response.writeHead(202); response.end('{}');
   });
@@ -21,7 +24,7 @@ test('adapter propagates context and reports only allowlisted metadata while ret
     response.writeHead(503, { 'x-received-traceparent': request.headers.traceparent });
     response.end('business body');
   });
-  const client = createFlowAtlasClient({ collectorUrl: collector.url, projectId: 'target', codeDigest: 'a'.repeat(64) });
+  const client = createFlowAtlasClient({ collectorUrl: collector.url, projectId: 'target', codeDigest: 'a'.repeat(64), sessionToken: token });
   const capture = await client.start({ name: 'send' });
   await capture.handler({ method: 'POST', path: '/api/send', symbol: 'send', file: 'server.mjs' });
   const response = await capture.fetch(`${downstream.url}/send?token=secret-query`, {
@@ -39,6 +42,7 @@ test('adapter propagates context and reports only allowlisted metadata while ret
   assert.equal(events[2].receivedTraceparent, capture.traceparent);
   assert.ok(events.every((event) => event.actionId === capture.id && event.projectId === 'target'));
   assert.doesNotMatch(JSON.stringify(events), /secret-|business body/);
+  assert.equal(JSON.stringify(events).includes(token), false);
   await assert.rejects(capture.handler({}), /finished/);
   await assert.rejects(capture.finish('success'), /finished/);
 });
@@ -79,7 +83,8 @@ test('adapter transport failures keep the original error and produce bounded fai
 
 test('adapter rejects invalid configuration and programmer inputs before sending requests', async () => {
   for (const extra of [{ collectorUrl: 'https://example.com' }, { collectorUrl: 'http://127.0.0.1/private' },
-    { projectId: '../bad' }, { projectId: true, service: 'target' }, { codeDigest: ['a'.repeat(64)] }, { codeDigest: 'bad' }, { timeoutMs: 0 }]) {
+    { projectId: '../bad' }, { projectId: true, service: 'target' }, { codeDigest: ['a'.repeat(64)] }, { codeDigest: 'bad' }, { timeoutMs: 0 },
+    { sessionToken: '' }, { sessionToken: 43 }, { sessionToken: 'x'.repeat(44) }]) {
     assert.throws(() => createFlowAtlasClient({ projectId: 'target', codeDigest: 'a'.repeat(64), ...extra }));
   }
   const client = createFlowAtlasClient({ projectId: 'target', codeDigest: 'a'.repeat(64) });

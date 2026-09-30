@@ -2,13 +2,14 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { spawn, spawnSync } from 'node:child_process';
 import { once } from 'node:events';
-import { randomUUID } from 'node:crypto';
+import { randomUUID, randomBytes } from 'node:crypto';
 import { copyFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { dirname, isAbsolute, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { registerApp } from '../scripts/register-app.mjs';
 
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
+const credential = randomBytes(32).toString('base64url');
 const parent = join(root, 'reports', 'storage');
 function workspace() { mkdirSync(parent, { recursive: true }); return mkdtempSync(join(parent, 'register-')); }
 function cleanup(directory) {
@@ -38,7 +39,7 @@ test('register command copies adapters, configures a separate app, and inspector
     }
     child = spawn(process.execPath, ['scripts/inspect.mjs', '--project', 'registered-qa',
       '--config', relative(root, config), '--data-dir', relative(root, state)], {
-      cwd: root, env: { ...process.env, FLOWATLAS_COLLECTOR_PORT: '0', FLOWATLAS_INVENTORY_PORT: '0' },
+      cwd: root, env: { ...process.env, FLOWATLAS_SESSION_TOKEN: credential, FLOWATLAS_COLLECTOR_PORT: '0', FLOWATLAS_INVENTORY_PORT: '0' },
       stdio: ['pipe', 'pipe', 'pipe'],
     });
     let output = '';
@@ -62,7 +63,7 @@ test('register command copies adapters, configures a separate app, and inspector
     assert.equal(start.status, 201);
     const response = await fetch(`${app}/api/message`, { headers: { 'x-flowatlas-action-id': id } });
     assert.equal(response.status, 200);
-    const graph = await (await fetch(`${collector}/flowatlas/actions/${id}`)).json();
+    const graph = await (await fetch(`${collector}/flowatlas/actions/${id}`, { headers: { authorization: `Bearer ${credential}` } })).json();
     assert.equal(graph.codeVersion.projectId, 'registered-qa');
     assert.equal(graph.outcome, 'success');
     assert.deepEqual(graph.edges.map((edge) => edge.status), ['observed', 'observed', 'observed', 'unknown']);

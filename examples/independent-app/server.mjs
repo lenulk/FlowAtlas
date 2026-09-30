@@ -47,12 +47,13 @@ function newTraceparent() {
   return `00-${randomBytes(16).toString('hex')}-${randomBytes(8).toString('hex')}-01`;
 }
 
-async function sendEvent(collectorUrl, event, timeoutMs) {
+async function sendEvent(collectorUrl, event, timeoutMs, sessionToken) {
   const response = await fetch(`${collectorUrl}/flowatlas/ingest`, {
     method: 'POST',
-    headers: { 'content-type': 'application/json' },
+    headers: { 'content-type': 'application/json', ...(sessionToken === null ? {} : { authorization: `Bearer ${sessionToken}` }) },
     body: JSON.stringify(event),
     signal: AbortSignal.timeout(timeoutMs),
+    redirect: 'error',
   });
   if (!response.ok) {
     const failure = await response.json().catch(() => ({}));
@@ -64,7 +65,7 @@ async function sendEvent(collectorUrl, event, timeoutMs) {
 async function reportEvent(collectorUrl, event, capture, timeoutMs) {
   if (!capture.complete) return;
   try {
-    await sendEvent(collectorUrl, event, timeoutMs);
+    await sendEvent(collectorUrl, event, timeoutMs, capture.sessionToken);
   } catch {
     // Stop this capture after the first loss: later events cannot repair an incomplete run.
     capture.complete = false;
@@ -123,8 +124,15 @@ async function failMessage(actionId, collectorUrl, messageUrl, capture, timeoutM
   return runAction(actions.get('POST /api/fail'), actionId, collectorUrl, messageUrl, capture, timeoutMs);
 }
 
-export async function startIndependentApp({ port = 4180, externalPort = 4181, collectorUrl = 'http://127.0.0.1:4173', telemetryTimeoutMs = 500 } = {}) {
+export async function startIndependentApp({ port = 4180, externalPort = 4181, collectorUrl = 'http://127.0.0.1:4173', telemetryTimeoutMs = 500,
+  sessionToken = process.env.FLOWATLAS_SESSION_TOKEN ?? null } = {}) {
   if (!Number.isInteger(telemetryTimeoutMs) || telemetryTimeoutMs <= 0) throw new Error('Invalid telemetry timeout');
+  const collector = new URL(collectorUrl);
+  if (collector.protocol !== 'http:' || !['127.0.0.1', 'localhost', '[::1]'].includes(collector.hostname)
+    || collector.username || collector.password || collector.pathname !== '/' || collector.search || collector.hash
+    || (sessionToken !== null && (typeof sessionToken !== 'string' || !/^[A-Za-z0-9_-]{43}$/.test(sessionToken)))) {
+    throw new Error('Invalid local collector config');
+  }
   const captures = new Map();
   const external = createMessageService();
   const actualExternalPort = await listen(external, externalPort);
@@ -149,7 +157,7 @@ export async function startIndependentApp({ port = 4180, externalPort = 4181, co
           return;
         }
         if (captures.has(body.id)) { sendJson(response, 409, { error: 'Action ID already exists' }); return; }
-        const capture = { name: body.name, complete: true, used: false };
+        const capture = { name: body.name, complete: true, used: false, sessionToken };
         captures.set(body.id, capture);
         if (captures.size > 100) captures.delete(captures.keys().next().value);
         await reportEvent(collectorUrl, {

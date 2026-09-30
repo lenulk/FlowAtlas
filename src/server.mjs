@@ -11,6 +11,7 @@ import { ingestEvent } from './ingest.mjs';
 import { JsonActionStore, storageErrorDiagnostic } from './action-store.mjs';
 import { ProjectSources, readProjectConfig } from './project-sources.mjs';
 import { resolveWorkspace, resolveDataDirectory } from './workspace.mjs';
+import { sessionToken as validateSessionToken, sessionAccess, showPairing } from './session-access.mjs';
 
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
 const staticFiles = new Map([
@@ -60,7 +61,7 @@ function placeOrder(inventoryUrl, actionId) {
   });
 }
 
-export async function startServers({ port = 4173, inventoryPort = 4174, dataDir = null, actionLimit = 100, projects = [], workspace,
+export async function startServers({ port = 4173, inventoryPort = 4174, dataDir = null, actionLimit = 100, projects = [], workspace, sessionToken = null,
   onStorageError = (diagnostic) => console.error(`FlowAtlas storage: ${JSON.stringify(diagnostic)}`) } = {}) {
   const reportStorageError = (error) => {
     if (error.code !== 'FLOWATLAS_STORAGE_ERROR') return;
@@ -68,6 +69,7 @@ export async function startServers({ port = 4173, inventoryPort = 4174, dataDir 
     catch { /* A diagnostic sink must not change the request result or storage cleanup. */ }
   };
   const version = getCodeVersion(root);
+  if (sessionToken !== null) validateSessionToken(sessionToken);
   const workspaceRoot = resolveWorkspace(root, workspace);
   const projectSources = new ProjectSources(workspaceRoot, projects);
   let store = null;
@@ -89,6 +91,20 @@ export async function startServers({ port = 4173, inventoryPort = 4174, dataDir 
     const url = new URL(request.url, 'http://localhost');
     let currentActionId = null;
     try {
+      response.setHeader('referrer-policy', 'no-referrer');
+      response.setHeader('x-content-type-options', 'nosniff');
+      response.setHeader('x-frame-options', 'DENY');
+      const publicPath = request.method === 'GET' && (staticFiles.has(url.pathname) || url.pathname === '/flowatlas/session');
+      const denied = sessionAccess(request, sessionToken, app.address().port, publicPath);
+      if (denied) {
+        request.resume();
+        sendJson(response, denied.status, { error: denied.error });
+        return;
+      }
+      if (request.method === 'GET' && url.pathname === '/flowatlas/session') {
+        sendJson(response, 200, { authorizationRequired: sessionToken !== null });
+        return;
+      }
       if (request.method === 'POST' && url.pathname === '/flowatlas/ingest') {
         try {
           const result = ingestEvent(atlas, await readJson(request));
@@ -299,13 +315,16 @@ export async function startServers({ port = 4173, inventoryPort = 4174, dataDir 
 }
 
 if (process.argv[1] && fileURLToPath(import.meta.url) === resolve(process.argv[1])) {
+  const credential = validateSessionToken(process.env.FLOWATLAS_SESSION_TOKEN);
   const servers = await startServers({
+    sessionToken: credential,
     port: Number(process.env.PORT ?? 4173),
     inventoryPort: Number(process.env.INVENTORY_PORT ?? 4174),
     dataDir: process.env.FLOWATLAS_MEMORY_ONLY === '1' ? null : process.env.FLOWATLAS_DATA_DIR ?? 'data/actions',
     projects: readProjectConfig(resolveWorkspace(root), process.env.FLOWATLAS_CONFIG ?? 'flowatlas.config.json'),
   });
   console.log(`FlowAtlas MVP: http://127.0.0.1:${servers.port}`);
+  showPairing(credential);
   const stop = () => servers.close().catch((error) => { console.error(error.message); process.exitCode = 1; });
   process.once('SIGINT', stop);
   process.once('SIGTERM', stop);

@@ -1,4 +1,49 @@
 const $ = (selector) => document.querySelector(selector);
+let credential = null;
+let authorized = false;
+let sessionGeneration = 0;
+function lockSession(message = '') {
+  sessionGeneration++;
+  historyRequest++;
+  credential = null; authorized = false;
+  document.body.classList.add('session-pending');
+  $('#session-panel').hidden = false;
+  $('#session-lock').hidden = true;
+  $('#session-code').value = '';
+  $('#session-message').textContent = message;
+  $('#history-list').replaceChildren(); $('#evidence').replaceChildren(); $('#map').replaceChildren();
+  $('#trace-content').hidden = true; $('#action-id').textContent = '';
+  $('#result').textContent = 'เลือกการกระทำเพื่อเริ่ม trace';
+}
+async function apiFetch(path, options = {}) {
+  const generation = sessionGeneration;
+  const url = new URL(path, location.origin);
+  if (url.origin !== location.origin || !/^\/(flowatlas|api)\//.test(url.pathname)) throw new Error('Invalid viewer request');
+  const headers = new Headers(options.headers);
+  if (credential) headers.set('authorization', `Bearer ${credential}`);
+  const response = await fetch(url, { ...options, headers, redirect: 'error' });
+  if (generation !== sessionGeneration) throw new Error('session ถูกล็อกแล้ว');
+  if (response.status === 401) {
+    lockSession('session หมดอายุหรือรหัสไม่ถูกต้อง กรุณาเชื่อมต่อใหม่');
+    throw new Error('กรุณาเชื่อมต่อ session');
+  }
+  return response;
+}
+function protectedLink(link) {
+  link.addEventListener('click', async (event) => {
+    event.preventDefault();
+    const popup = window.open('', '_blank');
+    if (!popup) return;
+    popup.opener = null;
+    const pre = popup.document.createElement('pre');
+    pre.textContent = 'กำลังอ่านข้อมูล…'; popup.document.body.replaceChildren(pre);
+    try {
+      const response = await apiFetch(link.getAttribute('href'));
+      if (!response.ok) throw new Error(`เปิดข้อมูลไม่สำเร็จ (${response.status})`);
+      pre.textContent = await response.text();
+    } catch (error) { pre.textContent = error.message; }
+  });
+}
 const svgNS = 'http://www.w3.org/2000/svg';
 const statusLabels = { observed: 'สังเกตจริง', inferred: 'อนุมาน', unknown: 'ยังไม่ทราบ' };
 const outcomeLabels = { success: 'สำเร็จ', error: 'ผิดพลาด', running: 'ยังไม่มีผลสุดท้าย' };
@@ -78,6 +123,7 @@ function renderEvidence(graph) {
       link.target = '_blank';
       link.rel = 'noopener';
       link.textContent = `เปิด ${target.source.file} · ${target.source.symbol} ↗`;
+      protectedLink(link);
       details.append(link);
     }
     item.append(details);
@@ -86,6 +132,7 @@ function renderEvidence(graph) {
 }
 
 function renderGraph(graph) {
+  if (!authorized) return;
   $('#empty').hidden = true;
   $('#trace-content').hidden = false;
   $('#trace-subtitle').textContent = `${graph.name} · ${outcomeLabels[graph.outcome]} · ${graph.nodes.length} nodes`;
@@ -96,23 +143,25 @@ function renderGraph(graph) {
 }
 
 async function performAction(button) {
+  const generation = sessionGeneration;
   const id = crypto.randomUUID();
   const action = button.dataset.action;
   document.querySelectorAll('button[data-action]').forEach((element) => { element.disabled = true; });
   $('#result').textContent = `กำลังรัน ${action}…`;
   try {
-    const started = await fetch('/flowatlas/action-start', {
+    const started = await apiFetch('/flowatlas/action-start', {
       method: 'POST', headers: { 'content-type': 'application/json' },
       body: JSON.stringify({ id, name: action, clientTime: new Date().toISOString() }),
     });
     if (!started.ok) throw new Error(`บันทึก action ไม่สำเร็จ (${started.status})`);
-    const response = await fetch(button.dataset.path, {
+    const response = await apiFetch(button.dataset.path, {
       method: button.dataset.method,
       headers: { 'x-flowatlas-action-id': id },
     });
     const result = await response.json();
+    if (generation !== sessionGeneration) return;
     $('#result').textContent = response.ok ? JSON.stringify(result) : `HTTP ${response.status}: ${JSON.stringify(result)}`;
-    const traceResponse = await fetch(`/flowatlas/actions/${encodeURIComponent(id)}`);
+    const traceResponse = await apiFetch(`/flowatlas/actions/${encodeURIComponent(id)}`);
     if (!traceResponse.ok) throw new Error('ไม่พบ trace');
     renderGraph(await traceResponse.json());
   } catch (error) {
@@ -125,12 +174,13 @@ async function performAction(button) {
 
 let historyRequest = 0;
 async function refreshHistory() {
+  if (!authorized) return;
   const request = ++historyRequest;
   const query = new URLSearchParams({ q: $('#history-query').value,
     outcome: $('#history-outcome').value, limit: $('#history-limit').value });
   $('#history-status').textContent = 'กำลังอ่านรายการ…';
   try {
-    const response = await fetch(`/flowatlas/actions?${query}`);
+    const response = await apiFetch(`/flowatlas/actions?${query}`);
     if (!response.ok) throw new Error(`อ่านรายการไม่สำเร็จ (${response.status})`);
     const actions = await response.json();
     if (request !== historyRequest) return;
@@ -141,6 +191,11 @@ async function refreshHistory() {
       const link = document.createElement('a');
       link.href = `/?actionId=${encodeURIComponent(action.id)}`;
       link.textContent = action.name;
+      link.addEventListener('click', (event) => {
+        event.preventDefault();
+        history.replaceState(null, '', link.getAttribute('href'));
+        loadGraph(action.id);
+      });
       const id = document.createElement('small');
       id.textContent = action.id;
       name.append(link, id);
@@ -163,15 +218,17 @@ async function refreshHistory() {
   }
 }
 $('#history-form').addEventListener('submit', (event) => { event.preventDefault(); refreshHistory(); });
-refreshHistory();
-fetch('/flowatlas/status').then((response) => {
+async function loadStorage() {
+return apiFetch('/flowatlas/status').then((response) => {
   if (!response.ok) throw new Error('ไม่สามารถตรวจสถานะการเก็บข้อมูลได้');
   return response.json();
 }).then((status) => {
+  if (!authorized) return;
   $('#storage-status').textContent = status.storage === 'disk'
     ? `เก็บผลในโฟลเดอร์โครงการ เปิดดูได้หลังเริ่มโปรแกรมใหม่ · สูงสุด ${status.actionLimit} actions`
     : `เก็บผลชั่วคราวในหน่วยความจำ ปิดโปรแกรมแล้วข้อมูลหาย · สูงสุด ${status.actionLimit} actions`;
 }).catch((error) => { $('#storage-status').textContent = error.message; });
+}
 
 document.querySelectorAll('button[data-action]').forEach((button) => {
   button.addEventListener('click', () => performAction(button));
@@ -182,12 +239,16 @@ if (incomingActionId) {
   $('#demo-actions').hidden = true;
   $('.workspace').classList.add('viewer-mode');
   $('#intro-lead').textContent = 'แผนที่จากการทำงานที่บันทึกไว้ เปิดรายการหลักฐานด้านล่างเพื่อดูที่มาและระดับความแน่นอนของแต่ละช่วง';
-  fetch(`/flowatlas/actions/${encodeURIComponent(incomingActionId)}`)
+}
+async function loadGraph(id) {
+  const generation = sessionGeneration;
+  return apiFetch(`/flowatlas/actions/${encodeURIComponent(id)}`)
     .then((response) => {
       if (!response.ok) throw new Error(`ไม่พบ action นี้ (${response.status})`);
       return response.json();
     })
     .then((graph) => {
+      if (generation !== sessionGeneration) return;
       renderGraph(graph);
     })
     .catch((error) => {
@@ -195,3 +256,27 @@ if (incomingActionId) {
       $('#empty p').textContent = 'ไม่สามารถเปิดแผนที่นี้ได้';
     });
 }
+async function initializeViewer() {
+  authorized = true; document.body.classList.remove('session-pending');
+  $('#session-panel').hidden = true; $('#session-lock').hidden = credential === null;
+  const actionId = new URLSearchParams(location.search).get('actionId');
+  await Promise.all([refreshHistory(), loadStorage(), actionId ? loadGraph(actionId) : Promise.resolve()]);
+}
+protectedLink($('#json-link')); protectedLink($('#history-json'));
+$('#session-lock').addEventListener('click', () => lockSession('session ถูกล็อกแล้ว'));
+$('#session-form').addEventListener('submit', async (event) => {
+  event.preventDefault();
+  const candidate = $('#session-code').value.trim(); $('#session-code').value = '';
+  if (!/^[A-Za-z0-9_-]{43}$/.test(candidate)) { $('#session-message').textContent = 'รหัสไม่ถูกต้อง'; return; }
+  credential = candidate;
+  try {
+    const response = await apiFetch('/flowatlas/status');
+    if (!response.ok) throw new Error('เชื่อมต่อไม่สำเร็จ');
+    await initializeViewer();
+  } catch { lockSession('เชื่อมต่อไม่สำเร็จ กรุณาตรวจ pairing code และเปิด session ใหม่'); }
+});
+fetch('/flowatlas/session', { redirect: 'error' }).then(async (response) => {
+  if (!response.ok) throw new Error('ตรวจ session ไม่สำเร็จ');
+  const session = await response.json();
+  if (session.authorizationRequired) lockSession(); else await initializeViewer();
+}).catch(() => lockSession('ไม่สามารถเชื่อมต่อ FlowAtlas ได้'));

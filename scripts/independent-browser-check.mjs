@@ -107,6 +107,7 @@ test('a second web app works through actual browser clicks and FlowAtlas graph l
       await sourceLink.click();
       const source = await sourcePopup;
       await source.waitForLoadState();
+      await source.waitForFunction((name) => document.body.textContent.includes(`async function ${name}(`), symbol);
       assert.match(await source.locator('body').innerText(), new RegExp(`async function ${symbol}\\(`));
       await source.close();
       console.log(`${name} source verified`);

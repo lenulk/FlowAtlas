@@ -908,3 +908,104 @@
 - Environment: win32/x64; OS 10.0.26200; Node v24.18.0
 - commit: 6fcee441e83a8f96de2920d4256931f163229bec; dirty: true
 - หลักฐาน: `reports/tests/2026-09-30T21-14-38-013Z.tap` และ `.json`
+
+## 2026-09-30T21-17-05-538Z
+
+- จุดประสงค์: Regression: authenticated local sessions must deny unauthorized reads/writes and foreign origins
+- ผล: ไม่ผ่าน — 0/3; failed 3; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: f8b125da000d5dc8205f6f3fc7c88d523de332c4; dirty: true
+- หลักฐาน: `reports/tests/2026-09-30T21-17-05-538Z.tap` และ `.json`
+- ไม่ผ่าน: session protects history, source, ingestion and demo routes before mutation
+- ไม่ผ่าน: foreign origins and rebinding Host are rejected even with a valid credential
+- ไม่ผ่าน: session credential stays out of graphs and invalid credentials cannot read or append
+
+## 2026-09-30T21-18-15-656Z
+
+- จุดประสงค์: Verify bearer session, host/origin restrictions, secret canary and unauthorized mutation rejection
+- ผล: ผ่าน — 3/3; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: f8b125da000d5dc8205f6f3fc7c88d523de332c4; dirty: true
+- หลักฐาน: `reports/tests/2026-09-30T21-18-15-656Z.tap` และ `.json`
+
+## Manual implementation checks — session access (2026-10-01)
+
+- node --check public/app.js ผ่านหลังเพิ่ม pairing UI; ยังไม่ใช่ browser runtime proof
+- rg ค้น script ด้วย file operand wildcard บน Windows พลาด os error 123; เปลี่ยนใช้ directory และ -g filter ต่อไป ไม่มี source mutation จาก search failure
+
+## 2026-09-30T21-21-30-891Z
+
+- จุดประสงค์: Verify secure CLI ingestion plus session and adapter boundaries
+- ผล: ผ่าน — 15/15; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: f8b125da000d5dc8205f6f3fc7c88d523de332c4; dirty: true
+- หลักฐาน: `reports/tests/2026-09-30T21-21-30-891Z.tap` และ `.json`
+
+## 2026-09-30T21-22-25-632Z
+
+- จุดประสงค์: Secure inspector browser: pairing, source, history, logout, reload, storage and restart
+- ผล: ไม่ผ่าน — 0/1; failed 1; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: f8b125da000d5dc8205f6f3fc7c88d523de332c4; dirty: true
+- หลักฐาน: `reports/tests/2026-09-30T21-22-25-632Z.tap` และ `.json`
+- ไม่ผ่าน: on-demand command supports a complete browser journey and persisted replay
+
+- Tool check: patch exact line ของ QUALITY.md ไม่พบข้อความที่คาด เพราะ Markdown backticks ใน PowerShell double-quoted string ถูกแปลเป็น escape; ตรวจไฟล์จริงและใช้ literal text ต่อ ไม่มี app source mutation จาก failed patch
+
+## 2026-09-30T21-23-17-401Z
+
+- จุดประสงค์: Secure inspector browser using installed Edge; previous Chromium binary unavailable
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: f8b125da000d5dc8205f6f3fc7c88d523de332c4; dirty: true
+- หลักฐาน: `reports/tests/2026-09-30T21-23-17-401Z.tap` และ `.json`
+
+## 2026-09-30T21-24-37-309Z
+
+- จุดประสงค์: Session UI changes: independent fixture browser and authorized inspector replay
+- ผล: ผ่าน — 2/2; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: f8b125da000d5dc8205f6f3fc7c88d523de332c4; dirty: true
+- หลักฐาน: `reports/tests/2026-09-30T21-24-37-309Z.tap` และ `.json`
+
+## 2026-09-30T21-25-11-226Z
+
+- จุดประสงค์: Full regression after authenticated default CLI and viewer source changes
+- ผล: ผ่าน — 69/69; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: f8b125da000d5dc8205f6f3fc7c88d523de332c4; dirty: true
+- หลักฐาน: `reports/tests/2026-09-30T21-25-11-226Z.tap` และ `.json`
+
+- Tool failures: การค้น docs ด้วย wildcard file operand บน Windows เกิด os error 123 อีกครั้ง แก้ใช้ -g '*.md' กับ directory สำเร็จ; คำสั่ง focused test ใช้ cwd สะกดชื่อเดสก์ท็อปผิดจึงถูกปฏิเสธ CreateProcess error 267 ก่อนรันทดสอบ รันใหม่จากพาธจริง ไม่มีผลจากรอบที่ไม่ได้เริ่ม
+
+## 2026-09-30T21-27-52-886Z
+
+- จุดประสงค์: Auth integration: standalone CLI and independent fixture use a shared local session without data leakage
+- ผล: ผ่าน — 12/12; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: f8b125da000d5dc8205f6f3fc7c88d523de332c4; dirty: true
+- หลักฐาน: `reports/tests/2026-09-30T21-27-52-886Z.tap` และ `.json`
+
+- Tool failure: npm pack ก่อน package QA ไม่เริ่ม เพราะ npm ใน PATH ชี้ AppData/Roaming/npm ที่ไม่มี npm-cli.js (MODULE_NOT_FOUND); ไม่ได้สร้าง/ติดตั้ง artifact ในรอบนี้ ตรวจ executable จริงและจะใช้ npm จาก Node installation โดยระบุพาธ
+
+## 2026-09-30T21-31-28-841Z
+
+- จุดประสงค์: Offline installed package with authenticated session, secret canary and credential rotation on restart
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: f8b125da000d5dc8205f6f3fc7c88d523de332c4; dirty: true
+- หลักฐาน: `reports/tests/2026-09-30T21-31-28-841Z.tap` และ `.json`
+
+## Manual package check — session (2026-10-01)
+
+- npm pack ผ่านเมื่อใช้ npm-cli.js ของ Node installation โดยตรง; inventory ไม่พบ reports/data/apps/tools/node_modules/.git หรือ local config; offline install ไม่รัน install scripts และ installed demo สำเร็จ; artifact/inventory อยู่ reports/releases/session-ffc2d9be2e7544daa387d6ee3d9cd3ed, installation อยู่ reports/storage/session-install-fb4dad14d2a847c2b7d3bf7d47570146
+
+## 2026-09-30T21-32-07-228Z
+
+- จุดประสงค์: Isolated source gate after session authorization and safe source popup changes
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: f8b125da000d5dc8205f6f3fc7c88d523de332c4; dirty: true
+- หลักฐาน: `reports/tests/2026-09-30T21-32-07-228Z.tap` และ `.json`
+
+- Manual visual check: inspected inspector-restart.png ของ Edge run 2026-09-30T21-24-37-309Z เห็นประวัติ 3 actions และ graph พร้อม observed/unknown; pairing input ไม่อยู่ในภาพ ตรวจ diff whitespace ผ่านก่อน staging

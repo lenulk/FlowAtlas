@@ -36,5 +36,5 @@ if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.ur
   const temporary = join(root, `.flowatlas-config-${randomUUID()}.tmp`);
   writeFileSync(temporary, JSON.stringify(config, null, 2) + '\n', { flag: 'wx' });
   renameSync(temporary, configPath);
-  console.log(`Created target app: ${directory}\nStart collector: node src/server.mjs\nStart target: node "${join(directory, 'server.mjs')}"`);
+  console.log(`Created target app: ${directory}\nStart: flowatlas inspect --project message-app (or node scripts/cli.mjs inspect --project message-app)`);
 }

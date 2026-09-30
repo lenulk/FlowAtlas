@@ -7,10 +7,11 @@
   <link rel="stylesheet" href="/style.css">
   <script type="module" src="/app.js"></script>
 </head>
-<body>
+<body class="session-pending">
   <header class="topbar">
     <div class="brand"><span class="brand-mark">F</span> FlowAtlas <span class="tag">MVP</span></div>
     <span class="top-note">Action → API → code → service</span>
+    <button id="session-lock" hidden>ล็อก session</button>
   </header>
   <main>
     <section class="intro">
@@ -26,6 +27,12 @@
       </div>
     </section>
 
+    <section id="session-panel" class="card" hidden aria-labelledby="session-title">
+      <h2 id="session-title">เชื่อมต่อ session ในเครื่อง</h2>
+      <p>ใส่ pairing code จากเทอร์มินัลที่เปิด FlowAtlas รหัสใช้กับการรันครั้งนี้และจะเก็บในหน่วยความจำของหน้านี้</p>
+      <form id="session-form"><label>Pairing code <input id="session-code" type="password" autocomplete="off" spellcheck="false" required maxlength="43"></label> <button type="submit">เชื่อมต่อ</button></form>
+      <p id="session-message" role="status"></p>
+    </section>
     <section class="history card" aria-labelledby="history-title">
       <div class="history-heading"><div><h2 id="history-title">รายการที่บันทึกไว้</h2><p>ค้นหาและเปิดหลักฐานของการทำงานที่ผ่านมา</p></div><a href="/" id="new-action-link">เริ่ม action ใหม่ ↗</a></div>
       <form id="history-form" class="history-controls">
@@ -63,7 +70,7 @@
         </div>
       </div>
     </section>
-    <p class="footnote"><span id="storage-status">กำลังตรวจสถานะการเก็บข้อมูล…</span> · บริการปลายทางในตัวอย่างเป็น mock · <a href="/flowatlas/actions" target="_blank" rel="noopener">รายการ actions แบบ JSON ↗</a></p>
+    <p class="footnote"><span id="storage-status">กำลังตรวจสถานะการเก็บข้อมูล…</span> · บริการปลายทางในตัวอย่างเป็น mock · <a href="/flowatlas/actions" id="history-json" target="_blank" rel="noopener">รายการ actions แบบ JSON ↗</a></p>
   </main>
 </body>
 </html>
