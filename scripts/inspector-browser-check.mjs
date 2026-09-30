@@ -55,7 +55,7 @@ async function stop() {
   const { child } = session;
   if (child.exitCode !== null || child.signalCode !== null) return;
   const exited = new Promise((resolveExit) => child.once('exit', resolveExit));
-  const timer = setTimeout(() => child.kill(), 8000);
+  const timer = setTimeout(() => child.kill('SIGKILL'), 8000);
   child.stdin.write('stop\n');
   try { assert.equal(await exited, 0, session.output()); } finally { clearTimeout(timer); }
 }
@@ -65,10 +65,16 @@ test('on-demand command supports a complete browser journey and persisted replay
   const require = createRequire(resolve(process.env.FLOWATLAS_PLAYWRIGHT_PACKAGE));
   const { chromium } = require('playwright');
   const browser = await chromium.launch({ headless: true });
-  const context = await browser.newContext({ viewport: { width: 1365, height: 900 } });
   const browserErrors = [], actions = [];
-  context.on('page', (page) => page.on('pageerror', (error) => browserErrors.push(error.message)));
+  const createContext = async () => {
+    const context = await browser.newContext({ viewport: { width: 1365, height: 900 } });
+    context.setDefaultTimeout(8000); context.setDefaultNavigationTimeout(8000);
+    context.on('page', (page) => page.on('pageerror', (error) => browserErrors.push(error.message)));
+    return context;
+  };
+  let context = await createContext();
   try {
+    console.log('Inspector: starting app and collector');
     let { app, collector } = await launch();
     const page = await context.newPage();
     assert.equal((await page.goto(app)).status(), 200);
@@ -77,6 +83,7 @@ test('on-demand command supports a complete browser journey and persisted replay
       ['send-message', 200, 'success', 'sendMessage'],
       ['fail-message', 503, 'error', 'failMessage'],
     ]) {
+      console.log(`Inspector: clicking ${name}`);
       const previousResult = await page.locator('#result').innerText();
       await page.locator(`button[data-name="${name}"]`).click();
       await page.waitForFunction(({ expected, previous }) => {
@@ -109,11 +116,15 @@ test('on-demand command supports a complete browser journey and persisted replay
       await viewer.close();
       actions.push({ id, name, outcome, nodes: graph.nodes.length, edges: graph.edges.length });
     }
+    console.log('Inspector: closing browser connections before first stop');
+    await context.close();
     await stop();
     await assert.rejects(fetch(app));
     await assert.rejects(fetch(collector));
     assert.equal(existsSync(join(dataDir, '.writer.lock')), false);
+    console.log('Inspector: restarting app and collector');
     ({ app, collector } = await launch());
+    context = await createContext();
     const viewer = await context.newPage();
     assert.equal((await viewer.goto(`${collector}/?actionId=${actions[0].id}`)).status(), 200);
     await viewer.locator('#trace-content').waitFor({ state: 'visible' });
@@ -125,10 +136,12 @@ test('on-demand command supports a complete browser journey and persisted replay
     assert.deepEqual(browserErrors, []);
     writeFileSync(join(evidence, 'result.json'), JSON.stringify({ platform: process.platform,
       browser: browser.version(), actions, restored: true, browserErrors }, null, 2) + '\n');
+    console.log('Inspector: closing browser connections before final stop');
+    await context.close();
     await stop();
     await assert.rejects(fetch(app));
     await assert.rejects(fetch(collector));
     assert.equal(existsSync(join(dataDir, '.writer.lock')), false);
-  } finally { await stop(); await browser.close(); }
+  } finally { try { await browser.close(); } finally { await stop(); } }
   console.log(`Inspector browser evidence: ${relative(root, evidence)}`);
 });

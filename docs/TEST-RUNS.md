@@ -814,3 +814,22 @@
 
 - git diff --check ผ่าน; local links ใน PLAN/README/install/ci รวม 27 จุดมีปลายทางครบ
 - ตรวจ scope package allowlist, CLI dispatcher/preflight และ inherited Git root fix; ไม่เพิ่ม runtime dependency หรือทำ npm publish
+
+## 2026-10-01 — CI browser gate ที่ค้าง
+
+- Run 36772248570 บน source 07c660c: Windows/Node 22.23.3, Windows/Node 24.21.0 และ Ubuntu/Node 24.21.0 success; Ubuntu/Node 22.23.3 main/source ผ่านแล้วแต่ inspector browser step ยัง in_progress เกินเวลาของ test ไม่สรุปว่า matrix ผ่านทั้งหมด
+- เก็บ job metadata ใน reports/vm/ci-36772248570-jobs.json; logs ของ job ที่กำลังรันยังไม่ได้ดาวน์โหลดจาก API นี้ จึงยังไม่ยืนยันตำแหน่งค้างภายใน test
+
+## 2026-10-01 — hosted inspector failure log
+
+- Run 36772248570 จบ cancelled โดย Ubuntu/Node 22 inspector ค้าง; ดาวน์โหลด failed job log reports/vm/ci-job-110081277840.log แล้ว จะอ่านสาเหตุใน log ก่อนสรุป
+- rg ครั้งแรกส่ง wildcard ใน file operand บน Windows ทำให้ os error 123; เปลี่ยนเป็น -g filter กับ directory รายงาน ไม่ถือว่าค้น log สำเร็จในครั้งแรก
+
+## 2026-10-01 — Node 22/Linux browser cleanup และ CLI
+
+- VM ใช้ bundle 6a4db47 พร้อม QA inspector script ที่ส่งเพิ่มและตรวจ SHA-256 d804218b7b47be29b918d0a07c7680c1a5a423134b6f2a1913f1c85c47fb9b2e ก่อนใช้; ไม่อ้าง clean commit ของ modified QA script
+- ดาวน์โหลด Node 22.23.3 portable จาก nodejs.org แล้วตรวจ tar.xz กับ official SHASUMS256 ก่อน extract ไม่เปลี่ยน Node ของระบบ
+- Inspector/restart ผ่าน 1/1 (`2026-09-30T20-45-52-408Z`) ใน 3.5 วินาที และ doctor/code-version/inspect/register ผ่าน 12/12 (`2026-09-30T20-45-56-048Z`); failed/skipped 0, ไม่พบ writer lock หลังจบ
+- Archive กลับเข้า host checksum 20b12270cb953fd5b0ab8012c7ce9bd21a3486dedcffbdf4d9bf806e137300de ตรง VM ตรวจ paths/ไม่ทับหลักฐานก่อน extract; hashes ทุก source ใน runner JSON ตรง host ปัจจุบัน และตรวจภาพ restart ด้วยตาแล้ว
+- CI failed artifact ของ run 36772248570 มี result.json: actions ทั้งสามและ restored=true/browserErrors=[] พร้อมภาพ restart ยืนยันว่า test ไปถึงก่อน final stop; log timeout 60 วินาทีแล้ว job ถูกยุติตาม 20 นาที จึงระบุการค้างอยู่หลังเขียน result ก่อน final shutdown จบ ไม่อ้างว่า product action/graph ล้มเหลว
+- ตรวจภาพ CI restart และ VM restart ด้วยตาแล้วอ่าน history/graph ได้; การแก้ cleanup ผ่าน VM แต่ยังต้องรัน hosted matrix ใหม่

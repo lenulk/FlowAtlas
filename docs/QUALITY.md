@@ -339,3 +339,11 @@
 - หลังแก้ inherited Git identity focused suite ผ่าน 12/12 (`2026-09-30T20-33-11-024Z`); offline package gate ผ่าน 1/1 (`2026-09-30T20-35-13-248Z`) จาก artifact ติดตั้งใหม่: 3 business actions, graph/source, stop ปิดพอร์ตและ lock, restart โหลดกราฟเดิมตรงกัน และ tool/target ไม่รับ parent commit
 - Package สำหรับ QA ยังผูก apps/config/data กับ package root และ update อาจแทนที่ directory นี้; ต้องเพิ่ม workspace แยกจาก installation พร้อม backup/update/uninstall checks ก่อนรับรอง R1 หรือเผยแพร่ทั่วไป ไม่ถือว่าผ่านทั้งระยะจาก smoke test นี้
 - Windows full regression หลัง CLI/identity ผ่าน 60/60 (`2026-09-30T20-36-52-292Z`) และ isolated source 1/1 (`2026-09-30T20-37-06-171Z`), failed/skipped 0; เพิ่ม offline package gate ใน CI สำหรับตรวจ Windows/Linux บน runtime matrix ด้วย ยังรอ hosted evidence ของ source ใหม่นี้
+
+## รอบ 32 — bounded inspector browser cleanup
+
+- Hosted Ubuntu/Node 22.23.3 main/source ผ่าน แต่ inspector browser step ค้างหลัง test timeout ขณะที่อีกสาม matrix jobs ผ่าน เก็บ metadata ไว้ ยังไม่มี completed job log ระบุตำแหน่งย่อย
+- Code inspection พบ stop() รอ child exit แต่ timer ส่ง SIGTERM ซ้ำ ซึ่งไม่รับประกันว่า child ที่ค้าง cleanup จะออก และ test ปิด server ขณะ browser context/HTTP connections ยังเปิด ลำดับนี้คล้าย cleanup issue ที่พบในรอบ 26 แต่ยังไม่ยืนยันว่าเป็นสาเหตุของ hosted job นี้
+- ปรับเฉพาะ QA script: stage markers, timeout ย่อยของ browser operations, ปิด context ก่อน stop/restart และ fallback SIGKILL หลัง 8 วินาที; forced kill ยังทำให้ assertion exit code fail จึงไม่เปลี่ยน hang/failure เป็น pass ผลต้องตรวจบน Node 22/Linux ก่อนปิดประเด็น
+- Completed hosted log ยืนยัน test timeout 60 วินาทีแล้วค้างถึง job timeout 20 นาที; artifact มี 3 actions/restored=true/browserErrors=[] และภาพหลัง restart (ก่อน final stop) จึงระบุการค้างหลัง result ถูกเขียน ใน final shutdown/cleanup ได้ เป็นปัญหา lifecycle ของ QA ที่ต้องแก้ ไม่ใช่หลักฐานว่า action/graph ไม่สำเร็จ
+- QA รุ่นใหม่ผ่าน Linux VM Node 22.23.3/Chromium 1/1 ภายใน 3.5 วินาที และ CLI affected suite 12/12; ตรวจ archive SHA-256, runner source hashes ตรง host และภาพแล้ว ไม่มี lock ค้าง ยังต้องรอ hosted matrix ใหม่ก่อนถือว่าปิด gate นี้
