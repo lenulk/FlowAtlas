@@ -2,6 +2,7 @@ import { createHash, randomUUID } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
+import { validateEdge } from './evidence-contract.mjs';
 
 const allowedStatuses = new Set(['observed', 'inferred', 'unknown']);
 
@@ -70,8 +71,10 @@ export class FlowAtlas {
     }
     const edge = {
       id: `e${action.edges.length + 1}`, from, to, status,
-      evidence: { id: randomUUID(), recordedAt: new Date().toISOString(), ...evidence },
+      evidence: { ...evidence, id: randomUUID(), recordedAt: new Date().toISOString() },
     };
+    const issues = validateEdge(action, edge);
+    if (issues.length) throw new Error(`Invalid evidence: ${issues.join('; ')}`);
     action.edges.push(edge);
     return edge;
   }

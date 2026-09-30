@@ -111,3 +111,25 @@ test('an unavailable service leaves evidence of the attempted outbound request',
     await servers.close();
   }
 });
+
+test('reusing an unverified action ID never upgrades it to an observed browser action', async () => {
+  const servers = await startServers({ port: 0, inventoryPort: 0 });
+  const base = `http://127.0.0.1:${servers.port}`;
+  const id = randomUUID();
+  try {
+    for (let count = 0; count < 2; count++) {
+      const response = await fetch(`${base}/api/product`, {
+        headers: { 'x-flowatlas-action-id': id },
+      });
+      assert.equal(response.status, 200);
+    }
+    const graphResponse = await fetch(`${base}/flowatlas/actions/${id}`);
+    assert.equal(graphResponse.status, 200);
+    const graph = await graphResponse.json();
+    assert.equal(graph.nodes[0].origin, 'unverified');
+    assert.deepEqual(graph.edges.filter((edge) => edge.from === 'action').map((edge) => edge.status),
+      ['unknown', 'unknown']);
+  } finally {
+    await servers.close();
+  }
+});

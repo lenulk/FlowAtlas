@@ -6,6 +6,7 @@ import { createHash, randomUUID } from 'node:crypto';
 import { FlowAtlas, getCodeVersion, sourceRef } from './flowatlas.mjs';
 import { getProduct } from './catalog.mjs';
 import { createInventoryService } from './inventory-service.mjs';
+import { validateGraph } from './evidence-contract.mjs';
 
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
 const staticFiles = new Map([
@@ -79,7 +80,13 @@ export async function startServers({ port = 4173, inventoryPort = 4174 } = {}) {
 
       if (request.method === 'GET' && url.pathname.startsWith('/flowatlas/actions/')) {
         const action = atlas.get(decodeURIComponent(url.pathname.slice('/flowatlas/actions/'.length)));
-        sendJson(response, action ? 200 : 404, action ?? { error: 'Action not found' });
+        if (!action) {
+          sendJson(response, 404, { error: 'Action not found' });
+          return;
+        }
+        const issues = validateGraph(action);
+        sendJson(response, issues.length ? 500 : 200,
+          issues.length ? { error: 'Invalid evidence graph', issues } : action);
         return;
       }
 
@@ -121,7 +128,7 @@ export async function startServers({ port = 4173, inventoryPort = 4174 } = {}) {
       const suppliedId = request.headers['x-flowatlas-action-id'];
       const actionId = typeof suppliedId === 'string' && /^[A-Za-z0-9_-]{8,80}$/.test(suppliedId) ? suppliedId : randomUUID();
       currentActionId = actionId;
-      const wasRegistered = Boolean(atlas.get(actionId));
+      const wasRegistered = atlas.get(actionId)?.nodes[0]?.origin === 'client-reported';
       const action = atlas.ensure(actionId, route.name);
       response.setHeader('x-flowatlas-action-id', actionId);
       const apiNode = `api:${request.method}:${url.pathname}`;
@@ -154,11 +161,6 @@ export async function startServers({ port = 4173, inventoryPort = 4174 } = {}) {
       const routeNode = `external-route:${method}:${externalPath}`;
       const unknownNode = `unknown:${externalPath}`;
       atlas.node(action, { id: externalNode, type: 'external-request', label: `${method} inventory service ${externalPath}` });
-      atlas.node(action, {
-        id: routeNode, type: 'code', label: `inventory service ${externalPath}`,
-        source: sourceRef(version, 'src/inventory-service.mjs', 'createInventoryService'),
-      });
-      atlas.node(action, { id: unknownNode, type: 'unknown', label: 'Untraced internal work' });
       const started = performance.now();
       const outboundEdge = atlas.edge(action, codeNode, externalNode, 'observed', {
         type: 'http-outbound', method, path: externalPath,
@@ -179,6 +181,11 @@ export async function startServers({ port = 4173, inventoryPort = 4174 } = {}) {
       outboundEdge.evidence.status = externalResponse.status;
       outboundEdge.evidence.durationMs = Math.round(performance.now() - started);
       outboundEdge.evidence.outcome = 'completed';
+      atlas.node(action, {
+        id: routeNode, type: 'code', label: `inventory service ${externalPath}`,
+        source: sourceRef(version, 'src/inventory-service.mjs', 'createInventoryService'),
+      });
+      atlas.node(action, { id: unknownNode, type: 'unknown', label: 'Untraced internal work' });
       atlas.edge(action, externalNode, routeNode, 'inferred', {
         type: 'source-route-match', reason: 'Matched the request path to the mock service route in source code.',
         source: sourceRef(version, 'src/inventory-service.mjs', 'createInventoryService'),
