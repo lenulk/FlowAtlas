@@ -9,13 +9,14 @@ const allowedStatuses = new Set(['observed', 'inferred', 'unknown']);
 function codeFiles(root, directory) {
   return readdirSync(join(root, directory), { withFileTypes: true }).flatMap((entry) => {
     const name = `${directory}/${entry.name}`;
+    if (entry.isSymbolicLink()) return [];
     return entry.isDirectory() ? codeFiles(root, name) : [name];
   });
 }
 
 export function getCodeVersion(root) {
   const files = {};
-  for (const file of [...codeFiles(root, 'src'), ...codeFiles(root, 'public')].sort()) {
+  for (const file of [...codeFiles(root, 'src'), ...codeFiles(root, 'public'), ...codeFiles(root, 'examples')].sort()) {
     files[file] = createHash('sha256').update(readFileSync(join(root, file))).digest('hex');
   }
   const digest = createHash('sha256')

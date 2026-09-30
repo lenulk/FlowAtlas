@@ -124,3 +124,22 @@ async function performAction(button) {
 document.querySelectorAll('button[data-action]').forEach((button) => {
   button.addEventListener('click', () => performAction(button));
 });
+
+const incomingActionId = new URLSearchParams(location.search).get('actionId');
+if (incomingActionId) {
+  $('#demo-actions').hidden = true;
+  $('.workspace').classList.add('viewer-mode');
+  $('#intro-lead').textContent = 'แผนที่นี้มาจากเว็บแอปอีกระบบหนึ่ง เลือกเส้นเชื่อมเพื่อดูหลักฐานและระดับความแน่นอนของแต่ละช่วง';
+  fetch(`/flowatlas/actions/${encodeURIComponent(incomingActionId)}`)
+    .then((response) => {
+      if (!response.ok) throw new Error(`ไม่พบ action นี้ (${response.status})`);
+      return response.json();
+    })
+    .then((graph) => {
+      renderGraph(graph);
+    })
+    .catch((error) => {
+      $('#trace-subtitle').textContent = error.message;
+      $('#empty p').textContent = 'ไม่สามารถเปิดแผนที่นี้ได้';
+    });
+}

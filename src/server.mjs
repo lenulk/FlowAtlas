@@ -7,6 +7,7 @@ import { FlowAtlas, getCodeVersion, sourceRef } from './flowatlas.mjs';
 import { getProduct } from './catalog.mjs';
 import { createInventoryService } from './inventory-service.mjs';
 import { validateGraph } from './evidence-contract.mjs';
+import { ingestEvent } from './ingest.mjs';
 
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
 const staticFiles = new Map([
@@ -62,6 +63,16 @@ export async function startServers({ port = 4173, inventoryPort = 4174 } = {}) {
     const url = new URL(request.url, 'http://localhost');
     let currentActionId = null;
     try {
+      if (request.method === 'POST' && url.pathname === '/flowatlas/ingest') {
+        try {
+          const result = ingestEvent(atlas, await readJson(request));
+          sendJson(response, 202, result);
+        } catch (error) {
+          sendJson(response, error.message === 'Action ID already exists' ? 409 : 400, { error: error.message });
+        }
+        return;
+      }
+
       if (request.method === 'POST' && url.pathname === '/flowatlas/action-start') {
         const body = await readJson(request);
         if (typeof body.id !== 'string' || !['view-product', 'check-stock', 'place-order'].includes(body.name)) {

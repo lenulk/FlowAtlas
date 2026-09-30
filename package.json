@@ -8,6 +8,7 @@
   },
   "scripts": {
     "start": "node src/server.mjs",
+    "start:fixture": "node examples/independent-app/server.mjs",
     "test": "node --test"
   }
 }

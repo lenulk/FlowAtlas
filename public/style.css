@@ -135,6 +135,9 @@ h1 {
   gap:20px;
   align-items:start
 }
+.workspace.viewer-mode {
+  grid-template-columns:minmax(0,1fr)
+}
 .card {
   min-width:0;
   border:1px solid #dbe1df;

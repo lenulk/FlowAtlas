@@ -75,6 +75,9 @@ export function validateEdge(action, edge) {
     if (evidence.outcome === 'failed' && !isText(evidence.error)) {
       issues.push(`${label}: failed request has no error`);
     }
+    if (evidence.outcome !== 'attempted' && (!Number.isFinite(evidence.durationMs) || evidence.durationMs < 0)) {
+      issues.push(`${label}: outbound duration is invalid`);
+    }
     if (edge.to !== `http:${evidence.method}:${evidence.path}`) {
       issues.push(`${label}: outbound evidence does not match the request node`);
     }
