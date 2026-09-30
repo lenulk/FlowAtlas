@@ -4,7 +4,7 @@
 
 `node src/server.mjs` เก็บ metadata ของ 100 actions ล่าสุดใน `data/actions/state.json` ภายในโครงการ เมื่อเปิดใหม่จะโหลดกราฟเดิมรวม evidence IDs, timestamps, uncertainty และ codeVersion ที่ capture ไว้ `running` หมายถึงยังไม่มีผลสุดท้ายที่บันทึกได้ จึงอาจเป็น capture ที่ขาดหลัง process หยุด ไม่ถือว่า success/error โดยอัตโนมัติ
 
-เปลี่ยนที่เก็บด้วย `FLOWATLAS_DATA_DIR` (relative หรือ absolute ภายในโครงการ และอยู่นอก src/public/examples/Git/config directories) ใช้ `FLOWATLAS_MEMORY_ONLY=1` หากต้องการโหมดชั่วคราว `startServers()` ที่ import ใน tests ใช้ memory โดยปริยาย; ระบุ `dataDir` เพื่อเปิด disk mode
+เปลี่ยนที่เก็บด้วย `FLOWATLAS_DATA_DIR` (relative หรือ absolute ภายใน workspace และอยู่นอก src/public/examples/Git/config directories; ไม่ผ่าน symlink/junction) ใช้ `FLOWATLAS_MEMORY_ONLY=1` หากต้องการโหมดชั่วคราว `startServers()` ที่ import ใน tests ใช้ memory โดยปริยาย; ระบุ `dataDir` เพื่อเปิด disk mode และ `workspace` เพื่อเลือก root ของแอป/config/history ต่างจาก tool installation ค่า default เป็นโฟลเดอร์เครื่องมือหรือ FLOWATLAS_WORKSPACE_ROOT
 
 UI และ `/flowatlas/status` แสดง mode ตามจริง ค่า query ของ `/flowatlas/actions` ได้แก่ `q` (ค้นชื่อ/ID, สูงสุด 200 ตัวอักษร), `outcome` (running/success/error), `limit` (1–100) filter เกิดก่อนจำกัดจำนวนและเรียงใหม่ไปเก่า JSON graph ยังใช้ schemaVersion 0.1; storage ใช้ storageVersion 1
 

@@ -347,3 +347,13 @@
 - ปรับเฉพาะ QA script: stage markers, timeout ย่อยของ browser operations, ปิด context ก่อน stop/restart และ fallback SIGKILL หลัง 8 วินาที; forced kill ยังทำให้ assertion exit code fail จึงไม่เปลี่ยน hang/failure เป็น pass ผลต้องตรวจบน Node 22/Linux ก่อนปิดประเด็น
 - Completed hosted log ยืนยัน test timeout 60 วินาทีแล้วค้างถึง job timeout 20 นาที; artifact มี 3 actions/restored=true/browserErrors=[] และภาพหลัง restart (ก่อน final stop) จึงระบุการค้างหลัง result ถูกเขียน ใน final shutdown/cleanup ได้ เป็นปัญหา lifecycle ของ QA ที่ต้องแก้ ไม่ใช่หลักฐานว่า action/graph ไม่สำเร็จ
 - QA รุ่นใหม่ผ่าน Linux VM Node 22.23.3/Chromium 1/1 ภายใน 3.5 วินาที และ CLI affected suite 12/12; ตรวจ archive SHA-256, runner source hashes ตรง host และภาพแล้ว ไม่มี lock ค้าง ยังต้องรอ hosted matrix ใหม่ก่อนถือว่าปิด gate นี้
+- Hosted run `36775394097` บน commit `1b4213f` completed success ครบ 4 jobs: Ubuntu/Windows กับ Node 22.23.3/24.21.0 รวม main/source/browser/offline package gate; จึงผ่าน gate ที่เคยค้างสำหรับ revision นี้ การเปลี่ยนแปลงใหม่ต้องผ่าน matrix ใหม่ตามเดิม
+
+## รอบ 33 — workspace แยกจาก installation
+
+- ปัญหา: package install directory อาจถูกแทนที่ตอน update/uninstall จึงไม่ควรใช้เก็บแอป/config/history ถาวร เกณฑ์คือแยก workspace ที่ผู้ใช้เลือก และถอน/ติดตั้ง package ซ้ำแล้วแอปและกราฟเดิมอยู่ครบ
+- เพิ่ม `flowatlas --workspace DIR` และ FLOWATLAS_WORKSPACE_ROOT; common resolver ใช้ใน CLI/demo/register/doctor/inspect/collector โดย tool templates/static/source snapshot ยังอ่านจาก installation และแอป/config/data อ่านจาก workspace การเรียกเดิมยังใช้ tool folder โดยปริยาย
+- ตรวจ data directory กับ root ที่เลือกทั้ง lexical/physical และปฏิเสธ symlink/junction; ไม่สร้างไฟล์นอกรากที่อนุญาต ข้อจำกัด single writer/100 actions/schema เดิมยังใช้
+- Focused 26/26 (`2026-09-30T20-56-17-590Z`) ผ่าน; offline package journey 1/1 (`2026-09-30T20-59-56-745Z`) และหลัง uninstall/reinstall 1/1 (`2026-09-30T21-00-02-679Z`) ผ่าน: state SHA-256 ไม่เปลี่ยนระหว่างถอน/ติดตั้ง, กราฟเก่า 3 และใหม่ 3 เปิดหลัง restart ได้ตรงเดิม, lock/ports ปิด, package root ไม่มี app/config/data
+- Windows full 64/64 (`2026-09-30T21-00-46-129Z`) และ isolated source 1/1 (`2026-09-30T21-00-59-100Z`) ผ่าน failed/skipped 0; เพิ่ม workspace/reinstall gate ใน CI แต่ยังต้องตรวจ hosted revision ใหม่
+- ยังไม่ยืนยัน upgrade ข้าม schema/adapter release หรือ integration/startup กับแอปธุรกิจทั่วไป; R1/R2–R5 ยังมีงานใน PLAN ไม่สรุปว่าโปรเจคบรรลุ v1 จาก installer tests

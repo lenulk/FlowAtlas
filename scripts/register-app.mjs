@@ -3,6 +3,7 @@ import { randomUUID } from 'node:crypto';
 import { dirname, isAbsolute, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { ProjectSources, captureProjectVersion, validSourcePath } from '../src/project-sources.mjs';
+import { resolveWorkspace } from '../src/workspace.mjs';
 
 const projectRoot = dirname(dirname(fileURLToPath(import.meta.url)));
 const adapters = ['node-adapter.mjs', 'project-sources.mjs'];
@@ -25,7 +26,7 @@ export function registerApp({ id, root, entry = 'server.mjs', sources = [], conf
     || typeof entry !== 'string' || !/\.(mjs|cjs|js)$/.test(entry) || !validSourcePath(entry)
     || !Array.isArray(sources) || sources.some((file) => !validSourcePath(file))) throw new Error(usage);
 
-  const resolvedRoot = realpathSync(projectRoot);
+  const resolvedRoot = resolveWorkspace(projectRoot);
   const targetPath = resolve(resolvedRoot, root);
   if (!inside(resolvedRoot, targetPath) || lstatSync(targetPath).isSymbolicLink()
     || !lstatSync(targetPath).isDirectory()) throw new Error('App root must be a real directory inside FlowAtlas');
@@ -57,7 +58,7 @@ export function registerApp({ id, root, entry = 'server.mjs', sources = [], conf
     const destination = join(appRoot, file);
     if (existsIncludingSymlink(destination) && (lstatSync(destination).isSymbolicLink()
       || !lstatSync(destination).isFile()
-      || !readFileSync(destination).equals(readFileSync(join(resolvedRoot, 'src', file))))) {
+      || !readFileSync(destination).equals(readFileSync(join(projectRoot, 'src', file))))) {
       throw new Error(`Adapter already exists with different contents: ${file}`);
     }
   }
@@ -68,7 +69,7 @@ export function registerApp({ id, root, entry = 'server.mjs', sources = [], conf
     for (const file of adapters) {
       const destination = join(appRoot, file);
       if (!existsIncludingSymlink(destination)) {
-        copyFileSync(join(resolvedRoot, 'src', file), destination, constants.COPYFILE_EXCL);
+        copyFileSync(join(projectRoot, 'src', file), destination, constants.COPYFILE_EXCL);
         copied.push(destination);
       }
     }
@@ -103,6 +104,6 @@ if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.ur
     const result = registerApp(parse(process.argv.slice(2)));
     console.log(`Registered ${result.registration.id} in ${result.configPath}`);
     console.log(`Copied ${result.copied.length} adapter file(s). Add browser action IDs and server instrumentation as described in docs/node-adapter.md`);
-    console.log(`After instrumentation, run: node scripts/inspect.mjs --project ${result.registration.id} --entry ${result.entry} --config "${relative(projectRoot, result.configPath)}"`);
+    console.log(`After instrumentation, run flowatlas with the same --workspace, then inspect --project ${result.registration.id} --entry ${result.entry} --config "${relative(resolveWorkspace(projectRoot), result.configPath)}"`);
   } catch (error) { console.error(error.message); process.exitCode = 1; }
 }

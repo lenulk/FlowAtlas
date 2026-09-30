@@ -71,13 +71,32 @@ jobs:
           npm install --prefix $taskInstall --cache reports/releases/npm-cache --offline --ignore-scripts --no-audit --no-fund $taskArtifact
           if ($LASTEXITCODE -ne 0) { throw 'Offline package install failed' }
           $taskInstalledRoot = (Resolve-Path -LiteralPath ($taskInstall + '/node_modules/flowatlas-mvp')).Path
-          node ($taskInstalledRoot + '/scripts/cli.mjs') demo
+          New-Item -ItemType Directory -Path ($taskInstall + '/workspace') | Out-Null
+          $taskWorkspace = (Resolve-Path -LiteralPath ($taskInstall + '/workspace')).Path
+          node ($taskInstalledRoot + '/scripts/cli.mjs') --workspace $taskWorkspace demo
           if ($LASTEXITCODE -ne 0) { throw 'Installed demo failed' }
           "FLOWATLAS_INSTALLED_ROOT=$taskInstalledRoot" >> $env:GITHUB_ENV
+          "FLOWATLAS_PACKAGE_WORKSPACE=$taskWorkspace" >> $env:GITHUB_ENV
       - name: Installed package journey and replay
         if: ${{ !cancelled() }}
         env:
           FLOWATLAS_TEST_PURPOSE: CI offline installed package journey and replay
+        run: node scripts/run-tests.mjs scripts/package-check.mjs
+      - name: Uninstall and reinstall without changing workspace data
+        run: |
+          $taskState = $env:FLOWATLAS_PACKAGE_WORKSPACE + '/data/actions/state.json'
+          $taskBefore = (Get-FileHash -Algorithm SHA256 -LiteralPath $taskState).Hash
+          npm uninstall --prefix reports/storage/package-install --cache reports/releases/npm-cache --offline --ignore-scripts --no-audit --no-fund flowatlas-mvp
+          if ($LASTEXITCODE -ne 0) { throw 'QA uninstall failed' }
+          if ((Get-FileHash -Algorithm SHA256 -LiteralPath $taskState).Hash -ne $taskBefore) { throw 'Workspace changed during uninstall' }
+          $taskPack = Get-Content -Raw reports/releases/pack-result.json | ConvertFrom-Json
+          $taskArtifact = (Resolve-Path -LiteralPath ('reports/releases/' + $taskPack.filename)).Path
+          npm install --prefix reports/storage/package-install --cache reports/releases/npm-cache --offline --ignore-scripts --no-audit --no-fund $taskArtifact
+          if ($LASTEXITCODE -ne 0) { throw 'QA reinstall failed' }
+          if ((Get-FileHash -Algorithm SHA256 -LiteralPath $taskState).Hash -ne $taskBefore) { throw 'Workspace changed during reinstall' }
+      - name: Replay and capture after reinstall
+        env:
+          FLOWATLAS_TEST_PURPOSE: CI workspace history after uninstall and reinstall
         run: node scripts/run-tests.mjs scripts/package-check.mjs
       - name: Save evidence including failed runs
         if: always()

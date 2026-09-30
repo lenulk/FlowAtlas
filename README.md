@@ -59,7 +59,7 @@ node scripts/run-tests.mjs
 
 ตัวรันทดสอบบันทึกผลสำเร็จและล้มเหลวทุกครั้งไว้ใน `reports/tests/` (TAP + JSON) และเพิ่มรายการใน [TEST-RUNS.md](docs/TEST-RUNS.md) การวิเคราะห์และการแก้แต่ละรอบอยู่ใน [QUALITY.md](docs/QUALITY.md) ใช้ `npm test` ได้เมื่อ npm ในเครื่องพร้อมใช้งาน
 
-ทดสอบทั้ง Windows และ Linux VM (Debian 12) ด้วย Node v24.18.0 แล้ว ชุดหลักเดิม 47 กรณีและ source แยก 1 กรณีผ่านบนทั้งสองระบบ เพิ่ม UI บน Linux Chromium headless ผ่าน 8/8 และคำสั่ง inspector ใหม่ผ่าน 3/3 บน Windows/Linux ชุดหลัก Windows ปัจจุบันผ่าน 50/50 รายงานใหม่ระบุ OS/architecture อัตโนมัติ ผล Linux และคำสั่งรันซ้ำอยู่ใน [linux-vm.md](docs/linux-vm.md) ยังไม่ได้ตรวจ GUI desktop บน Linux, มือถือจริง หรือ Node 20/22
+ทดสอบทั้ง Windows และ Linux VM (Debian 12) แล้ว ผลล่าสุดและ source revision ระบุใน [TEST-RUNS](docs/TEST-RUNS.md) และ [Linux VM](docs/linux-vm.md) หลังเพิ่ม workspace ชุดหลัก Windows ผ่าน 64/64 และ source แยก 1/1; hosted CI รุ่นก่อนหน้า `1b4213f` ผ่านครบ Windows/Ubuntu กับ Node 22.23.3/24.21.0 รวม browser และ offline package ([CI](docs/ci.md)) ต้องตรวจ matrix ใหม่เมื่อ source เปลี่ยน ยังไม่ได้ตรวจ Linux GUI desktop, มือถือจริง หรือ Node 20
 
 เมื่อตรวจ source link ให้รันแยกจากชุดหลัก:
 

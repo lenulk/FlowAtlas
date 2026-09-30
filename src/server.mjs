@@ -1,6 +1,6 @@
 import { createServer } from 'node:http';
 import { readFileSync } from 'node:fs';
-import { dirname, join, resolve, relative, isAbsolute } from 'node:path';
+import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createHash, randomUUID } from 'node:crypto';
 import { FlowAtlas, getCodeVersion, sourceRef } from './flowatlas.mjs';
@@ -10,6 +10,7 @@ import { validateGraph } from './evidence-contract.mjs';
 import { ingestEvent } from './ingest.mjs';
 import { JsonActionStore, storageErrorDiagnostic } from './action-store.mjs';
 import { ProjectSources, readProjectConfig } from './project-sources.mjs';
+import { resolveWorkspace, resolveDataDirectory } from './workspace.mjs';
 
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
 const staticFiles = new Map([
@@ -59,7 +60,7 @@ function placeOrder(inventoryUrl, actionId) {
   });
 }
 
-export async function startServers({ port = 4173, inventoryPort = 4174, dataDir = null, actionLimit = 100, projects = [],
+export async function startServers({ port = 4173, inventoryPort = 4174, dataDir = null, actionLimit = 100, projects = [], workspace,
   onStorageError = (diagnostic) => console.error(`FlowAtlas storage: ${JSON.stringify(diagnostic)}`) } = {}) {
   const reportStorageError = (error) => {
     if (error.code !== 'FLOWATLAS_STORAGE_ERROR') return;
@@ -67,18 +68,13 @@ export async function startServers({ port = 4173, inventoryPort = 4174, dataDir 
     catch { /* A diagnostic sink must not change the request result or storage cleanup. */ }
   };
   const version = getCodeVersion(root);
-  const projectSources = new ProjectSources(root, projects);
+  const workspaceRoot = resolveWorkspace(root, workspace);
+  const projectSources = new ProjectSources(workspaceRoot, projects);
   let store = null;
   let atlas;
   try {
     if (dataDir !== null) {
-      const directory = resolve(root, dataDir);
-      const within = relative(root, directory);
-      const first = within.split(/[\\/]/)[0].toLowerCase();
-      if (!within || within.startsWith('..') || isAbsolute(within)
-        || ['src', 'public', 'examples', '.git', '.codex', '.agents'].includes(first)) {
-        throw new Error('Data directory must be inside the project and outside code or Git directories');
-      }
+      const directory = resolveDataDirectory(workspaceRoot, dataDir);
       store = new JsonActionStore(directory);
     }
     atlas = new FlowAtlas(version, actionLimit, store, projectSources);
@@ -307,7 +303,7 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === resolve(process.argv[1
     port: Number(process.env.PORT ?? 4173),
     inventoryPort: Number(process.env.INVENTORY_PORT ?? 4174),
     dataDir: process.env.FLOWATLAS_MEMORY_ONLY === '1' ? null : process.env.FLOWATLAS_DATA_DIR ?? 'data/actions',
-    projects: readProjectConfig(root, process.env.FLOWATLAS_CONFIG ?? 'flowatlas.config.json'),
+    projects: readProjectConfig(resolveWorkspace(root), process.env.FLOWATLAS_CONFIG ?? 'flowatlas.config.json'),
   });
   console.log(`FlowAtlas MVP: http://127.0.0.1:${servers.port}`);
   const stop = () => servers.close().catch((error) => { console.error(error.message); process.exitCode = 1; });

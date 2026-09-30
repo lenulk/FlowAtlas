@@ -6,8 +6,9 @@ import { fileURLToPath } from 'node:url';
 import { realpathSync, lstatSync } from 'node:fs';
 import { startServers } from '../src/server.mjs';
 import { readProjectConfig } from '../src/project-sources.mjs';
+import { resolveWorkspace } from '../src/workspace.mjs';
 
-const root = dirname(dirname(fileURLToPath(import.meta.url)));
+const root = resolveWorkspace(dirname(dirname(fileURLToPath(import.meta.url))));
 const usage = 'Usage: node scripts/inspect.mjs [--project ID] [--entry registered-file] [--config local-path] [--data-dir local-path] [--app-url local-origin]';
 function inside(parent, path) {
   const rel = relative(parent, path);
@@ -87,7 +88,7 @@ async function runInspector(args = process.argv.slice(2)) {
     || !lstatSync(entryPath).isFile() || !/\.(mjs|cjs|js)$/.test(entry)) throw new Error('Entry must be a Node source file inside the registered project');
   const dataDir = flags['--data-dir'] ?? 'data/actions';
   const servers = await startServers({ port: Number(process.env.FLOWATLAS_COLLECTOR_PORT ?? 4173),
-    inventoryPort: Number(process.env.FLOWATLAS_INVENTORY_PORT ?? 4174), dataDir, projects: config });
+    inventoryPort: Number(process.env.FLOWATLAS_INVENTORY_PORT ?? 4174), dataDir, projects: config, workspace: root });
   const collectorUrl = `http://127.0.0.1:${servers.port}`;
   let target, input;
   let stopping;

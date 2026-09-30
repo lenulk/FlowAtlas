@@ -4,8 +4,10 @@ import { spawnSync } from 'node:child_process';
 import { dirname, isAbsolute, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { ProjectSources, readProjectConfig } from '../src/project-sources.mjs';
+import { resolveWorkspace, resolveDataDirectory } from '../src/workspace.mjs';
 
-const root = dirname(dirname(fileURLToPath(import.meta.url)));
+const toolRoot = dirname(dirname(fileURLToPath(import.meta.url)));
+const root = resolveWorkspace(toolRoot);
 const usage = 'Usage: flowatlas doctor [--project ID] [--entry server.mjs] [--config local-file] [--data-dir local-dir] [--json]';
 function inside(parent, target) {
   const path = relative(parent, target);
@@ -68,7 +70,7 @@ export async function doctor(args = []) {
       for (const file of ['node-adapter.mjs', 'project-sources.mjs']) {
         const adapter = join(directory, file);
         if (!existsSync(adapter) || lstatSync(adapter).isSymbolicLink() || !lstatSync(adapter).isFile()
-          || !readFileSync(adapter).equals(readFileSync(join(root, 'src', file)))) {
+          || !readFileSync(adapter).equals(readFileSync(join(toolRoot, 'src', file)))) {
           throw new Error(`Adapter missing or differs from this tool version: ${file}`);
         }
       }
@@ -76,10 +78,7 @@ export async function doctor(args = []) {
     });
   }
   await check('storage', () => {
-    const directory = resolve(root, flags['--data-dir'] ?? 'data/actions');
-    const path = relative(root, directory);
-    if (!inside(root, directory) || ['src', 'public', 'examples', '.git', '.codex', '.agents']
-      .includes(path.split(/[\\/]/)[0].toLowerCase())) throw new Error('Storage must be inside FlowAtlas and outside code/config directories');
+    const directory = resolveDataDirectory(root, flags['--data-dir'] ?? 'data/actions');
     let parent = directory;
     while (!existsSync(parent)) parent = dirname(parent);
     if ((parent !== root && !inside(realpathSync(root), realpathSync(parent))) || !lstatSync(parent).isDirectory()) {

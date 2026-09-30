@@ -833,3 +833,54 @@
 - Archive กลับเข้า host checksum 20b12270cb953fd5b0ab8012c7ce9bd21a3486dedcffbdf4d9bf806e137300de ตรง VM ตรวจ paths/ไม่ทับหลักฐานก่อน extract; hashes ทุก source ใน runner JSON ตรง host ปัจจุบัน และตรวจภาพ restart ด้วยตาแล้ว
 - CI failed artifact ของ run 36772248570 มี result.json: actions ทั้งสามและ restored=true/browserErrors=[] พร้อมภาพ restart ยืนยันว่า test ไปถึงก่อน final stop; log timeout 60 วินาทีแล้ว job ถูกยุติตาม 20 นาที จึงระบุการค้างอยู่หลังเขียน result ก่อน final shutdown จบ ไม่อ้างว่า product action/graph ล้มเหลว
 - ตรวจภาพ CI restart และ VM restart ด้วยตาแล้วอ่าน history/graph ได้; การแก้ cleanup ผ่าน VM แต่ยังต้องรัน hosted matrix ใหม่
+
+## 2026-09-30T20-56-17-590Z
+
+- จุดประสงค์: FA-03 independent workspace: preflight, storage boundaries, retention and existing CLI integration
+- ผล: ผ่าน — 26/26; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: 1b4213f3c84328927d2768614baf30376d557e5a; dirty: true
+- หลักฐาน: `reports/tests/2026-09-30T20-56-17-590Z.tap` และ `.json`
+
+## 2026-09-30T20-59-56-745Z
+
+- จุดประสงค์: FA-03 offline package with independent workspace: three actions and replay
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: 1b4213f3c84328927d2768614baf30376d557e5a; dirty: true
+- หลักฐาน: `reports/tests/2026-09-30T20-59-56-745Z.tap` และ `.json`
+
+## 2026-09-30T21-00-02-679Z
+
+- จุดประสงค์: FA-03 same-version reinstall: preserve old graphs and capture new actions
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: 1b4213f3c84328927d2768614baf30376d557e5a; dirty: true
+- หลักฐาน: `reports/tests/2026-09-30T21-00-02-679Z.tap` และ `.json`
+
+## 2026-09-30T21-00-46-129Z
+
+- จุดประสงค์: FA-03 full regression with configurable workspace and physical data directory boundaries
+- ผล: ผ่าน — 64/64; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: 1b4213f3c84328927d2768614baf30376d557e5a; dirty: true
+- หลักฐาน: `reports/tests/2026-09-30T21-00-46-129Z.tap` และ `.json`
+
+## 2026-09-30T21-00-59-100Z
+
+- จุดประสงค์: FA-03 isolated source with workspace separation
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: 1b4213f3c84328927d2768614baf30376d557e5a; dirty: true
+- หลักฐาน: `reports/tests/2026-09-30T21-00-59-100Z.tap` และ `.json`
+
+## 2026-10-01 — ตรวจ hosted gate และถอน/ติดตั้ง package
+
+- Run 36775394097 บน 1b4213f completed success ทุก matrix job (Ubuntu/Windows, Node 22.23.3/24.21.0); ดู https://github.com/lenulk/FlowAtlas/actions/runs/36775394097 เป็นผลรุ่นก่อน workspace separation ล่าสุด
+- Package workspace test ใช้ disposable reports/storage/workspace-install-0f03a201454f43758f041dcf655d5ec6: npm pack/offline install, demo, running integration ผ่าน; uninstall/reinstall package รุ่นเดิมแล้ว hash ของ workspace state ไม่เปลี่ยน
+- package-check หลัง reinstall ตรวจกราฟเก่า 3 และใหม่ 3 ทั้งก่อน/หลัง restart ตรงกัน; ไม่มีแอป/config/data ใน installation directory; ไม่ใช่ upgrade ข้ามรุ่นหรือ real-app trial
+
+## 2026-10-01 — review workspace change
+
+- git diff --check ผ่าน; ตรวจ local links ใน PLAN/README/install/ci/storage รวม 29 จุดมีอยู่; ทบทวน caller roots, static/source files, registration templates, storage boundaries และ CI reinstall workflow
+

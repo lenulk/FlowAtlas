@@ -12,11 +12,14 @@ test('installed package CLI records three actions, preserves history and closes 
   const installed = realpathSync(process.env.FLOWATLAS_INSTALLED_ROOT ?? 'missing-installed-package');
   const path = relative(realpathSync(join(root, 'reports', 'storage')), installed);
   assert.ok(path && !path.startsWith('..') && !isAbsolute(path), 'Use a disposable installation under reports/storage');
+  const workspace = realpathSync(process.env.FLOWATLAS_PACKAGE_WORKSPACE ?? installed);
+  const workspacePath = relative(realpathSync(join(root, 'reports', 'storage')), workspace);
+  assert.ok(workspacePath && !workspacePath.startsWith('..') && !isAbsolute(workspacePath));
   const { getCodeVersion } = await import(pathToFileURL(join(installed, 'src', 'flowatlas.mjs')));
   assert.equal(getCodeVersion(installed).commit, null, 'Package must not inherit parent Git identity');
   let child;
   const launch = async () => {
-    child = spawn(process.execPath, [join(installed, 'scripts', 'cli.mjs'), 'inspect'], {
+    child = spawn(process.execPath, [join(installed, 'scripts', 'cli.mjs'), '--workspace', workspace, 'inspect'], {
       cwd: installed, stdio: ['pipe', 'pipe', 'pipe'], env: { ...process.env,
         FLOWATLAS_COLLECTOR_PORT: '0', FLOWATLAS_INVENTORY_PORT: '0' },
     });
@@ -48,6 +51,10 @@ test('installed package CLI records three actions, preserves history and closes 
   const graphs = [];
   try {
     const first = await launch();
+    const previous = await (await fetch(`${first.collector}/flowatlas/actions`)).json();
+    assert.ok(previous.length <= 3, 'Use a fresh fixture workspace or one prior package-check run');
+    const previousGraphs = await Promise.all(previous.map(async ({ id }) =>
+      (await fetch(`${first.collector}/flowatlas/actions/${id}`)).json()));
     for (const [name, route, method, status] of [
       ['view-message', '/api/message', 'GET', 200], ['send-message', '/api/send', 'POST', 200],
       ['fail-message', '/api/fail', 'POST', 503],
@@ -66,11 +73,16 @@ test('installed package CLI records three actions, preserves history and closes 
     }
     await stop();
     await assert.rejects(fetch(first.app)); await assert.rejects(fetch(first.collector));
-    assert.equal(existsSync(join(installed, 'data', 'actions', '.writer.lock')), false);
+    assert.equal(existsSync(join(workspace, 'data', 'actions', '.writer.lock')), false);
     const restarted = await launch();
-    assert.equal((await (await fetch(`${restarted.collector}/flowatlas/actions`)).json()).length, 3);
-    for (const graph of graphs) assert.deepEqual(await (await fetch(`${restarted.collector}/flowatlas/actions/${graph.id}`)).json(), graph);
+    assert.equal((await (await fetch(`${restarted.collector}/flowatlas/actions`)).json()).length, previous.length + 3);
+    for (const graph of [...previousGraphs, ...graphs]) assert.deepEqual(await (await fetch(`${restarted.collector}/flowatlas/actions/${graph.id}`)).json(), graph);
     await stop();
-    assert.equal(existsSync(join(installed, 'data', 'actions', '.writer.lock')), false);
+    assert.equal(existsSync(join(workspace, 'data', 'actions', '.writer.lock')), false);
+    if (workspace !== installed) {
+      assert.equal(existsSync(join(installed, 'flowatlas.config.json')), false);
+      assert.equal(existsSync(join(installed, 'apps')), false);
+      assert.equal(existsSync(join(installed, 'data')), false);
+    }
   } finally { await stop(); }
 });
