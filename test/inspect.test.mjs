@@ -91,3 +91,54 @@ test('app startup failure releases collector storage lock', () => {
     rmSync(directory, { recursive: true, force: true });
   }
 });
+
+test('app crash after readiness fails the CLI and releases collector port and lock', async () => {
+  const parent = join(root, 'reports', 'storage'); mkdirSync(parent, { recursive: true });
+  const directory = mkdtempSync(join(parent, 'inspect-crash-'));
+  let child;
+  try {
+    const target = createTargetApp(join(directory, 'target'));
+    writeFileSync(join(target, 'server.mjs'), `import { createServer } from 'node:http';
+const server = createServer((request, response) => {
+  response.end('ok');
+  if (request.url === '/crash') setTimeout(() => process.exit(9), 50);
+});
+server.listen(0, '127.0.0.1', () => console.log('Registered app: http://127.0.0.1:' + server.address().port));
+`);
+    const config = join(directory, 'config.json');
+    writeFileSync(config, JSON.stringify({ projects: [{ id: 'message-app', root: relative(root, target), files: targetFiles }] }));
+    const state = join(directory, 'state');
+    child = spawn(process.execPath, ['scripts/cli.mjs', 'inspect', '--config', relative(root, config),
+      '--data-dir', relative(root, state)], { cwd: root,
+      env: { ...process.env, FLOWATLAS_COLLECTOR_PORT: '0', FLOWATLAS_INVENTORY_PORT: '0' }, stdio: ['pipe', 'pipe', 'pipe'] });
+    let output = ''; child.stdout.on('data', (data) => { output += data; });
+    child.stderr.on('data', (data) => { output += data; });
+    const exited = once(child, 'exit');
+    const [collector, app] = await new Promise((resolveReady, rejectReady) => {
+      const timer = setTimeout(() => rejectReady(new Error('Inspector readiness timed out')), 12000);
+      const inspect = () => {
+        const a = output.match(/FlowAtlas: (http:\/\/127\.0\.0\.1:\d+)/);
+        const b = output.match(/App: (http:\/\/127\.0\.0\.1:\d+)/);
+        if (a && b) { clearTimeout(timer); resolveReady([a[1], b[1]]); }
+      };
+      child.stdout.on('data', inspect);
+      child.once('error', (error) => { clearTimeout(timer); rejectReady(error); });
+      child.once('exit', () => { clearTimeout(timer); rejectReady(new Error('Inspector exited before ready')); });
+    });
+    assert.equal((await fetch(`${app}/crash`)).status, 200);
+    const [code] = await exited;
+    assert.equal(code, 1, output);
+    assert.match(output, /App exited unexpectedly \(9\)/);
+    assert.equal(existsSync(join(state, '.writer.lock')), false);
+    await assert.rejects(fetch(collector));
+    await assert.rejects(fetch(app));
+  } finally {
+    if (child && child.exitCode === null && child.signalCode === null) {
+      child.stdin.end('stop\n');
+      await once(child, 'exit');
+    }
+    const within = relative(parent, directory);
+    assert.ok(within && !within.startsWith('..') && !isAbsolute(within));
+    rmSync(directory, { recursive: true, force: true });
+  }
+});

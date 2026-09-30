@@ -357,3 +357,16 @@
 - Focused 26/26 (`2026-09-30T20-56-17-590Z`) ผ่าน; offline package journey 1/1 (`2026-09-30T20-59-56-745Z`) และหลัง uninstall/reinstall 1/1 (`2026-09-30T21-00-02-679Z`) ผ่าน: state SHA-256 ไม่เปลี่ยนระหว่างถอน/ติดตั้ง, กราฟเก่า 3 และใหม่ 3 เปิดหลัง restart ได้ตรงเดิม, lock/ports ปิด, package root ไม่มี app/config/data
 - Windows full 64/64 (`2026-09-30T21-00-46-129Z`) และ isolated source 1/1 (`2026-09-30T21-00-59-100Z`) ผ่าน failed/skipped 0; เพิ่ม workspace/reinstall gate ใน CI แต่ยังต้องตรวจ hosted revision ใหม่
 - ยังไม่ยืนยัน upgrade ข้าม schema/adapter release หรือ integration/startup กับแอปธุรกิจทั่วไป; R1/R2–R5 ยังมีงานใน PLAN ไม่สรุปว่าโปรเจคบรรลุ v1 จาก installer tests
+
+## รอบ 35 — ทบทวนผล CI และตรวจรอบถัดไป
+
+- CI ของ workspace separation commit 6fcee44 ผ่านครบ 4 matrix jobs; เป็น hosted runtime verification ของ fixture/package journeys ไม่ใช่ pilot ของแอปธุรกิจหรือผู้ใช้
+- คำสั่ง staged whitespace check เตือน blank EOF แต่ shell sequence ยัง commit เพราะไม่ได้ตรวจ external exit code; แก้ trailing whitespace และบังคับตรวจ LASTEXITCODE ก่อน commit ต่อไป
+- การอ่านพาธ adapter ผิดแก้ด้วย inventory จาก rg; ไม่มี source mutation จาก tool failure
+
+## รอบ 36 — รายงาน target crash หลัง readiness
+
+- เกณฑ์: CLI ต้องจบ nonzero เมื่อ target ล้มหลัง readiness พร้อมปิด collector และคืน writer lock; stop ที่ผู้ใช้สั่งยังจบสำเร็จ
+- Regression ก่อนแก้ผ่าน 3/4 (`2026-09-30T21-14-11-853Z`): target exit 9 แต่ CLI คืน 0 เพราะ exit branch เรียก cleanup โดยไม่รายงานความล้มเหลว
+- แยก unexpected target exit ออกจาก exit ที่เกิดระหว่าง stop; ให้ error ผ่าน cleanup และ CLI failure path เดิม ไม่ restart แอปหรือ retry business requests
+- หลังแก้ Windows focused ผ่าน 12/12 (2026-09-30T21-14-38-013Z), failed/skipped 0; รวม CLI crash exit 9→1, startup error, explicit stop, registration action และ workspace persistence ไม่ทดสอบ auto-restart ซึ่งยังไม่มี

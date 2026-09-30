@@ -884,3 +884,27 @@
 
 - git diff --check ผ่าน; ตรวจ local links ใน PLAN/README/install/ci/storage รวม 29 จุดมีอยู่; ทบทวน caller roots, static/source files, registration templates, storage boundaries และ CI reinstall workflow
 
+## Manual check — CI workspace และตรวจเอกสาร (2026-10-01)
+
+- GitHub Actions run 36777333008, commit 6fcee441e83a8f96de2920d4256931f163229bec: completed success ครบ Windows/Linux × Node 22.23.3/24.21.0 รวม offline package และ workspace reinstall gates; ตรวจ API ที่รับรองสิทธิ์โดยไม่เก็บ credentials
+- ตรวจ staged diff ก่อน commit ล่าสุดพบ new blank line at EOF ใน TEST-RUNS.md แต่คำสั่ง PowerShell ไม่หยุดและ commit ต่อ; รอบนี้ตัด trailing blank line แล้วจะตรวจ exit code อย่างชัดเจนก่อน commit
+- อ่าน adapter จาก examples/node-adapter.mjs ไม่พบไฟล์; ใช้ rg --files ยืนยัน implementation อยู่ src/node-adapter.mjs ไม่เปลี่ยนโค้ดจากการอ่านผิด
+
+- การตรวจ whitespace รอบแก้ log ยังพบ blank EOF ใน QUALITY.md จาก Add-Content; ตัด trailing whitespace ทั้งสองเอกสารแล้วตรวจใหม่ด้วย exit-code gate
+
+## 2026-09-30T21-14-11-853Z
+
+- จุดประสงค์: Regression: inspector must fail when target crashes after readiness
+- ผล: ไม่ผ่าน — 3/4; failed 1; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: 6fcee441e83a8f96de2920d4256931f163229bec; dirty: true
+- หลักฐาน: `reports/tests/2026-09-30T21-14-11-853Z.tap` และ `.json`
+- ไม่ผ่าน: app crash after readiness fails the CLI and releases collector port and lock
+
+## 2026-09-30T21-14-38-013Z
+
+- จุดประสงค์: Verify unexpected target exit, startup failure and explicit stop lifecycle
+- ผล: ผ่าน — 12/12; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: 6fcee441e83a8f96de2920d4256931f163229bec; dirty: true
+- หลักฐาน: `reports/tests/2026-09-30T21-14-38-013Z.tap` และ `.json`

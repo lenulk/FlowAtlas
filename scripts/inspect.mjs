@@ -117,7 +117,10 @@ async function runInspector(args = process.argv.slice(2)) {
     input = createInterface({ input: process.stdin });
     input.on('line', (line) => { if (line.trim() === 'stop') stop().catch((error) => { console.error(error); process.exitCode = 1; }); });
     const closedInput = once(input, 'close').then(() => stop());
-    const exitedTarget = targetExited.then(() => stop());
+    const exitedTarget = targetExited.then(([code, signal]) => {
+      if (!stopping) throw new Error(`App exited unexpectedly (${code ?? signal})`);
+      return stop();
+    });
     await Promise.race([closedInput, exitedTarget]);
     await stop();
   } catch (error) {
