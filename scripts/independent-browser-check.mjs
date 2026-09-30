@@ -111,7 +111,7 @@ test('a second web app works through actual browser clicks and FlowAtlas graph l
       assert.match(await source.locator('body').innerText(), new RegExp(`async function ${symbol}\\(`));
       await source.close();
       console.log(`${name} source verified`);
-      if (name === 'fail-message') await viewer.screenshot({ path: join(evidence, 'graph.png'), fullPage: true });
+      if (name === 'fail-message') await viewer.screenshot({ path: join(evidence, 'graph.png'), fullPage: true, timeout: 20000 });
       await page.goto(appUrl);
       actions.push({ id, name, outcome, nodes: graph.nodes.length, edges: graph.edges.length });
     }

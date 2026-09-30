@@ -393,3 +393,10 @@
 - เพิ่ม bounded URL parse failure response ไม่มี input/token/stack ใน response ไม่เปลี่ยนการ parse route ที่ถูกต้องหรือ retry requests
 - Collector focused 9/9 (`2026-09-30T21-35-13-081Z`) ผ่าน แต่ neighboring workflow inspection พบ inventory listener ใน process เดียวกันมี parser ก่อน error handling เช่นกัน; expanded regression 0/1 (`2026-09-30T21-36-03-320Z`) ผ่าน collector path แล้วล้มที่ inventory path จึงแก้ทั้งสอง listener ของ principal issue นี้
 - หลังแก้ทั้งสอง listener focused Windows ผ่าน 14/14 (2026-09-30T21-36-41-853Z), failed/skipped 0; malformed targets ได้ 400, inventory stock ยังคง 2, collector ยังรับ authorized status และ action/session flows ผ่าน ไม่รัน source snapshot gate ซ้ำเพราะไม่ได้เปลี่ยน source serving
+## รอบ 39 — CI artifact capture deadline
+
+- CI f8b125d run 36778221475 ล้มเฉพาะ Windows Node 22 job 110101417922; log เก็บ reports/vm/ci-job-110101417922.log: main/source/inspector ผ่าน, independent app actions/graph/source ทั้ง 3 ผ่าน แล้ว page.screenshot timeout 8000 ms หลัง fonts loaded
+- ข้อผิดพลาดเกิดใน artifact capture ไม่ใช่หลักฐานว่า business graph ผิด; 8 วินาทีเป็น default interactive deadline แต่ full-page capture บน hosted Windows เป็นงานคนละแบบ สาเหตุภายใน browser/runner ยังไม่ยืนยัน
+- จะกำหนด screenshot deadline 20 วินาทีแยกจาก interactive actions 8 วินาที, ไม่ retry และยัง fail หากเกินเพดาน; ต้องตรวจผล hosted อีกครั้งก่อนปิด QA risk
+- พบ secondary failure: package check รันแม้ pack/install ถูก skipped เพราะ if !cancelled ไม่ตรวจ prerequisite; จดเป็น repair ถัดไป ไม่ถือ ENOENT missing-installed-package ว่า package regression
+- Local Edge journeys ผ่าน 2/2 (2026-09-30T21-39-22-368Z) พร้อม deadlines ที่แยก; ผลนี้ไม่ใช่ repro/หลักฐานการแก้ screenshot timeout บน hosted Windows ยังต้องรอ CI

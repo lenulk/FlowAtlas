@@ -133,7 +133,7 @@ test('on-demand command supports a complete browser journey and persisted replay
       await source.waitForFunction((name) => document.body.textContent.includes(`async function ${name}(`), symbol);
       assert.match(await source.locator('body').innerText(), new RegExp(`async function ${symbol}\\(`));
       await source.close();
-      if (name === 'fail-message') await viewer.screenshot({ path: join(evidence, 'inspector-graph.png'), fullPage: true });
+      if (name === 'fail-message') await viewer.screenshot({ path: join(evidence, 'inspector-graph.png'), fullPage: true, timeout: 20000 });
       await viewer.close();
       actions.push({ id, name, outcome, nodes: graph.nodes.length, edges: graph.edges.length });
     }
@@ -159,7 +159,7 @@ test('on-demand command supports a complete browser journey and persisted replay
     await viewer.locator('#history-status').waitFor();
     await viewer.waitForFunction(() => document.querySelectorAll('#history-list tr').length === 3);
     assert.equal(await viewer.locator('#history-list tr').count(), 3);
-    await viewer.screenshot({ path: join(evidence, 'inspector-restart.png'), fullPage: true });
+    await viewer.screenshot({ path: join(evidence, 'inspector-restart.png'), fullPage: true, timeout: 20000 });
     await viewer.locator('#session-lock').click();
     await viewer.locator('#session-panel').waitFor({ state: 'visible' });
     assert.equal(await viewer.locator('#history-list tr').count(), 0);

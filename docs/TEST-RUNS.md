@@ -1043,3 +1043,18 @@
 - Environment: win32/x64; OS 10.0.26200; Node v24.18.0
 - commit: 678a2478bc999c1a09f3642f1979e5492d852670; dirty: true
 - หลักฐาน: `reports/tests/2026-09-30T21-36-41-853Z.tap` และ `.json`
+
+## Manual CI status — 2026-10-01
+
+- Run 36780234072 / 678a247: Ubuntu Node 22/24 success; Windows ทั้งสองยัง in_progress ตอนตรวจ จึงยังไม่ถือว่า session matrix ผ่านครบ และ push f22f11a เริ่ม revision ใหม่
+- Run 36778221475 / f8b125d: completed failure, Windows Node 22 job ไม่ผ่าน ขณะที่อีก 3 jobs success; ต้องอ่าน failed step/log ก่อนทำงานฟีเจอร์ถัดไป
+
+- Manual failed-CI log review: independent actions/source ผ่านทุกเคสก่อน full-page screenshot timeout 8000 ms; package ENOENT เป็น secondary failure หลัง install skipped ตาม job step conclusions เก็บ log local โดยไม่เก็บ credentials
+
+## 2026-09-30T21-39-22-368Z
+
+- จุดประสงค์: Browser artifact capture uses a separate bounded deadline; functional journeys retain 8-second limits
+- ผล: ผ่าน — 2/2; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: f22f11acae12fc10ef215d428319a8d1aa1c69f9; dirty: true
+- หลักฐาน: `reports/tests/2026-09-30T21-39-22-368Z.tap` และ `.json`
