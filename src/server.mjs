@@ -8,7 +8,7 @@ import { getProduct } from './catalog.mjs';
 import { createInventoryService } from './inventory-service.mjs';
 import { validateGraph } from './evidence-contract.mjs';
 import { ingestEvent } from './ingest.mjs';
-import { JsonActionStore } from './action-store.mjs';
+import { JsonActionStore, storageErrorDiagnostic } from './action-store.mjs';
 import { ProjectSources, readProjectConfig } from './project-sources.mjs';
 
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
@@ -59,7 +59,13 @@ function placeOrder(inventoryUrl, actionId) {
   });
 }
 
-export async function startServers({ port = 4173, inventoryPort = 4174, dataDir = null, actionLimit = 100, projects = [] } = {}) {
+export async function startServers({ port = 4173, inventoryPort = 4174, dataDir = null, actionLimit = 100, projects = [],
+  onStorageError = (diagnostic) => console.error(`FlowAtlas storage: ${JSON.stringify(diagnostic)}`) } = {}) {
+  const reportStorageError = (error) => {
+    if (error.code !== 'FLOWATLAS_STORAGE_ERROR') return;
+    try { onStorageError(storageErrorDiagnostic(error)); }
+    catch { /* A diagnostic sink must not change the request result or storage cleanup. */ }
+  };
   const version = getCodeVersion(root);
   const projectSources = new ProjectSources(root, projects);
   let store = null;
@@ -76,7 +82,7 @@ export async function startServers({ port = 4173, inventoryPort = 4174, dataDir 
       store = new JsonActionStore(directory);
     }
     atlas = new FlowAtlas(version, actionLimit, store, projectSources);
-  } catch (error) { store?.close(); throw error; }
+  } catch (error) { reportStorageError(error); store?.close(); throw error; }
   const inventory = createInventoryService();
   let actualInventoryPort;
   try { actualInventoryPort = await listen(inventory, inventoryPort); }
@@ -92,6 +98,7 @@ export async function startServers({ port = 4173, inventoryPort = 4174, dataDir 
           const result = ingestEvent(atlas, await readJson(request));
           sendJson(response, 202, result);
         } catch (error) {
+          reportStorageError(error);
           sendJson(response, error.code === 'FLOWATLAS_STORAGE_ERROR' ? 503
             : error.code === 'FLOWATLAS_SNAPSHOT_MISMATCH' || error.message === 'Action ID already exists' ? 409
             : error.message === 'Graph capacity exceeded' ? 413 : 400, { error: error.message });
@@ -270,6 +277,7 @@ export async function startServers({ port = 4173, inventoryPort = 4174, dataDir 
         : error.message === 'Graph capacity exceeded' ? 413
         : ['Invalid action ID', 'Invalid action name', 'Invalid client time', 'Invalid JSON object', 'Request body is too large'].includes(error.message)
           || error instanceof SyntaxError ? 400 : 500;
+      reportStorageError(error);
       sendJson(response, status, { error: error.message });
     }
   });

@@ -22,6 +22,12 @@ UI และ `/flowatlas/status` แสดง mode ตามจริง ค่�
 
 ## การสำรองและ recovery
 
+เมื่อ initialize/load/save ล้มเหลว collector พิมพ์ `FlowAtlas storage:` ตามด้วย JSON ใน stderr ของเครื่อง ประกอบด้วย `code`, `operation`, `stage` และ `causeCode` เช่น `save/rename/EPERM` ใช้เฉพาะค่าที่อนุญาต ไม่บันทึก filesystem path, error message/stack, action/body หรือ credentials; cause ที่ไม่ได้จำแนกแสดง `UNKNOWN` ไม่เพิ่มรายละเอียดนี้ใน HTTP response
+
+ผู้เรียก `startServers({ onStorageError })` ส่ง callback แบบ synchronous เพื่อรับ diagnostic ที่กรองแล้วได้ เช่นเก็บในรายงาน QA ภายในโครงการ หาก callback throw จะยังคงผลคำขอและ cleanup เดิม ไม่มี retry write เพิ่มจาก diagnostics
+
+ผลจาก rename obstruction ที่จำลองบน Windows แสดง `EPERM` และเขียนต่อได้หลังคืนไฟล์ แต่ยังไม่ยืนยันสาเหตุของ recovery 503 ที่เกิดเป็นบางครั้งในรายงานเดิม หากเกิดซ้ำให้เก็บ diagnostic ของคำขอนั้นเทียบขั้นตอน filesystem ก่อนเลือกแก้ ไม่สรุปว่า OneDrive เป็นสาเหตุจากตำแหน่งโฟลเดอร์อย่างเดียว
+
 1. หยุด collector ให้เรียบร้อยก่อนสำรองทั้ง directory ที่เก็บข้อมูล เก็บสำเนาในโครงการและรักษาข้อมูลต้นฉบับ การ copy ขณะ collector เขียน/OneDrive sync ยังไม่อยู่ในเกณฑ์ที่ทดสอบ
 2. ถ้า startup แจ้งไฟล์เสีย ให้เก็บ `state.json` และรายงาน error ไว้ก่อน ตรวจหรือคืนไฟล์จาก backup ที่เชื่อถือได้ ไม่เขียนทับเพื่อให้โปรแกรมเปิดได้อย่างเดียว
 3. ถ้าแจ้ง locked ให้ดู `.writer.lock` เพื่อระบุ PID/host ตรวจว่ามี collector ตัวนั้นทำงานหรือไม่ ถ้ามี ให้ปิดตัวนั้นอย่างถูกต้อง

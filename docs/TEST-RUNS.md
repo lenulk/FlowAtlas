@@ -667,3 +667,40 @@
 
 - ตรวจ local Markdown links ของ PLAN/QUALITY/TEST-RUNS รวม 13 จุดผ่าน; `git diff --check` ผ่าน
 - คำสั่งอ่าน `src/storage.mjs` ไม่สำเร็จเพราะไม่มีไฟล์ชื่อนี้; `rg` ยืนยัน implementation อยู่ใน `src/action-store.mjs` จึงอ่านไฟล์จริงต่อ ไม่มีการเปลี่ยนโค้ดจากคำสั่งที่ผิด
+
+## 2026-09-30T20-00-40-681Z
+
+- จุดประสงค์: FA-01 regression before local storage diagnostics: obstruction, rollback and recovery
+- ผล: ไม่ผ่าน — 8/9; failed 1; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: 57d8ecb5b1201888d3510105de403c4d06954e1f; dirty: true
+- หลักฐาน: `reports/tests/2026-09-30T20-00-40-681Z.tap` และ `.json`
+- ไม่ผ่าน: a filesystem write failure returns 503 without committing the rejected event or action
+
+## 2026-09-30T20-04-37-398Z
+
+- จุดประสงค์: FA-01 local diagnostics: cause stage privacy, rejected state, recovery and throwing sink
+- ผล: ผ่าน — 11/11; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: 57d8ecb5b1201888d3510105de403c4d06954e1f; dirty: true
+- หลักฐาน: `reports/tests/2026-09-30T20-04-37-398Z.tap` และ `.json`
+
+## 2026-10-01 — ตรวจ inventory ก่อน Linux QA
+
+- `rg --files scripts .github test` แสดงคำเตือนว่า `.github` ยังไม่มี; ยืนยันว่าโครงการยังไม่มี CI workflow ให้ตรวจ และอ่าน scripts/test ที่มีต่อ ผลนี้ไม่ใช่ application test failure
+
+## 2026-09-30T20-06-43-000Z
+
+- จุดประสงค์: FA-01 default parallel regression with safe storage cause diagnostics
+- ผล: ผ่าน — 56/56; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: 57d8ecb5b1201888d3510105de403c4d06954e1f; dirty: true
+- หลักฐาน: `reports/tests/2026-09-30T20-06-43-000Z.tap` และ `.json`
+
+## 2026-10-01 — ตรวจเครื่องมือ SSH ใน host
+
+- Python ระบบมีอยู่แต่ `import paramiko` ไม่ผ่าน (`ModuleNotFoundError`); ยังไม่ได้เชื่อม VM หรือทดสอบ Linux ในคำสั่งนี้ จะตรวจ runtime ที่มีและใช้ SSH ด้วย host key เดิม
+- การค้นหา automation ด้วย CODEX_HOME ไม่สำเร็จเพราะตัวแปรไม่ได้ตั้ง; ใช้ตำแหน่ง Codex ของผู้ใช้ที่ทราบแล้วต่อ ไม่ตีความว่าไม่มี automation
+- Python bundled ก็ไม่มี paramiko; จะใช้ OpenSSH ที่มีอยู่และตรวจ host key จาก reports/ssh/known_hosts แทน ไม่ติดตั้ง dependency เพิ่ม
+- OpenSSH ใน sandbox ตอบ Permission denied ก่อนเชื่อมพอร์ต 22; ยังไม่ใช่ผลทดสอบหรือปัญหาของ VM ขอ network escalation ตามการอนุญาต SSH เดิมของผู้ใช้
+- หลัง escalation SSH ตรวจ host key เดิมผ่านและแสดง FLOWATLAS_SSH_READY/Linux; `command -v node` ไม่พบใน PATH จึง exit 1 ใช้ Node portable ที่ติดตั้งไว้ใน QA แทน ไม่มี credential บันทึกลงโครงการ

@@ -6,6 +6,7 @@ import { createHash } from 'node:crypto';
 import { dirname, join, relative, isAbsolute } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { startServers } from '../src/server.mjs';
+import { StorageError, storageErrorDiagnostic } from '../src/action-store.mjs';
 
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
 const storageTests = join(root, 'reports', 'storage');
@@ -61,9 +62,13 @@ test('completed and partial graphs survive a server restart without changing evi
 
 test('a storage directory accepts only one collector at a time', async (t) => {
   const dataDir = temporaryStorage(t);
+  const diagnostics = [];
   const first = await startServers({ port: 0, inventoryPort: 0, dataDir });
   try {
-    await expectStartupFailure({ port: 0, inventoryPort: 0, dataDir }, /locked/i);
+    await expectStartupFailure({ port: 0, inventoryPort: 0, dataDir,
+      onStorageError: (diagnostic) => diagnostics.push(diagnostic) }, /locked/i);
+    assert.deepEqual(diagnostics, [{ code: 'FLOWATLAS_STORAGE_ERROR', operation: 'initialize',
+      stage: 'lock', causeCode: 'EEXIST' }]);
   } finally { await first.close(); }
   const reopened = await startServers({ port: 0, inventoryPort: 0, dataDir });
   await reopened.close();
@@ -71,14 +76,55 @@ test('a storage directory accepts only one collector at a time', async (t) => {
 
 test('corrupted saved data prevents startup and is preserved for recovery', async (t) => {
   const dataDir = temporaryStorage(t);
+  const diagnostics = [];
   const file = join(dataDir, 'state.json');
   writeFileSync(file, '{broken');
-  await expectStartupFailure({ port: 0, inventoryPort: 0, dataDir }, /saved action/i);
+  await expectStartupFailure({ port: 0, inventoryPort: 0, dataDir,
+    onStorageError: (diagnostic) => diagnostics.push(diagnostic) }, /saved action/i);
+  assert.deepEqual(diagnostics, [{ code: 'FLOWATLAS_STORAGE_ERROR', operation: 'load',
+    stage: 'parse', causeCode: 'UNKNOWN' }]);
   assert.equal(readFileSync(file, 'utf8'), '{broken');
   // Failed initialization must release its lock and leave no inventory listener behind.
   rmSync(file);
   const reopened = await startServers({ port: 0, inventoryPort: 0, dataDir });
   await reopened.close();
+});
+
+test('storage diagnostics omit secrets even in unexpected cause fields and nested errors', () => {
+  const secret = 'CANARY_PRIVATE_TOKEN';
+  for (const code of ['EPERM', secret]) {
+    const cause = Object.assign(new Error(`${secret}: private path`), { code, path: secret,
+      dest: secret, syscall: secret, stack: secret });
+    const nested = new StorageError(secret, cause);
+    const error = new StorageError(secret, nested, { operation: secret, stage: secret });
+    const diagnostic = storageErrorDiagnostic(error);
+    assert.deepEqual(diagnostic, { code: 'FLOWATLAS_STORAGE_ERROR', operation: 'unknown',
+      stage: 'unknown', causeCode: code === 'EPERM' ? 'EPERM' : 'UNKNOWN' });
+    assert.equal(JSON.stringify(diagnostic).includes(secret), false);
+    assert.equal(Object.isFrozen(diagnostic), true);
+  }
+});
+
+test('a throwing diagnostic sink cannot change storage rejection, cleanup or recovery', async (t) => {
+  const dataDir = temporaryStorage(t);
+  let called = 0;
+  const servers = await startServers({ port: 0, inventoryPort: 0, dataDir,
+    onStorageError: () => { called++; throw new Error('CANARY_SINK_FAILURE'); } });
+  const base = `http://127.0.0.1:${servers.port}`;
+  const state = join(dataDir, 'state.json');
+  const id = randomUUID();
+  try {
+    mkdirSync(state);
+    const response = await post(base, '/flowatlas/action-start', { id, name: 'view-product' });
+    assert.equal(response.status, 503);
+    assert.deepEqual(await response.json(), { error: 'Unable to persist action; previous saved state has been preserved' });
+    assert.equal(called, 1);
+    assert.equal(servers.atlas.get(id), null);
+    assert.equal(readdirSync(dataDir).some((file) => file.endsWith('.tmp')), false);
+    rmdirSync(state);
+    assert.equal((await post(base, '/flowatlas/action-start', { id, name: 'view-product' })).status, 201);
+    assert.equal(called, 1);
+  } finally { await servers.close(); }
 });
 
 test('persistent retention removes only expired graphs and remains bounded after restart', async (t) => {
@@ -99,14 +145,16 @@ test('persistent retention removes only expired graphs and remains bounded after
 
 test('a filesystem write failure returns 503 without committing the rejected event or action', async (t) => {
   const dataDir = temporaryStorage(t);
-  const servers = await startServers({ port: 0, inventoryPort: 0, dataDir });
+  const diagnostics = [];
+  const servers = await startServers({ port: 0, inventoryPort: 0, dataDir,
+    onStorageError: (diagnostic) => diagnostics.push(diagnostic) });
   const base = `http://127.0.0.1:${servers.port}`;
   const id = randomUUID();
   const state = join(dataDir, 'state.json');
   const backup = join(dataDir, 'before-write.json');
   let blocked = false;
   try {
-    await post(base, '/flowatlas/ingest', { kind: 'action-start', actionId: id, name: 'test' });
+    assert.equal((await post(base, '/flowatlas/ingest', { kind: 'action-start', actionId: id, name: 'test' })).status, 202);
     const before = structuredClone(servers.atlas.get(id));
     const saved = readFileSync(state, 'utf8');
     // Create an actual rename obstruction in a disposable directory, preserving the last state.
@@ -115,17 +163,28 @@ test('a filesystem write failure returns 503 without committing the rejected eve
     blocked = true;
     const event = { kind: 'handler-entry', actionId: id, name: 'test', service: 'app',
       method: 'GET', path: '/test', symbol: 'handler', file: 'src/server.mjs' };
-    assert.equal((await post(base, '/flowatlas/ingest', event)).status, 503);
+    const failed = await post(base, '/flowatlas/ingest', event);
+    assert.equal(failed.status, 503);
+    assert.deepEqual(await failed.json(), { error: 'Unable to persist action; previous saved state has been preserved' });
     assert.deepEqual(servers.atlas.get(id), before);
     const rejectedId = randomUUID();
     assert.equal((await post(base, '/flowatlas/action-start', { id: rejectedId, name: 'view-product' })).status, 503);
+    assert.equal(diagnostics.length, 2, 'Both rejected writes must have local diagnostics');
+    for (const diagnostic of diagnostics) {
+      assert.equal(diagnostic.operation, 'save');
+      assert.equal(diagnostic.stage, 'rename');
+      assert.notEqual(diagnostic.causeCode, 'UNKNOWN');
+      t.diagnostic(`storage obstruction: ${JSON.stringify(diagnostic)}`);
+    }
     assert.equal(servers.atlas.get(rejectedId), null);
     assert.equal(readFileSync(backup, 'utf8'), saved);
     assert.equal(readdirSync(dataDir).some((file) => file.endsWith('.tmp')), false);
     rmdirSync(state);
     renameSync(backup, state);
     blocked = false;
-    assert.equal((await post(base, '/flowatlas/ingest', event)).status, 202);
+    const recovered = await post(base, '/flowatlas/ingest', event);
+    assert.equal(recovered.status, 202, `Recovery failed: ${JSON.stringify(diagnostics)}`);
+    assert.equal(diagnostics.length, 2);
     assert.equal(JSON.parse(readFileSync(state, 'utf8')).actions[0].edges.length, 2);
   } finally {
     if (blocked) { rmdirSync(state); renameSync(backup, state); }

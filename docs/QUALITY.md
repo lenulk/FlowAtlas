@@ -309,3 +309,14 @@
 - ให้ storage recovery intermittent เป็นงานแรกที่ต้องวินิจฉัย; แยกคำสั่งและความสามารถที่เสนอจากของที่มีแล้ว; ใช้ reference app เดิน R0–R3 ได้ แต่ต้องผ่าน independent pilot และ user trial ก่อนรับรอง v1
 - ตรวจด้วยมือ: diff whitespace ผ่าน, ลิงก์ในแผน 8 จุดมีอยู่, 14 ID ไม่ซ้ำ, เทียบจำนวน/ขอบเขตผลทดสอบกับรายงานเดิม; แก้เงื่อนไข R1 และ Alpha/Beta ให้สอดคล้องกับการยังไม่มีแอปจริง
 - ความเสี่ยงที่เหลือ: ระยะเวลา 24–40 วันทำงานและตัวเลข acceptance เป็นประมาณการ/เป้าหมาย ยังไม่ได้ทดลอง; framework/runtime, ingestion, storage และ license ต้องตัดสินใจตามระยะ; ไม่มีโค้ดใหม่หรือหลักฐานว่าผ่าน release gates ในรอบนี้
+
+## รอบ 29 — diagnostics สำหรับ storage recovery
+
+- เกณฑ์: write failure ทั้ง ingestion/action-start ต้องมี operation/stage/cause code ใน diagnostics ของเครื่อง โดยไม่เพิ่ม path/message/body/credentials ใน HTTP response; rejected state ไม่ commit และ recovery เขียนต่อได้
+- Regression ก่อนเพิ่ม diagnostics ไม่ผ่าน 8/9 (`2026-09-30T20-00-40-681Z`): ทั้งสองคำขอได้ 503 แต่ไม่มี local diagnostic ให้แยกสาเหตุ (0 แทน 2); นี่เป็นหลักฐานของช่องว่างด้านวินิจฉัย ไม่ใช่ repro ของ intermittent หลังคืนไฟล์เดิม
+- คำสั่งค้นหาไฟล์ครั้งแรกอ่าน `src/storage.mjs` ที่ไม่มีอยู่; ใช้ผล `rg` อ่าน implementation จริง `src/action-store.mjs` ต่อ ไม่มีการเปลี่ยนโค้ดจากการอ่านที่ผิด
+- เพิ่ม metadata operation/stage ใน StorageError และสร้าง diagnostic ด้วย allowlist ของ filesystem codes; collector ส่งเฉพาะ diagnostic นี้ไป stderr หรือ synchronous callback ที่ผู้เรียกกำหนด ไม่เปลี่ยน HTTP response หรือ retry write
+- Focused Windows ผ่าน 11/11 (`2026-09-30T20-04-37-398Z`), failed/skipped 0: obstruction แสดง `save/rename/EPERM` ทั้งสอง route, rejected graph/ไฟล์เดิมไม่เปลี่ยน, temp cleanup/recovery ผ่าน; canary path/message/stack/unknown code ไม่ออก diagnostic และ callback ที่ throw ไม่เปลี่ยนผลคำขอ
+- ผลนี้ยังไม่ใช่ repro ของ intermittent หลังคืนไฟล์; ต้องตรวจ default parallel integration และเก็บ cause หากเกิดอีกครั้ง ก่อนปิดประเด็นเดิม
+- Default Windows parallel regression ผ่าน 56/56 (`2026-09-30T20-06-43-000Z`), failed/skipped 0; ไม่พบ recovery 503 หลังคืนไฟล์ในรอบนี้ จึงส่งมอบ diagnostics แต่ยังเปิด investigation ของอาการเดิมไว้ ไม่เพิ่ม retries เพื่อกลบปัญหา
+- ขั้นตอน Linux QA: Python ทั้งระบบ/bundled ไม่มี paramiko, ใช้ OpenSSH ที่มีและ host key เดิม; sandbox ปฏิเสธ network ก่อนต่อพอร์ต จึงใช้ escalation ที่อนุญาตแล้ว ต่อ VM สำเร็จ ระบบเป็น Linux และไม่มี Node ใน PATH ปกติ (ใช้ portable runtime เดิมใน QA)
