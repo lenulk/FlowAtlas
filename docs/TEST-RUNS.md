@@ -515,3 +515,50 @@
 - VM ใช้ checkout ฐาน `530e221` แบบ dirty โดยส่งสคริปต์ทดสอบและ `inspect.mjs` รุ่นปัจจุบันเพิ่ม; SHA-256 ของไฟล์ใน runner JSON ตรงกับ host ไม่ใช่การทดสอบ clean checkout ของ commit ปัจจุบัน
 - ตรวจรายการภาพครั้งแรกใช้ `Get-ChildItem -LiteralPath` กับ wildcard จึงหาไฟล์ไม่พบ; รันใหม่ด้วย `-Path` พบภาพทั้งสองครบ (205432 และ 172186 bytes) ไม่กระทบผลทดสอบหรือไฟล์
 - บันทึก Git ครั้งแรกไม่สำเร็จเพราะ environment นี้ไม่มี `user.name`/`user.email`; staged files ยังครบ ตรวจ `git log` พบ commit เดิมใช้ `Codex <codex@localhost>` จึงใช้ identity เดิมเฉพาะคำสั่ง commit ไม่เปลี่ยน global/local config
+
+## 2026-09-30T18-41-03-640Z
+
+- จุดประสงค์: Other web app HTTP integration baseline
+- ผล: ผ่าน — 2/2; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: d83e26d86a9a0f67100e394be67d6bec91d777bd; dirty: false
+- หลักฐาน: `reports/tests/2026-09-30T18-41-03-640Z.tap` และ `.json`
+
+## 2026-09-30T18-42-03-055Z
+
+- จุดประสงค์: Second web app real Edge browser integration
+- ผล: ไม่ผ่าน — 0/1; failed 1; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: d83e26d86a9a0f67100e394be67d6bec91d777bd; dirty: true
+- หลักฐาน: `reports/tests/2026-09-30T18-42-03-055Z.tap` และ `.json`
+- ไม่ผ่าน: a second web app works through actual browser clicks and FlowAtlas graph links
+
+## 2026-09-30T18-43-16-785Z — Browser retry ที่ถูกยุติ
+
+- หลังแก้สมมติฐานเรื่องลิงก์แท็บเดิม รอบ browser ยังชน test timeout 60 วินาที; TAP แสดง 0/1 และ `testTimeoutFailure` แต่ runner ค้างระหว่างปิด จึงส่ง Ctrl+C ก่อนสร้าง JSON/TAP ฉบับสมบูรณ์ ไม่อ้างว่ารอบนี้ผ่าน
+- เก็บ working evidence ใน `reports/browser/independent-browser-2026-09-30T18-43-16-785Z-2b0d37e2/`; ระบุจุดค้างและจำกัดเวลาของ browser operation ก่อนรันทดสอบใหม่
+- ขั้นตอนตรวจ process ใช้ working directory ภาษาไทยผิดหนึ่งครั้ง ทำให้ CreateProcess ปฏิเสธ; retry ด้วย path ที่ถูกต้อง แต่ Win32_Process query ถูก sandbox ปฏิเสธ access denied จึงยังไม่ได้ยืนยันด้วย command line ว่า process ค้างหรือไม่
+
+## 2026-09-30T18-46-26-787Z
+
+- จุดประสงค์: Second web app Edge browser integration with bounded operations
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: d83e26d86a9a0f67100e394be67d6bec91d777bd; dirty: true
+- หลักฐาน: `reports/tests/2026-09-30T18-46-26-787Z.tap` และ `.json`
+
+## 2026-09-30T18-48-22-675Z — เว็บอีกตัวผ่าน Edge browser
+
+- หลังตัด timer ที่เกินจำเป็นใน test cleanup รอบสุดท้ายผ่าน 1/1, failed/skipped 0 บน Windows / Node v24.18.0 / Edge 154.0.4258.37
+- คลิก view/send/fail ผ่านหน้าเว็บที่รันคนละโปรเซสกับ FlowAtlas ได้ HTTP 200/200/503; เปิดแผนที่ในแท็บเดิม กราฟแต่ละ action มี 6 nodes/5 edges (`observed` 3, `inferred` 1, `unknown` 1) และเปิด source handler ตรง action ทั้งสาม; pageerror 0
+- ปิดแอปและ collector แล้วทดสอบว่า URL ทั้งสองไม่ตอบ และไม่มี `.writer.lock` ในพื้นที่ทดสอบใหม่; ตรวจภาพ `reports/ui/independent-browser-graph.png` ด้วยตาแล้ว
+- หลักฐาน: `reports/tests/2026-09-30T18-48-22-675Z.{tap,json}`, `reports/browser/independent-browser-2026-09-30T18-48-23-186Z-3f8f2afb/{result.json,graph.png}` และภาพที่ติดตามใน Git; SHA-256 ของภาพต้นฉบับตรงสำเนา `1fe2c177db3d65de3b30521a09020abb508a4ab09811e902e4db305d6a86db2a`
+- รอบที่ถูกยุติสร้าง stale lock ใน QA directory; ตรวจ PID `24280` จาก lock ว่าไม่มีโปรเซสแล้วก่อนลบเฉพาะไฟล์ล็อกนั้น ตรวจซ้ำแล้ว test directories ทั้งสี่ไม่มี lock ค้าง ไม่แตะ lock เก่าของ test อื่น
+
+## 2026-09-30T18-48-22-675Z
+
+- จุดประสงค์: Second web app final Edge browser and cleanup verification
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: d83e26d86a9a0f67100e394be67d6bec91d777bd; dirty: true
+- หลักฐาน: `reports/tests/2026-09-30T18-48-22-675Z.tap` และ `.json`

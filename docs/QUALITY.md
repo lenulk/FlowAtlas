@@ -268,3 +268,16 @@
 - ขอบเขตหลักฐาน: Browser test ใช้ Chromium headless บน VM; ไม่ใช่ Linux desktop GUI, browser อื่น, มือถือจริง, production load หรือการยืนยันว่าจะ instrument แอปที่ไม่แก้โค้ดได้
 - ขั้นตอนตรวจหลักฐาน: PowerShell `-LiteralPath` ไม่ขยาย wildcard จึงเปลี่ยนเฉพาะคำสั่งแสดงรายการเป็น `-Path` และยืนยันภาพทั้งสองอยู่ครบ; ไม่มีความเสี่ยงต่อข้อมูลทดสอบ
 - ขั้นตอนบันทึก Git: environment ไม่มี commit identity ทำให้คำสั่ง commit แรก fail; staged files ไม่เสียหาย ใช้ identity `Codex <codex@localhost>` จาก commit ก่อนหน้ากับคำสั่ง commit เดียว ไม่แตะ config ถาวร
+
+## รอบ 26 — เว็บแอปอีกตัวในโครงการ
+
+- เกณฑ์: เว็บ `examples/independent-app` ที่รันคนละโปรเซสส่ง 3 actions ไป FlowAtlas ผ่านการคลิกใน browser จริง; กราฟ/source ตรง action; ปิดแล้วพอร์ตและ lock หาย
+- HTTP integration baseline ผ่าน 2/2 (`2026-09-30T18-41-03-640Z`) บน Windows
+- Browser run แรกไม่ผ่าน 0/1 (`2026-09-30T18-42-03-055Z`): test รอ `page` event หลังคลิก graph link แต่เว็บนี้ใช้ลิงก์ในแท็บเดิม; timeout 30 วินาที เกิดจากสมมติฐานใน test ไม่ใช่หลักฐานว่า product graph ล้มเหลว
+- ปรับ test ให้ตรวจ navigation ในแท็บเดิม แล้วรันซ้ำ; เก็บ failed report เพื่อเทียบผล
+- Retry หลังแก้แท็บเดิมชน timeout 60 วินาทีและ runner ไม่ปิดเอง จึงยุติด้วย Ctrl+C ก่อนสร้าง raw JSON/TAP; ยังแยกไม่ออกว่าค้างที่ browser operation หรือ cleanup เพิ่ม step markers/timeout ย่อยและปิด browser ก่อน collector ใน cleanup
+- การตรวจ Win32_Process ด้วย CIM ถูก sandbox ปฏิเสธ access denied; หลีกเลี่ยงการสรุปจากการตรวจ process ที่ไม่สำเร็จ ใช้ port/lock checks ใน test ที่ผ่านแทน
+- ตรวจ evidence ของ retry ที่ timeout พบ `result.json` มีทั้ง 3 actions และ pageerror 0 ก่อนค้าง จึงระบุจุดค้างอยู่ใน cleanup; ปิด browser ก่อน collector และใส่ timeout ย่อย/step markers แล้วผ่าน 1/1 (`2026-09-30T18-46-26-787Z`)
+- ตัด timer ใน `stopApp` หลัง child ออกแล้ว รันรอบสุดท้ายผ่าน 1/1 (`2026-09-30T18-48-22-675Z`); HTTP baseline 2/2, graph/source ตรงทั้งสาม, พอร์ตปิด, lock ของรอบสำเร็จไม่มี, ภาพอ่านได้
+- รอบ timeout เหลือ stale lock แม้ PID เจ้าของหยุดแล้ว; ตรวจเจ้าของและลบเฉพาะ lock ของรอบ QA ที่ถูกยุติ ตรวจพื้นที่ของ browser test ทั้งสี่รอบไม่มี lock ค้าง
+- ข้อจำกัด: เว็บนี้เป็น fixture ที่สร้างเพื่อเชื่อม FlowAtlas อยู่แล้วและอยู่ใน repository เดียวกับ collector แม้รันคนละโปรเซส ผลนี้เพิ่มหลักฐาน browser บน Windows/Edge แต่ยังไม่พิสูจน์ว่าใช้กับเว็บภายนอกทั่วไปหรือเว็บงานจริงได้โดยไม่ติด adapter
