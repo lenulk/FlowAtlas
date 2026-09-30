@@ -2,6 +2,8 @@
 
 FlowAtlas เชื่อมการกระทำหนึ่งครั้งของผู้ใช้บนเว็บเข้ากับคำขอ API เส้นทางการรัน โค้ดที่เกี่ยวข้อง และบริการภายนอก แล้วแสดงเป็นแผนที่และคำอธิบายที่ตรวจสอบหลักฐานย้อนหลังได้ ข้อมูลชุดเดียวกันต้องอ่านได้ด้วยโปรแกรมเพื่อให้ AI coding agent สอบถามต่อได้
 
+เป้าหมายคือเครื่องมือที่เรียกใช้เมื่ออยากตรวจการทำงานของแอป ปัจจุบันมีคำสั่งเดียวสำหรับแอป Node.js ที่ลงทะเบียนและติดตั้งตัวเชื่อมแล้ว; เปิด URL ของแอป กด action และเปิด FlowAtlas จากลิงก์ที่แอปแสดง เครื่องมือยังไม่สามารถเห็นฟังก์ชันภายในของแอปใด ๆ โดยไม่ติดตั้งตัวเชื่อม
+
 แผนพัฒนาจากต้นแบบไปสู่การทดลองกับเว็บแอปอิสระอยู่ใน [PLAN.md](PLAN.md)
 
 ## ผู้ใช้กลุ่มแรก
@@ -12,6 +14,16 @@ FlowAtlas เชื่อมการกระทำหนึ่งครั้�
 ## ลองใช้งาน
 
 ต้องใช้ Node.js 20 ขึ้นไป ไม่ต้องติดตั้งแพ็กเกจเพิ่มเติม
+
+สำหรับแอปตัวอย่างที่ลงทะเบียนแล้ว ใช้คำสั่งเดียว:
+
+```powershell
+node scripts/inspect.mjs --project message-app
+```
+
+คำสั่งพิมพ์ URL ของแอปและ FlowAtlas เปิด URL ของแอป กด **ดูข้อความ**, **ส่งข้อความ** หรือ **ทดลองบริการล้มเหลว** แล้วเปิดแผนที่จากลิงก์ กด `stop` แล้ว Enter เพื่อปิดทั้งสองเซิร์ฟเวอร์ ประวัติอยู่ใน `data/actions` ภายในโครงการ หากยังไม่มี `apps/message-app` หรือ local config ให้รัน `node scripts/create-target-app.mjs` ก่อน สำหรับแอป Node อื่น ให้ลงทะเบียนและใส่ adapter ตาม [คู่มือ](docs/node-adapter.md) แล้วใช้ `--project ID --entry ไฟล์เริ่มแอป`; ไฟล์ entry ต้องอยู่ใน allowlist ของการลงทะเบียน แอปที่ไม่พิมพ์ `Registered app: http://127.0.0.1:<port>` ระบุ `--app-url http://127.0.0.1:<port>` ได้
+
+ตัวอย่างร้านค้าภายใน FlowAtlas ยังเรียกแยกได้ด้วย:
 
 ```powershell
 node src/server.mjs
@@ -43,7 +55,7 @@ node scripts/run-tests.mjs
 
 ตัวรันทดสอบบันทึกผลสำเร็จและล้มเหลวทุกครั้งไว้ใน `reports/tests/` (TAP + JSON) และเพิ่มรายการใน [TEST-RUNS.md](docs/TEST-RUNS.md) การวิเคราะห์และการแก้แต่ละรอบอยู่ใน [QUALITY.md](docs/QUALITY.md) ใช้ `npm test` ได้เมื่อ npm ในเครื่องพร้อมใช้งาน
 
-ทดสอบทั้ง Windows และ Linux VM (Debian 12) ด้วย Node v24.18.0 แล้ว ชุดหลัก 47 กรณีและ source แยก 1 กรณีผ่านบนทั้งสองระบบ เพิ่ม UI บน Linux Chromium headless ผ่าน 8/8 รวม source popup, history/restart, viewport แคบ และ collector outage รายงานใหม่ระบุ OS/architecture อัตโนมัติ ผล Linux และคำสั่งรันซ้ำอยู่ใน [linux-vm.md](docs/linux-vm.md) ยังไม่ได้ตรวจ GUI desktop บน Linux, มือถือจริง หรือ Node 20/22
+ทดสอบทั้ง Windows และ Linux VM (Debian 12) ด้วย Node v24.18.0 แล้ว ชุดหลักเดิม 47 กรณีและ source แยก 1 กรณีผ่านบนทั้งสองระบบ เพิ่ม UI บน Linux Chromium headless ผ่าน 8/8 และคำสั่ง inspector ใหม่ผ่าน 3/3 บน Windows/Linux ชุดหลัก Windows ปัจจุบันผ่าน 50/50 รายงานใหม่ระบุ OS/architecture อัตโนมัติ ผล Linux และคำสั่งรันซ้ำอยู่ใน [linux-vm.md](docs/linux-vm.md) ยังไม่ได้ตรวจ GUI desktop บน Linux, มือถือจริง หรือ Node 20/22
 
 เมื่อตรวจ source link ให้รันแยกจากชุดหลัก:
 

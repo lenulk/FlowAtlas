@@ -246,3 +246,14 @@
 - Import ครั้งแรกสร้าง destination directory ไม่ครบ ทำให้ Copy-Item ภาพล้มเหลว แม้ checksum ผ่าน; สร้าง directory ก่อน copy และเทียบไฟล์เดิมก่อนข้าม ผลสุดท้าย archive/raw/evidence/source hashes ตรงทั้งหมด
 - ตรวจภาพทั้ง 7 แล้ว ไทย/กราฟ/history/conflict/outage ตรงผล automated; VM ไม่มี process ของ QA workspace หรือ writer lock ค้าง ปิด SSH แล้ว หลักฐานและวิธีรันซ้ำใน linux-vm.md
 - สถานะ Linux: ชุดหลัก 47 + source 1 + browser 8 = 56 กรณีผ่าน แยกรอบตามหลักฐาน; ยังไม่พิสูจน์ GUI desktop/browser อื่น/มือถือจริง/Node 20–22/production/user trial หรือ trace capture มาตรฐาน
+
+## รอบ 24 — เครื่องมือเรียกใช้ตามต้องการ
+
+- ผู้ใช้ระบุรูปแบบที่ต้องการ: เรียกใช้เครื่องมือ/ตัวเสริมเมื่ออยากเห็นการทำงาน จึงทำ CLI เริ่ม collector กับ Node app ที่ลงทะเบียนและติดตั้ง adapter ด้วยคำสั่งเดียว พิมพ์ URL ของแอปและแผนที่ ปิดทั้งคู่ด้วย `stop`
+- เกณฑ์: กด action ของแอปแล้วได้กราฟที่สัมพันธ์ด้วย action ID; ปิดแล้วสองพอร์ตหยุด; URL นอก localhost ถูกปฏิเสธก่อนเปิดบริการ; target startup failure ไม่ทิ้ง writer lock
+- First focused test ค้างหลัง stop เพราะ CLI ปิด readline แต่ยังถือ stdin pipe; ยุติ run ก่อน runner สร้าง report และบันทึกใน TEST-RUNS.md ตรวจด้วย direct TTY พบ service ปิดแล้ว; แก้ให้ destroy stdin หลัง stop
+- Windows focused 2/2 ผ่าน (`2026-09-30T15-14-23-434Z`) หลังแก้ และ 3/3 ผ่าน (`2026-09-30T15-15-57-442Z`) หลังเพิ่ม startup failure regression
+- Linux VM focused 3/3 ผ่าน (`2026-09-30T15-18-33-154Z`), failed/skipped 0; ตรวจ source/archive/raw report checksums ตรง ไม่พบ writer lock ค้าง และปิด SSH
+- ขอบเขต: คำสั่งช่วยลดขั้นตอนเปิดใช้งานแอปที่ลงทะเบียนแล้วเท่านั้น ยังต้องใส่ adapter ในแอปจริงเอง และไม่มี OpenTelemetry SDK หรือการดึงโค้ดภายในอัตโนมัติ; ไม่อ้างว่าใช้งานกับทุกเว็บแอปได้
+- Windows ชุดหลักหลังเพิ่ม inspector ผ่าน 50/50 (`2026-09-30T15-22-43-835Z`) ไม่มี failed/skipped; ไม่มีการเปลี่ยนพฤติกรรม src collector/adapter ในรอบนี้
+- ปรับ shutdown ของ CLI ให้ส่ง SIGTERM โดยตรงเพื่อเลี่ยง race กับ stdin ของแอป และ forward stdout ของแอปหลัง readiness; Windows focused ล่าสุด 3/3 (`2026-09-30T17-53-55-845Z`), Linux focused ล่าสุด 3/3 (`2026-09-30T17-55-39-917Z`) ไม่มี failed/skipped/lock ค้าง ตรวจ checksums ของหลักฐาน VM หลังนำเข้าผ่าน

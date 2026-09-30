@@ -12,7 +12,13 @@ node scripts/create-target-app.mjs
 
 สคริปต์คัดลอกแอปกับ adapter ลง `apps/message-app` และเพิ่ม registration ลง `flowatlas.config.json` ทั้งสองเป็นข้อมูลในเครื่องที่ไม่ใส่ Git ของ collector โดยปริยาย ตัว template และ generator อยู่ใน Git เพื่อสร้างใหม่ได้ สำหรับชุดที่จัดเตรียมในรอบนี้ สร้างแอปและ Git repository แยกไว้แล้ว ไม่ต้องรัน generator ซ้ำ
 
-เปิดสองเทอร์มินัลในโฟลเดอร์ FlowAtlas:
+เปิดแอปที่ลงทะเบียนกับ collector ด้วยคำสั่งเดียวในโฟลเดอร์ FlowAtlas:
+
+```powershell
+node scripts/inspect.mjs --project message-app
+```
+
+คำสั่งแสดง URL ทั้งสองและรอ `stop` เพื่อปิดพร้อมกัน ถ้าต้องการแยกการรันเอง ให้เปิดสองเทอร์มินัลในโฟลเดอร์ FlowAtlas:
 
 ```powershell
 # เทอร์มินัลแรก: collector + แผนที่

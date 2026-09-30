@@ -450,3 +450,56 @@
 
 - Final static review: browser script syntax, git diff whitespace และเอกสาร local links 18 ลิงก์ผ่าน; raw JSON ยืนยัน Linux 8/8 exit 0; app source ไม่มี diff
 - Static check รอบแรกพบ blank line ท้าย TEST-RUNS.md; ตัดบรรทัดว่างท้ายไฟล์แล้วตรวจซ้ำก่อน commit
+
+## 2026-09-30 — Inspector round 1
+
+- Focused run `node scripts/run-tests.mjs test/inspect.test.mjs` แสดง TAP header แล้วค้างเกิน 40 วินาที จึงยุติด้วย Ctrl+C; runner ถูกยุติก่อนเขียน TAP/JSON อัตโนมัติ
+- Direct interactive run เปิด collector/app และคำสั่ง stop ปิด exit 0; กำลังแยกสาเหตุที่ test harness ค้างก่อนอ้างว่าผ่าน
+
+
+## 2026-09-30T15-14-23-434Z
+
+- จุดประสงค์: inspector command starts both services, captures action and stops cleanly
+- ผล: ผ่าน — 2/2; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: 649c6dacbb84bed522a16d21866c113c1b0d7f39; dirty: true
+- หลักฐาน: `reports/tests/2026-09-30T15-14-23-434Z.tap` และ `.json`
+
+## 2026-09-30T15-15-57-442Z
+
+- จุดประสงค์: inspector: action path, local URL validation, startup cleanup
+- ผล: ผ่าน — 3/3; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: 649c6dacbb84bed522a16d21866c113c1b0d7f39; dirty: true
+- หลักฐาน: `reports/tests/2026-09-30T15-15-57-442Z.tap` และ `.json`
+
+## 2026-09-30T15-18-33-154Z — Linux inspector
+
+- ชุด focused ผ่าน 3/3, failed 0, skipped 0, exit 0 บน Debian 12 / Node v24.18.0
+- ส่ง `scripts/inspect.mjs` และ `test/inspect.test.mjs` ไป VM, ตรวจ SHA-256 ตรงกับ host; archive และ raw TAP/JSON/console ตรวจ checksum หลัง SCP แล้ว
+- ครอบคลุมเปิด collector + แอปตัวอย่างคำสั่งเดียว, action→graph, stop แล้วพอร์ตปิด, ปฏิเสธ URL นอกเครื่อง, และ startup failure ปล่อย writer lock
+- ไม่พบ writer lock ใน QA storage หลังจบ ปิด SSH แล้ว; raw files อยู่ใน `reports/tests/` และ `reports/vm/inspect-results.tgz`
+
+## 2026-09-30T15-22-43-835Z
+
+- จุดประสงค์: Windows full regression after adding on-demand inspector
+- ผล: ผ่าน — 50/50; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: 649c6dacbb84bed522a16d21866c113c1b0d7f39; dirty: true
+- หลักฐาน: `reports/tests/2026-09-30T15-22-43-835Z.tap` และ `.json`
+
+## 2026-10-01 — Inspector final shutdown check
+
+- ปรับ CLI ให้ส่ง SIGTERM เพื่อหยุดแอปและส่ง stdout ของแอปต่อไปยังเทอร์มินัล; ไม่มีการเปลี่ยน collector/adapter
+- Windows focused 3/3 ผ่าน (`2026-09-30T17-53-55-845Z` UTC), failed/skipped 0, exit 0
+- Linux VM focused 3/3 ผ่าน (`2026-09-30T17-55-39-917Z` UTC), failed/skipped 0, exit 0; source SHA-256 ตรง host
+- ตรวจ archive SHA-256 และ raw TAP/JSON/console checksums หลัง SCP ตรงทั้งหมด; ไม่พบ writer lock ใน QA storage, ปิด SSH แล้ว
+- หลักฐาน: `reports/tests/{runId}.{tap,json}` และ `reports/vm/inspect-final.tgz` ภายในโครงการ
+
+## 2026-09-30T17-53-55-845Z
+
+- จุดประสงค์: inspector final shutdown signal and stdout forwarding
+- ผล: ผ่าน — 3/3; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: 649c6dacbb84bed522a16d21866c113c1b0d7f39; dirty: true
+- หลักฐาน: `reports/tests/2026-09-30T17-53-55-845Z.tap` และ `.json`
