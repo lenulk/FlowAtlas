@@ -41,10 +41,12 @@ export function sourceRef(version, file, symbol) {
 }
 
 export class FlowAtlas {
-  constructor(version, limit = 100) {
+  constructor(version, limit = 100, store = null) {
+    if (!Number.isInteger(limit) || limit < 1 || limit > 100) throw new Error('Invalid action limit');
     this.version = version;
     this.limit = limit;
-    this.actions = new Map();
+    this.store = store;
+    this.actions = new Map((store?.load(limit) ?? []).map((action) => [action.id, action]));
   }
 
   start(id, name, clientTime = null, origin = 'client-reported') {
@@ -59,13 +61,26 @@ export class FlowAtlas {
       codeVersion: this.version,
       nodes: [{ id: 'action', type: 'user-action', label: name, origin }], edges: [],
     };
-    this.actions.set(id, action);
-    if (this.actions.size > this.limit) this.actions.delete(this.actions.keys().next().value);
+    const next = new Map(this.actions);
+    next.set(id, action);
+    if (next.size > this.limit) next.delete(next.keys().next().value);
+    this.store?.save([...next.values()]);
+    this.actions = next;
     return action;
   }
 
   ensure(id, name = 'Unregistered action') {
-    return this.actions.get(id) ?? this.start(id, name, null, 'unverified');
+    const existing = this.actions.get(id);
+    this.assertCurrentVersion(existing);
+    return existing ?? this.start(id, name, null, 'unverified');
+  }
+
+  assertCurrentVersion(action) {
+    if (action && action.codeVersion.digest !== this.version.digest) {
+      const error = new Error('Action belongs to a different code snapshot; start a new action');
+      error.code = 'FLOWATLAS_SNAPSHOT_MISMATCH';
+      throw error;
+    }
   }
 
   node(action, node) {
@@ -100,13 +115,22 @@ export class FlowAtlas {
   finish(id, outcome) {
     const action = this.actions.get(id);
     if (!action) return;
-    action.finishedAt = new Date().toISOString();
-    action.outcome = outcome;
+    if (!['success', 'error'].includes(outcome)) throw new Error('Invalid outcome');
+    this.commit(action, { ...action, finishedAt: new Date().toISOString(), outcome });
+  }
+
+  commit(original, staged) {
+    this.store?.save([...this.actions.values()].map((action) => action.id === staged.id ? staged : action));
+    Object.assign(original, staged);
   }
 
   get(id) { return this.actions.get(id) ?? null; }
 
-  list() {
-    return [...this.actions.values()].reverse().map(({ id, name, startedAt, outcome }) => ({ id, name, startedAt, outcome }));
+  list({ query = '', outcome = null, limit = this.limit } = {}) {
+    const term = query.trim().toLowerCase();
+    return [...this.actions.values()].reverse()
+      .filter((action) => (!outcome || action.outcome === outcome)
+        && (!term || action.name.toLowerCase().includes(term) || action.id.toLowerCase().includes(term)))
+      .slice(0, limit).map(({ id, name, startedAt, outcome }) => ({ id, name, startedAt, outcome }));
   }
 }

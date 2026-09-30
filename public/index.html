@@ -26,6 +26,17 @@
       </div>
     </section>
 
+    <section class="history card" aria-labelledby="history-title">
+      <div class="history-heading"><div><h2 id="history-title">รายการที่บันทึกไว้</h2><p>ค้นหาและเปิดหลักฐานของการทำงานที่ผ่านมา</p></div><a href="/" id="new-action-link">เริ่ม action ใหม่ ↗</a></div>
+      <form id="history-form" class="history-controls">
+        <label>ค้นหา<input id="history-query" type="search" maxlength="200" placeholder="ชื่อ action หรือรหัส"></label>
+        <label>ผลลัพธ์<select id="history-outcome"><option value="">ทั้งหมด</option><option value="success">สำเร็จ</option><option value="error">ผิดพลาด</option><option value="running">ยังไม่มีผลสุดท้าย</option></select></label>
+        <label>จำนวน<select id="history-limit"><option value="20">20</option><option value="50">50</option><option value="100">100</option></select></label>
+        <button type="submit">ค้นหา / รีเฟรช</button>
+      </form>
+      <p id="history-status" role="status">กำลังอ่านรายการ…</p>
+      <div class="history-table-wrap"><table><thead><tr><th scope="col">Action</th><th scope="col">เริ่มเมื่อ</th><th scope="col">ผลลัพธ์</th></tr></thead><tbody id="history-list"></tbody></table></div>
+    </section>
     <section class="workspace">
       <div class="actions card" id="demo-actions">
         <div class="section-heading"><span class="step">01</span><div><h2>เลือกการกระทำ</h2><p>แต่ละปุ่มสร้างรหัส action ใหม่</p></div></div>
@@ -52,7 +63,7 @@
         </div>
       </div>
     </section>
-    <p class="footnote">ข้อมูลเก็บในหน่วยความจำของเครื่องนี้ สูงสุด 100 actions · บริการปลายทางในตัวอย่างเป็น mock · <a href="/flowatlas/actions" target="_blank" rel="noopener">รายการ actions ทั้งหมด ↗</a></p>
+    <p class="footnote"><span id="storage-status">กำลังตรวจสถานะการเก็บข้อมูล…</span> · บริการปลายทางในตัวอย่างเป็น mock · <a href="/flowatlas/actions" target="_blank" rel="noopener">รายการ actions แบบ JSON ↗</a></p>
   </main>
 </body>
 </html>

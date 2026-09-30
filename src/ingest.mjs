@@ -27,6 +27,7 @@ export function ingestEvent(atlas, event) {
 
   const original = atlas.get(actionId);
   if (!original) throw new Error('Action has not been started');
+  atlas.assertCurrentVersion(original);
   // Validate and build on a copy; rejected events must never partially alter a graph.
   const action = structuredClone(original);
 
@@ -54,7 +55,7 @@ export function ingestEvent(atlas, event) {
       type: 'instrumented-handler-entry', symbol, sourceDeclaration: source,
       service, traceparent: context,
     });
-    Object.assign(original, action);
+    atlas.commit(original, action);
     return { actionId, apiNode, codeNode };
   }
 
@@ -109,7 +110,7 @@ export function ingestEvent(atlas, event) {
         type: 'coverage-gap', reason: 'No internal spans were captured from the destination service.',
       });
     }
-    Object.assign(original, action);
+    atlas.commit(original, action);
     return { actionId, externalNode };
   }
 

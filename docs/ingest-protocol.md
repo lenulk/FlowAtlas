@@ -27,6 +27,8 @@
 
 JSON body ต้องเป็น object และไม่เกิน 16,384 bytes; `clientTime` เป็นเวลาแบบ string ที่ parse ได้ หรือ null แต่ละกราฟจำกัด 100 nodes และ 200 edges (413 เมื่อเต็ม) เหตุการณ์ที่ถูกปฏิเสธไม่เปลี่ยนกราฟที่เก็บไว้ `destination` แยกตัวตนของคำขอที่มี method/path เหมือนกัน เมื่อ handler และ outbound มี traceparent ต้องอยู่ใน trace ID เดียวกัน โดย span ID เปลี่ยนได้
 
+เมื่อใช้ CLI ตัวรับเก็บ actions ลงดิสก์ก่อนตอบรับ event หาก write ล้มตอบ 503 เมื่อโหลดกราฟรุ่นโค้ดเก่ากลับมา API อ่านยังใช้ได้ แต่การเติม event ต้องมี code digest ตรงกับ runtime ปัจจุบัน มิฉะนั้นตอบ 409 ให้เริ่ม action ID ใหม่ การสำรอง/recovery อยู่ใน [storage.md](storage.md)
+
 fixture เก็บ action IDs ในเครื่องเพื่อทำงานได้เมื่อ collector ล้ม คำตอบ `/action-start` มี `telemetry.complete`; คำตอบ API มี header `x-flowatlas-telemetry: complete|incomplete` เมื่อขาดเหตุการณ์จะหยุด capture ของ action นั้นและ UI แจ้งว่าหลักฐานไม่ครบ กราฟที่ collector รับไปบางส่วนอาจยังเป็น `running` จึงห้ามตีความว่าเป็นหลักฐานครบหรือผลธุรกิจล้มเหลว
 
 ## ขอบเขตความเชื่อมั่น

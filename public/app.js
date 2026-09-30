@@ -1,6 +1,7 @@
 const $ = (selector) => document.querySelector(selector);
 const svgNS = 'http://www.w3.org/2000/svg';
 const statusLabels = { observed: 'สังเกตจริง', inferred: 'อนุมาน', unknown: 'ยังไม่ทราบ' };
+const outcomeLabels = { success: 'สำเร็จ', error: 'ผิดพลาด', running: 'ยังไม่มีผลสุดท้าย' };
 const typeLabels = {
   'user-action': 'USER ACTION', api: 'API', code: 'CODE',
   'external-request': 'EXTERNAL REQUEST', unknown: 'COVERAGE GAP',
@@ -73,7 +74,7 @@ function renderEvidence(graph) {
     details.append(pre);
     if (target.source) {
       const link = document.createElement('a');
-      link.href = `/flowatlas/source?file=${encodeURIComponent(target.source.file)}&sha256=${target.source.sha256}`;
+      link.href = `/flowatlas/source?actionId=${encodeURIComponent(graph.id)}&file=${encodeURIComponent(target.source.file)}&sha256=${target.source.sha256}`;
       link.target = '_blank';
       link.rel = 'noopener';
       link.textContent = `เปิด ${target.source.file} · ${target.source.symbol} ↗`;
@@ -87,7 +88,7 @@ function renderEvidence(graph) {
 function renderGraph(graph) {
   $('#empty').hidden = true;
   $('#trace-content').hidden = false;
-  $('#trace-subtitle').textContent = `${graph.name} · ${graph.outcome} · ${graph.nodes.length} nodes`;
+  $('#trace-subtitle').textContent = `${graph.name} · ${outcomeLabels[graph.outcome]} · ${graph.nodes.length} nodes`;
   $('#action-id').textContent = graph.id;
   $('#json-link').href = `/flowatlas/actions/${encodeURIComponent(graph.id)}`;
   renderMap(graph);
@@ -118,8 +119,59 @@ async function performAction(button) {
     $('#result').textContent = error.message;
   } finally {
     document.querySelectorAll('button[data-action]').forEach((element) => { element.disabled = false; });
+    await refreshHistory();
   }
 }
+
+let historyRequest = 0;
+async function refreshHistory() {
+  const request = ++historyRequest;
+  const query = new URLSearchParams({ q: $('#history-query').value,
+    outcome: $('#history-outcome').value, limit: $('#history-limit').value });
+  $('#history-status').textContent = 'กำลังอ่านรายการ…';
+  try {
+    const response = await fetch(`/flowatlas/actions?${query}`);
+    if (!response.ok) throw new Error(`อ่านรายการไม่สำเร็จ (${response.status})`);
+    const actions = await response.json();
+    if (request !== historyRequest) return;
+    $('#history-list').replaceChildren();
+    for (const action of actions) {
+      const row = document.createElement('tr');
+      const name = document.createElement('td');
+      const link = document.createElement('a');
+      link.href = `/?actionId=${encodeURIComponent(action.id)}`;
+      link.textContent = action.name;
+      const id = document.createElement('small');
+      id.textContent = action.id;
+      name.append(link, id);
+      const time = document.createElement('td');
+      time.textContent = new Date(action.startedAt).toLocaleString('th-TH');
+      const outcome = document.createElement('td');
+      const badge = document.createElement('span');
+      badge.className = `history-outcome ${action.outcome}`;
+      badge.textContent = outcomeLabels[action.outcome];
+      outcome.append(badge);
+      row.append(name, time, outcome);
+      $('#history-list').append(row);
+    }
+    $('#history-status').textContent = actions.length
+      ? `แสดง ${actions.length} รายการล่าสุดที่ตรงกับเงื่อนไข` : 'ยังไม่มีรายการที่ตรงกับเงื่อนไข';
+  } catch (error) {
+    if (request !== historyRequest) return;
+    $('#history-list').replaceChildren();
+    $('#history-status').textContent = error.message;
+  }
+}
+$('#history-form').addEventListener('submit', (event) => { event.preventDefault(); refreshHistory(); });
+refreshHistory();
+fetch('/flowatlas/status').then((response) => {
+  if (!response.ok) throw new Error('ไม่สามารถตรวจสถานะการเก็บข้อมูลได้');
+  return response.json();
+}).then((status) => {
+  $('#storage-status').textContent = status.storage === 'disk'
+    ? `เก็บผลในโฟลเดอร์โครงการ เปิดดูได้หลังเริ่มโปรแกรมใหม่ · สูงสุด ${status.actionLimit} actions`
+    : `เก็บผลชั่วคราวในหน่วยความจำ ปิดโปรแกรมแล้วข้อมูลหาย · สูงสุด ${status.actionLimit} actions`;
+}).catch((error) => { $('#storage-status').textContent = error.message; });
 
 document.querySelectorAll('button[data-action]').forEach((button) => {
   button.addEventListener('click', () => performAction(button));
@@ -129,7 +181,7 @@ const incomingActionId = new URLSearchParams(location.search).get('actionId');
 if (incomingActionId) {
   $('#demo-actions').hidden = true;
   $('.workspace').classList.add('viewer-mode');
-  $('#intro-lead').textContent = 'แผนที่นี้มาจากเว็บแอปอีกระบบหนึ่ง เลือกเส้นเชื่อมเพื่อดูหลักฐานและระดับความแน่นอนของแต่ละช่วง';
+  $('#intro-lead').textContent = 'แผนที่จากการทำงานที่บันทึกไว้ เปิดรายการหลักฐานด้านล่างเพื่อดูที่มาและระดับความแน่นอนของแต่ละช่วง';
   fetch(`/flowatlas/actions/${encodeURIComponent(incomingActionId)}`)
     .then((response) => {
       if (!response.ok) throw new Error(`ไม่พบ action นี้ (${response.status})`);

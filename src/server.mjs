@@ -1,6 +1,6 @@
 import { createServer } from 'node:http';
 import { readFileSync } from 'node:fs';
-import { dirname, join, resolve } from 'node:path';
+import { dirname, join, resolve, relative, isAbsolute } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createHash, randomUUID } from 'node:crypto';
 import { FlowAtlas, getCodeVersion, sourceRef } from './flowatlas.mjs';
@@ -8,6 +8,7 @@ import { getProduct } from './catalog.mjs';
 import { createInventoryService } from './inventory-service.mjs';
 import { validateGraph } from './evidence-contract.mjs';
 import { ingestEvent } from './ingest.mjs';
+import { JsonActionStore } from './action-store.mjs';
 
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
 const staticFiles = new Map([
@@ -57,11 +58,27 @@ function placeOrder(inventoryUrl, actionId) {
   });
 }
 
-export async function startServers({ port = 4173, inventoryPort = 4174 } = {}) {
+export async function startServers({ port = 4173, inventoryPort = 4174, dataDir = null, actionLimit = 100 } = {}) {
   const version = getCodeVersion(root);
-  const atlas = new FlowAtlas(version);
+  let store = null;
+  let atlas;
+  try {
+    if (dataDir !== null) {
+      const directory = resolve(root, dataDir);
+      const within = relative(root, directory);
+      const first = within.split(/[\\/]/)[0].toLowerCase();
+      if (!within || within.startsWith('..') || isAbsolute(within)
+        || ['src', 'public', 'examples', '.git', '.codex', '.agents'].includes(first)) {
+        throw new Error('Data directory must be inside the project and outside code or Git directories');
+      }
+      store = new JsonActionStore(directory);
+    }
+    atlas = new FlowAtlas(version, actionLimit, store);
+  } catch (error) { store?.close(); throw error; }
   const inventory = createInventoryService();
-  const actualInventoryPort = await listen(inventory, inventoryPort);
+  let actualInventoryPort;
+  try { actualInventoryPort = await listen(inventory, inventoryPort); }
+  catch (error) { store?.close(); throw error; }
   const inventoryUrl = `http://127.0.0.1:${actualInventoryPort}`;
 
   const app = createServer(async (request, response) => {
@@ -73,9 +90,15 @@ export async function startServers({ port = 4173, inventoryPort = 4174 } = {}) {
           const result = ingestEvent(atlas, await readJson(request));
           sendJson(response, 202, result);
         } catch (error) {
-          sendJson(response, error.message === 'Action ID already exists' ? 409
+          sendJson(response, error.code === 'FLOWATLAS_STORAGE_ERROR' ? 503
+            : error.code === 'FLOWATLAS_SNAPSHOT_MISMATCH' || error.message === 'Action ID already exists' ? 409
             : error.message === 'Graph capacity exceeded' ? 413 : 400, { error: error.message });
         }
+        return;
+      }
+
+      if (request.method === 'GET' && url.pathname === '/flowatlas/status') {
+        sendJson(response, 200, { storage: store ? 'disk' : 'memory', actionLimit: atlas.limit, retainedActions: atlas.actions.size });
         return;
       }
 
@@ -91,7 +114,16 @@ export async function startServers({ port = 4173, inventoryPort = 4174 } = {}) {
       }
 
       if (request.method === 'GET' && url.pathname === '/flowatlas/actions') {
-        sendJson(response, 200, atlas.list());
+        const query = url.searchParams.get('q') ?? '';
+        const outcome = url.searchParams.get('outcome') || null;
+        const limitText = url.searchParams.get('limit');
+        const limit = limitText === null ? atlas.limit : Number(limitText);
+        if (query.length > 200 || (outcome && !['running', 'success', 'error'].includes(outcome))
+          || !Number.isInteger(limit) || limit < 1 || limit > 100) {
+          sendJson(response, 400, { error: 'Invalid history filter' });
+          return;
+        }
+        sendJson(response, 200, atlas.list({ query, outcome, limit }));
         return;
       }
 
@@ -110,7 +142,9 @@ export async function startServers({ port = 4173, inventoryPort = 4174 } = {}) {
       if (request.method === 'GET' && url.pathname === '/flowatlas/source') {
         const file = url.searchParams.get('file');
         const expectedHash = url.searchParams.get('sha256');
-        if (!file || !Object.hasOwn(version.files, file) || version.files[file] !== expectedHash) {
+        const sourceActionId = url.searchParams.get('actionId');
+        const snapshot = sourceActionId ? atlas.get(sourceActionId)?.codeVersion : version;
+        if (!file || !snapshot || !Object.hasOwn(snapshot.files, file) || snapshot.files[file] !== expectedHash) {
           sendJson(response, 404, { error: 'Source is not in this code snapshot' });
           return;
         }
@@ -119,11 +153,11 @@ export async function startServers({ port = 4173, inventoryPort = 4174 } = {}) {
           content = readFileSync(join(root, file));
         } catch (error) {
           if (error.code !== 'ENOENT') throw error;
-          sendJson(response, 409, { error: 'Source was removed after this server started' });
+          sendJson(response, 409, { error: 'Source is unavailable for the captured code snapshot' });
           return;
         }
         if (createHash('sha256').update(content).digest('hex') !== expectedHash) {
-          sendJson(response, 409, { error: 'Source changed after this server started' });
+          sendJson(response, 409, { error: 'Source differs from the captured code snapshot' });
           return;
         }
         response.writeHead(200, { 'content-type': 'text/plain; charset=utf-8', 'cache-control': 'no-store' });
@@ -220,8 +254,11 @@ export async function startServers({ port = 4173, inventoryPort = 4174 } = {}) {
       atlas.finish(actionId, externalResponse.ok ? 'success' : 'error');
       sendJson(response, externalResponse.status, result);
     } catch (error) {
-      if (currentActionId) atlas.finish(currentActionId, 'error');
-      const status = error.message === 'Action ID already exists' ? 409
+      if (currentActionId && !['FLOWATLAS_STORAGE_ERROR', 'FLOWATLAS_SNAPSHOT_MISMATCH'].includes(error.code)) {
+        try { atlas.finish(currentActionId, 'error'); } catch (failure) { error = failure; }
+      }
+      const status = error.code === 'FLOWATLAS_STORAGE_ERROR' ? 503
+        : error.code === 'FLOWATLAS_SNAPSHOT_MISMATCH' || error.message === 'Action ID already exists' ? 409
         : error.message === 'Graph capacity exceeded' ? 413
         : ['Invalid action ID', 'Invalid action name', 'Invalid client time', 'Invalid JSON object', 'Request body is too large'].includes(error.message)
           || error instanceof SyntaxError ? 400 : 500;
@@ -231,14 +268,20 @@ export async function startServers({ port = 4173, inventoryPort = 4174 } = {}) {
 
   try {
     const actualPort = await listen(app, port);
+    let closing;
     return {
       app, inventory, atlas, port: actualPort, inventoryPort: actualInventoryPort,
       async close() {
-        await Promise.all([app, inventory].map((server) => new Promise((resolve) => server.close(resolve))));
+        closing ??= (async () => {
+          try { await Promise.all([app, inventory].map((server) => new Promise((resolve) => server.close(resolve)))); }
+          finally { store?.close(); }
+        })();
+        return closing;
       },
     };
   } catch (error) {
     await new Promise((resolve) => inventory.close(resolve));
+    store?.close();
     throw error;
   }
 }
@@ -247,6 +290,10 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === resolve(process.argv[1
   const servers = await startServers({
     port: Number(process.env.PORT ?? 4173),
     inventoryPort: Number(process.env.INVENTORY_PORT ?? 4174),
+    dataDir: process.env.FLOWATLAS_MEMORY_ONLY === '1' ? null : process.env.FLOWATLAS_DATA_DIR ?? 'data/actions',
   });
   console.log(`FlowAtlas MVP: http://127.0.0.1:${servers.port}`);
+  const stop = () => servers.close().catch((error) => { console.error(error.message); process.exitCode = 1; });
+  process.once('SIGINT', stop);
+  process.once('SIGTERM', stop);
 }

@@ -1,5 +1,31 @@
 # บันทึกการรันทดสอบ
 
+## Final storage/history review — 2026-09-30
+
+- วิธี: อ่าน actual diff, ตรวจ syntax ด้วย `node --check` สำหรับ src/public/examples/scripts/test และ `git diff --check`
+- ผล: syntax 25 ไฟล์ผ่าน; diff whitespace ผ่าน
+- ตรวจลิงก์ไฟล์ในเอกสาร 12 ลิงก์: ปลายทางมีอยู่ครบ
+- อ่าน JSON ผลชุดหลัก `2026-09-30T11-33-55-378Z`: 38 passed / 0 failed / 0 skipped; source แยกล่าสุด `2026-09-30T11-31-51-627Z`: 1/1 ผ่าน
+- ตรวจ QA state หลัง stop: ยังเก็บ 5 actions และไม่มี `.writer.lock` ใน directory ของ session
+- ขอบเขต: final static/evidence review; ไม่ใช่การทดสอบ forced crash, power loss, OneDrive ข้ามเครื่อง หรือ production load
+
+## UI history — 2026-09-30T11:18–11:19Z
+
+- คำสั่ง: `node scripts/qa-session.mjs` (ต้องใช้ interactive stdin/TTY; เมื่อ stdin เป็น EOF โปรแกรมปิดตามปกติ)
+- Data: `reports/storage/ui-17369e7f-ea68-4a0f-838c-0344d657cb62`
+- ผ่าน: สร้าง view-product, check-stock และ place-order 3 ครั้ง รวม 5 actions; order ครั้งที่สาม HTTP 409 และกราฟ error
+- ผ่าน: ตารางเพิ่มรายการหลัง action ทุกครั้ง; filter error แสดง order ที่ล้มเพียงรายการเดียว
+- ผ่าน: ส่งคำสั่ง restart แล้ว collector โหลดกลับมา 5 actions; reload browser ยังเห็นรายการเดิมทั้งหมด
+- ผ่าน: ค้นชื่อ check-stock ได้รายการเดียว และเปิดกราฟเดิม 6 nodes พร้อม evidence/source link ที่มี actionId ตรงกับ snapshot เก่า
+- ภาพ: `reports/ui/history-after-restart.jpg`
+
+## รอบ 8 ก่อน storage — 2026-09-30T10:59Z
+
+- คำสั่ง: `node scripts/run-tests.mjs test/persistence.test.mjs`
+- ผล: ทั้ง 4 กรณีไม่ผ่าน — restart เหลือ 0 actions, ไม่มี writer lock, ไม่ตรวจ corrupt file และ actionLimit ยังไม่ใช้
+- ตัวทดสอบค้างหลัง assertions เพราะกรณีที่คาดว่า startup จะปฏิเสธกลับเปิด server สำเร็จแล้วไม่ได้ปิด; หยุดด้วย Ctrl+C จึงไม่มีรายงานอัตโนมัติของรอบนี้
+- การแก้ test harness: เก็บและปิด server แม้ startup ไม่ได้ปฏิเสธตามคาด
+
 สร้างโดย `node scripts/run-tests.mjs` หรือ `npm test` ทุกครั้ง รายละเอียด TAP และ metadata อยู่ใน `reports/tests/` เวลาเป็น UTC; การวิเคราะห์และการแก้อยู่ใน [QUALITY.md](QUALITY.md)
 
 ## Final review — 2026-09-30
@@ -128,3 +154,91 @@
 - ผล: ผ่าน — 3/3; failed 0; skipped 0
 - Node: v24.18.0; commit: a517239672631f4d96cecf665350f10b93378fe0; dirty: true
 - หลักฐาน: `reports/tests/2026-09-30T10-19-01-072Z.tap` และ `.json`
+
+## 2026-09-30T11-05-26-981Z
+
+- จุดประสงค์: รอบ 8: ตรวจ JSON storage restart single writer retention และ corruption
+- ผล: ผ่าน — 4/4; failed 0; skipped 0
+- Node: v24.18.0; commit: df2cfe7613dae41cafaf24af7ef2e4c89467d91e; dirty: true
+- หลักฐาน: `reports/tests/2026-09-30T11-05-26-981Z.tap` และ `.json`
+
+## 2026-09-30T11-09-01-073Z
+
+- จุดประสงค์: รอบ 9: history query และ invalid filters ก่อนเพิ่ม
+- ผล: ไม่ผ่าน — 0/2; failed 2; skipped 0
+- Node: v24.18.0; commit: df2cfe7613dae41cafaf24af7ef2e4c89467d91e; dirty: true
+- หลักฐาน: `reports/tests/2026-09-30T11-09-01-073Z.tap` และ `.json`
+- ไม่ผ่าน: history queries filter name or ID and outcome before applying the limit
+- ไม่ผ่าน: invalid history filters return 400 and storage status reflects the running mode
+
+## 2026-09-30T11-11-41-657Z
+
+- จุดประสงค์: รอบ 9: ตรวจ storage และ history queries พร้อมชุดเดิม
+- ผล: ผ่าน — 32/32; failed 0; skipped 0
+- Node: v24.18.0; commit: df2cfe7613dae41cafaf24af7ef2e4c89467d91e; dirty: true
+- หลักฐาน: `reports/tests/2026-09-30T11-11-41-657Z.tap` และ `.json`
+
+## 2026-09-30T11-15-01-652Z
+
+- จุดประสงค์: รอบ 10: filesystem failure saved graph validation และ data path ก่อน guard เพิ่ม
+- ผล: ไม่ผ่าน — 6/7; failed 1; skipped 0
+- Node: v24.18.0; commit: df2cfe7613dae41cafaf24af7ef2e4c89467d91e; dirty: true
+- หลักฐาน: `reports/tests/2026-09-30T11-15-01-652Z.tap` และ `.json`
+- ไม่ผ่าน: storage cannot be placed outside the project or in code and Git directories
+
+## 2026-09-30T11-16-07-209Z
+
+- จุดประสงค์: รอบ 10: ตรวจ data directory guard และชุดรวม
+- ผล: ผ่าน — 35/35; failed 0; skipped 0
+- Node: v24.18.0; commit: df2cfe7613dae41cafaf24af7ef2e4c89467d91e; dirty: true
+- หลักฐาน: `reports/tests/2026-09-30T11-16-07-209Z.tap` และ `.json`
+
+## 2026-09-30T11-16-16-085Z
+
+- จุดประสงค์: รอบ 10: isolated source snapshot เดิมหลัง restart และไฟล์เปลี่ยน
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Node: v24.18.0; commit: df2cfe7613dae41cafaf24af7ef2e4c89467d91e; dirty: true
+- หลักฐาน: `reports/tests/2026-09-30T11-16-16-085Z.tap` และ `.json`
+
+## 2026-09-30T11-23-49-658Z
+
+- จุดประสงค์: รอบ 11: ปิด Node process แรกและโหลด graph ใน process ใหม่จริง
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Node: v24.18.0; commit: df2cfe7613dae41cafaf24af7ef2e4c89467d91e; dirty: true
+- หลักฐาน: `reports/tests/2026-09-30T11-23-49-658Z.tap` และ `.json`
+
+## 2026-09-30T11-26-20-404Z
+
+- จุดประสงค์: รอบ 12: regression การเติม event ลง action รุ่นโค้ดเก่า ก่อน guard
+- ผล: ไม่ผ่าน — 0/1; failed 1; skipped 0
+- Node: v24.18.0; commit: df2cfe7613dae41cafaf24af7ef2e4c89467d91e; dirty: true
+- หลักฐาน: `reports/tests/2026-09-30T11-26-20-404Z.tap` และ `.json`
+- ไม่ผ่าน: source links reject changed and removed files from an actual captured snapshot
+
+## 2026-09-30T11-27-43-620Z
+
+- จุดประสงค์: รอบ 12: ชุดรวมหลังเพิ่ม snapshot version guard และ process restart
+- ผล: ผ่าน — 36/36; failed 0; skipped 0
+- Node: v24.18.0; commit: df2cfe7613dae41cafaf24af7ef2e4c89467d91e; dirty: true
+- หลักฐาน: `reports/tests/2026-09-30T11-27-43-620Z.tap` และ `.json`
+
+## 2026-09-30T11-27-51-901Z
+
+- จุดประสงค์: รอบ 12: isolated old snapshot source และปฏิเสธ append ข้ามรุ่น
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Node: v24.18.0; commit: df2cfe7613dae41cafaf24af7ef2e4c89467d91e; dirty: true
+- หลักฐาน: `reports/tests/2026-09-30T11-27-51-901Z.tap` และ `.json`
+
+## 2026-09-30T11-31-51-627Z
+
+- จุดประสงค์: ตรวจ source conflict response หลังปรับข้อความให้ตรง captured snapshot
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Node: v24.18.0; commit: df2cfe7613dae41cafaf24af7ef2e4c89467d91e; dirty: true
+- หลักฐาน: `reports/tests/2026-09-30T11-31-51-627Z.tap` และ `.json`
+
+## 2026-09-30T11-33-55-378Z
+
+- จุดประสงค์: รอบสุดท้าย: concurrent disk checkpoints และ port-conflict cleanup รวมชุดหลัก
+- ผล: ผ่าน — 38/38; failed 0; skipped 0
+- Node: v24.18.0; commit: df2cfe7613dae41cafaf24af7ef2e4c89467d91e; dirty: true
+- หลักฐาน: `reports/tests/2026-09-30T11-33-55-378Z.tap` และ `.json`
