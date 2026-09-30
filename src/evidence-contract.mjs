@@ -29,7 +29,8 @@ function validateSource(source, version, location) {
 export function validateEdge(action, edge) {
   const issues = [];
   const label = `edge ${edge?.id ?? '?'}`;
-  const nodeIds = new Set(action?.nodes?.map((node) => node.id));
+  const nodes = Array.isArray(action?.nodes) ? action.nodes.filter((node) => node && typeof node === 'object') : [];
+  const nodeIds = new Set(nodes.map((node) => node.id));
   if (!isText(edge?.from) || !isText(edge?.to) || !nodeIds.has(edge.from) || !nodeIds.has(edge.to)) {
     issues.push(`${label}: endpoint is missing`);
   }
@@ -44,20 +45,20 @@ export function validateEdge(action, edge) {
   }
 
   if (evidence.type === 'client-report-and-http-inbound') {
-    if (action.nodes.find((node) => node.id === edge.from)?.origin !== 'client-reported') {
+    if (nodes.find((node) => node.id === edge.from)?.origin !== 'client-reported') {
       issues.push(`${label}: no client-reported action exists`);
     }
     if (evidence.correlationId !== action.id || !isText(evidence.method) || !isText(evidence.path)) {
       issues.push(`${label}: correlation or HTTP request data is missing`);
     }
-    const target = action.nodes.find((node) => node.id === edge.to);
+    const target = nodes.find((node) => node.id === edge.to);
     if (target?.type !== 'api' || target.label !== `${evidence.method} ${evidence.path}`) {
       issues.push(`${label}: HTTP evidence does not match the API node`);
     }
   } else if (evidence.type === 'instrumented-handler-entry') {
     if (!isText(evidence.symbol)) issues.push(`${label}: handler symbol is missing`);
     issues.push(...validateSource(evidence.sourceDeclaration, action.codeVersion, label));
-    const target = action.nodes.find((node) => node.id === edge.to);
+    const target = nodes.find((node) => node.id === edge.to);
     if (target?.type !== 'code' || target.source?.symbol !== evidence.symbol
       || target.source?.file !== evidence.sourceDeclaration?.file) {
       issues.push(`${label}: handler evidence does not match the code node`);
@@ -78,13 +79,17 @@ export function validateEdge(action, edge) {
     if (evidence.outcome !== 'attempted' && (!Number.isFinite(evidence.durationMs) || evidence.durationMs < 0)) {
       issues.push(`${label}: outbound duration is invalid`);
     }
-    if (edge.to !== `http:${evidence.method}:${evidence.path}`) {
+    const requestId = evidence.destination === undefined ? `http:${evidence.method}:${evidence.path}`
+      : `http:${encodeURIComponent(evidence.destination)}:${evidence.method}:${evidence.path}`;
+    const target = nodes.find((node) => node.id === edge.to);
+    if (edge.to !== requestId || target?.type !== 'external-request'
+      || (evidence.destination !== undefined && (!isText(evidence.destination) || target.destination !== evidence.destination))) {
       issues.push(`${label}: outbound evidence does not match the request node`);
     }
   } else if (evidence.type === 'source-route-match') {
     if (!isText(evidence.reason)) issues.push(`${label}: inference reason is missing`);
     issues.push(...validateSource(evidence.source, action.codeVersion, label));
-    const target = action.nodes.find((node) => node.id === edge.to);
+    const target = nodes.find((node) => node.id === edge.to);
     if (target?.source?.file !== evidence.source?.file || target.source?.sha256 !== evidence.source?.sha256) {
       issues.push(`${label}: inferred source does not match the target node`);
     }
@@ -110,6 +115,7 @@ export function validateGraph(graph) {
   }
   const nodeIds = new Set();
   for (const node of graph.nodes) {
+    if (!node || typeof node !== 'object' || Array.isArray(node)) { issues.push('invalid node'); continue; }
     if (!isText(node.id) || !isText(node.type) || !isText(node.label)) issues.push('invalid node');
     if (nodeIds.has(node.id)) issues.push(`duplicate node ${node.id}`);
     nodeIds.add(node.id);
@@ -117,6 +123,7 @@ export function validateGraph(graph) {
   }
   const edgeIds = new Set();
   for (const edge of graph.edges) {
+    if (!edge || typeof edge !== 'object' || Array.isArray(edge)) { issues.push('invalid edge'); continue; }
     if (!isText(edge.id) || edgeIds.has(edge.id)) issues.push(`duplicate or missing edge ID ${edge.id}`);
     edgeIds.add(edge.id);
     issues.push(...validateEdge(graph, edge));

@@ -14,6 +14,8 @@
 
 เริ่มระยะ 2 ด้วยเว็บแอป fixture ที่รันคนละโปรเซสและส่งเหตุการณ์ผ่าน HTTP เข้า FlowAtlas แล้ว มีการส่งต่อ W3C `traceparent` ไปยังบริการจำลองและตรวจว่าบริการได้รับค่าเดียวกัน นี่ยังไม่ใช่ OpenTelemetry SDK, Playwright trace หรือการติดตั้งกับ repository ภายนอก จึงยังไม่ผ่านเกณฑ์ระยะ 2 ทั้งหมด
 
+เพิ่มวงรอบตรวจคุณภาพที่บันทึกทุกการรันใน [TEST-RUNS.md](docs/TEST-RUNS.md) และวิเคราะห์ใน [QUALITY.md](docs/QUALITY.md) แล้ว ครอบคลุมข้อมูลผิดรูปแบบ, atomic ingestion, destination/trace correlation, 20 actions พร้อมกัน, collector outage/timeout, retention และ source mismatch; การผ่านชุดทดสอบยังไม่แทนเกณฑ์การทดลองกับแอปภายนอกและผู้ใช้จริง
+
 ## โครงสร้างเป้าหมาย
 
 ```mermaid

@@ -32,7 +32,15 @@ node examples/independent-app/server.mjs
 ทดสอบด้วย:
 
 ```powershell
-node --test
+node scripts/run-tests.mjs
+```
+
+ตัวรันทดสอบบันทึกผลสำเร็จและล้มเหลวทุกครั้งไว้ใน `reports/tests/` (TAP + JSON) และเพิ่มรายการใน [TEST-RUNS.md](docs/TEST-RUNS.md) การวิเคราะห์และการแก้แต่ละรอบอยู่ใน [QUALITY.md](docs/QUALITY.md) ใช้ `npm test` ได้เมื่อ npm ในเครื่องพร้อมใช้งาน
+
+เมื่อตรวจ source link ให้รันแยกจากชุดหลัก:
+
+```powershell
+node scripts/run-tests.mjs scripts/source-check.mjs
 ```
 
 ข้อมูลสำหรับโปรแกรมและ AI coding agent อ่านได้จาก `GET /flowatlas/actions` และ `GET /flowatlas/actions/{id}` โดยไม่ต้องอ่านหรือแปลหน้าเว็บ JSON ยังเป็นรูปแบบทดลอง (`schemaVersion: 0.1`)
@@ -65,9 +73,9 @@ node --test
 
 - ตัวอย่างนี้ใช้ Node.js และจุด instrumentation ที่ใส่ไว้เอง ยังไม่ติดตั้งกับเว็บแอปอื่นโดยอัตโนมัติ
 - แอปที่แยกโปรเซสยังเป็น fixture ภายใน repository เดียวกัน และส่งเหตุการณ์ด้วยโปรโตคอลทดลองของ FlowAtlas มีการส่งต่อ `traceparent` แบบ W3C แต่ยังไม่ได้ใช้ OpenTelemetry SDK หรือบันทึก Playwright trace
-- fixture รอคำตอบจากตัวรับหลักฐานทุกเหตุการณ์ หากตัวรับหยุดทำงาน fixture อาจตอบ HTTP 502 รุ่นใช้งานจริงต้องแยกความล้มเหลวของ telemetry ออกจากงานหลักของแอป
+- fixture ส่ง telemetry แบบ best effort และยังทำงานธุรกิจได้เมื่อ collector หยุดทำงาน พร้อมแสดง capture ไม่ครบ รอ collector สูงสุด 500 ms ต่อเหตุการณ์และหยุดส่ง action นั้นเมื่อส่งไม่สำเร็จ ยังไม่มี retry queue; กราฟบางส่วนอาจค้าง `running` หาก finish ส่งไม่ถึง
 - บริการสต็อกเป็น mock ภายในโครงการ ไม่ใช่บริการภายนอกจริง และไม่มี trace ภายในบริการ
-- เก็บ actions ล่าสุดไม่เกิน 100 รายการในหน่วยความจำ เมื่อหยุดเซิร์ฟเวอร์ข้อมูลจะหาย
+- เก็บ actions ล่าสุดไม่เกิน 100 รายการในหน่วยความจำ แต่ละกราฟไม่เกิน 100 nodes / 200 edges (เกินแล้วตอบ 413) เมื่อหยุดเซิร์ฟเวอร์ข้อมูลจะหาย
 - ยังไม่มีการทดสอบกับนักพัฒนาใหม่หรือผู้แก้ incident จริง เกณฑ์วัดผลด้านบนเป็นแผนทดลอง
 - เปิดเฉพาะ `127.0.0.1` และ endpoint รับเหตุการณ์ยังไม่มีการตรวจสิทธิ์ จึงเหมาะกับการทดลองในเครื่องที่เชื่อถือได้เท่านั้น
 

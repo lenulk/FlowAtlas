@@ -36,7 +36,7 @@ export function getCodeVersion(root) {
 }
 
 export function sourceRef(version, file, symbol) {
-  if (!version.files[file]) throw new Error(`Source file is outside the code snapshot: ${file}`);
+  if (!Object.hasOwn(version.files, file)) throw new Error(`Source file is outside the code snapshot: ${file}`);
   return { file, symbol, sha256: version.files[file], status: 'inferred' };
 }
 
@@ -49,6 +49,9 @@ export class FlowAtlas {
 
   start(id, name, clientTime = null, origin = 'client-reported') {
     if (!/^[A-Za-z0-9_-]{8,80}$/.test(id)) throw new Error('Invalid action ID');
+    if (typeof name !== 'string' || !name.trim() || name.length > 200) throw new Error('Invalid action name');
+    if (clientTime !== null && (typeof clientTime !== 'string' || clientTime.length > 64
+      || Number.isNaN(Date.parse(clientTime)))) throw new Error('Invalid client time');
     if (this.actions.has(id)) throw new Error('Action ID already exists');
     const action = {
       schemaVersion: '0.1', id, name, clientTime,
@@ -66,10 +69,20 @@ export class FlowAtlas {
   }
 
   node(action, node) {
-    if (!action.nodes.some((existing) => existing.id === node.id)) action.nodes.push(node);
+    const existing = action.nodes.find((item) => item.id === node.id);
+    if (existing) {
+      if (['type', 'label', 'service'].some((key) => existing[key] !== node[key])
+        || ['file', 'symbol', 'sha256', 'status'].some((key) => existing.source?.[key] !== node.source?.[key])) {
+        throw new Error(`Conflicting node declaration: ${node.id}`);
+      }
+      return;
+    }
+    if (action.nodes.length >= 100) throw new Error('Graph capacity exceeded');
+    action.nodes.push(node);
   }
 
   edge(action, from, to, status, evidence) {
+    if (action.edges.length >= 200) throw new Error('Graph capacity exceeded');
     if (!allowedStatuses.has(status)) throw new Error(`Invalid evidence status: ${status}`);
     if (!action.nodes.some((node) => node.id === from) || !action.nodes.some((node) => node.id === to)) {
       throw new Error(`Missing endpoint for edge ${from} -> ${to}`);

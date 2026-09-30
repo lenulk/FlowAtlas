@@ -1,7 +1,7 @@
 import { sourceRef } from './flowatlas.mjs';
 
 function requiredText(value, field) {
-  if (typeof value !== 'string' || !value || value.length > 200) throw new Error(`Invalid ${field}`);
+  if (typeof value !== 'string' || !value.trim() || value.length > 200) throw new Error(`Invalid ${field}`);
   return value;
 }
 
@@ -15,7 +15,7 @@ function traceparent(value) {
 }
 
 export function ingestEvent(atlas, event) {
-  if (!event || typeof event !== 'object') throw new Error('Invalid event');
+  if (!event || typeof event !== 'object' || Array.isArray(event)) throw new Error('Invalid event');
   const actionId = requiredText(event.actionId, 'actionId');
   if (!/^[A-Za-z0-9_-]{8,80}$/.test(actionId)) throw new Error('Invalid actionId');
 
@@ -25,8 +25,10 @@ export function ingestEvent(atlas, event) {
     return { actionId };
   }
 
-  const action = atlas.get(actionId);
-  if (!action) throw new Error('Action has not been started');
+  const original = atlas.get(actionId);
+  if (!original) throw new Error('Action has not been started');
+  // Validate and build on a copy; rejected events must never partially alter a graph.
+  const action = structuredClone(original);
 
   if (event.kind === 'handler-entry') {
     if (event.name !== action.name) throw new Error('Action name does not match the registered action');
@@ -52,6 +54,7 @@ export function ingestEvent(atlas, event) {
       type: 'instrumented-handler-entry', symbol, sourceDeclaration: source,
       service, traceparent: context,
     });
+    Object.assign(original, action);
     return { actionId, apiNode, codeNode };
   }
 
@@ -61,26 +64,32 @@ export function ingestEvent(atlas, event) {
     const method = requiredText(event.method, 'method');
     const path = requiredText(event.path, 'path');
     const codeNode = `code:${service}:${symbol}`;
-    const externalNode = `http:${method}:${path}`;
     const context = traceparent(event.traceparent);
     const receivedContext = traceparent(event.receivedTraceparent);
     if (receivedContext && receivedContext !== context) throw new Error('Trace context changed in transit');
     if (!action.nodes.some((node) => node.id === codeNode)) throw new Error('Handler entry is missing');
+    const handlerContexts = action.edges.filter((edge) => edge.to === codeNode
+      && edge.evidence.type === 'instrumented-handler-entry').map((edge) => edge.evidence.traceparent).filter(Boolean);
+    if (context && handlerContexts.length && !handlerContexts.some((value) => value.split('-')[1] === context.split('-')[1])) {
+      throw new Error('Outbound trace does not match the handler trace');
+    }
     if (!['completed', 'failed'].includes(event.outcome)) throw new Error('Invalid outbound outcome');
     if (!Number.isFinite(event.durationMs) || event.durationMs < 0) throw new Error('Invalid outbound duration');
     if (event.outcome === 'completed' && (!Number.isInteger(event.status) || event.status < 100 || event.status > 599)) {
       throw new Error('Invalid HTTP status');
     }
     const destination = event.destination === undefined ? 'external service' : requiredText(event.destination, 'destination');
+    const destinationKey = encodeURIComponent(destination);
+    const externalNode = `http:${destinationKey}:${method}:${path}`;
     if (Boolean(event.routeFile) !== Boolean(event.routeSymbol)) throw new Error('Incomplete route source');
     const routeSource = event.routeFile ? sourceRef(action.codeVersion,
       requiredText(event.routeFile, 'routeFile'), requiredText(event.routeSymbol, 'routeSymbol')) : null;
     const failure = event.outcome === 'failed' ? requiredText(event.error, 'error') : null;
     atlas.node(action, {
-      id: externalNode, type: 'external-request', label: `${method} ${destination} ${path}`,
+      id: externalNode, type: 'external-request', label: `${method} ${destination} ${path}`, destination,
     });
     const evidence = {
-      type: 'http-outbound', method, path, correlationId: actionId,
+      type: 'http-outbound', method, path, destination, correlationId: actionId,
       outcome: event.outcome, traceparent: context,
       receivedTraceparent: receivedContext,
       durationMs: event.durationMs,
@@ -89,8 +98,8 @@ export function ingestEvent(atlas, event) {
     if (failure) evidence.error = failure;
     atlas.edge(action, codeNode, externalNode, 'observed', evidence);
     if (event.outcome === 'completed' && routeSource) {
-      const routeNode = `external-route:${method}:${path}`;
-      const gapNode = `unknown:${path}`;
+      const routeNode = `external-route:${destinationKey}:${method}:${path}`;
+      const gapNode = `unknown:${destinationKey}:${path}`;
       atlas.node(action, { id: routeNode, type: 'code', label: `${destination} ${path}`, source: routeSource });
       atlas.node(action, { id: gapNode, type: 'unknown', label: 'Untraced internal work' });
       atlas.edge(action, externalNode, routeNode, 'inferred', {
@@ -100,6 +109,7 @@ export function ingestEvent(atlas, event) {
         type: 'coverage-gap', reason: 'No internal spans were captured from the destination service.',
       });
     }
+    Object.assign(original, action);
     return { actionId, externalNode };
   }
 

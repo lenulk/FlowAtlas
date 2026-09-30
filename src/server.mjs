@@ -22,12 +22,17 @@ function sendJson(response, status, value) {
 }
 
 async function readJson(request) {
-  let text = '';
+  const chunks = [];
+  let bytes = 0;
   for await (const part of request) {
-    text += part;
-    if (text.length > 16_384) throw new Error('Request body is too large');
+    bytes += part.length;
+    if (bytes > 16_384) throw new Error('Request body is too large');
+    chunks.push(part);
   }
-  return text ? JSON.parse(text) : {};
+  const text = Buffer.concat(chunks).toString('utf8');
+  const value = text ? JSON.parse(text) : {};
+  if (!value || typeof value !== 'object' || Array.isArray(value)) throw new Error('Invalid JSON object');
+  return value;
 }
 
 function listen(server, port) {
@@ -68,7 +73,8 @@ export async function startServers({ port = 4173, inventoryPort = 4174 } = {}) {
           const result = ingestEvent(atlas, await readJson(request));
           sendJson(response, 202, result);
         } catch (error) {
-          sendJson(response, error.message === 'Action ID already exists' ? 409 : 400, { error: error.message });
+          sendJson(response, error.message === 'Action ID already exists' ? 409
+            : error.message === 'Graph capacity exceeded' ? 413 : 400, { error: error.message });
         }
         return;
       }
@@ -104,11 +110,18 @@ export async function startServers({ port = 4173, inventoryPort = 4174 } = {}) {
       if (request.method === 'GET' && url.pathname === '/flowatlas/source') {
         const file = url.searchParams.get('file');
         const expectedHash = url.searchParams.get('sha256');
-        if (!file || !version.files[file] || version.files[file] !== expectedHash) {
+        if (!file || !Object.hasOwn(version.files, file) || version.files[file] !== expectedHash) {
           sendJson(response, 404, { error: 'Source is not in this code snapshot' });
           return;
         }
-        const content = readFileSync(join(root, file));
+        let content;
+        try {
+          content = readFileSync(join(root, file));
+        } catch (error) {
+          if (error.code !== 'ENOENT') throw error;
+          sendJson(response, 409, { error: 'Source was removed after this server started' });
+          return;
+        }
         if (createHash('sha256').update(content).digest('hex') !== expectedHash) {
           sendJson(response, 409, { error: 'Source changed after this server started' });
           return;
@@ -209,7 +222,9 @@ export async function startServers({ port = 4173, inventoryPort = 4174 } = {}) {
     } catch (error) {
       if (currentActionId) atlas.finish(currentActionId, 'error');
       const status = error.message === 'Action ID already exists' ? 409
-        : error.message === 'Invalid action ID' || error.message === 'Request body is too large' || error instanceof SyntaxError ? 400 : 500;
+        : error.message === 'Graph capacity exceeded' ? 413
+        : ['Invalid action ID', 'Invalid action name', 'Invalid client time', 'Invalid JSON object', 'Request body is too large'].includes(error.message)
+          || error instanceof SyntaxError ? 400 : 500;
       sendJson(response, status, { error: error.message });
     }
   });

@@ -9,6 +9,7 @@
   "scripts": {
     "start": "node src/server.mjs",
     "start:fixture": "node examples/independent-app/server.mjs",
-    "test": "node --test"
+    "test": "node scripts/run-tests.mjs",
+    "test:source": "node scripts/run-tests.mjs scripts/source-check.mjs"
   }
 }

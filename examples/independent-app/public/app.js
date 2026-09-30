@@ -18,8 +18,11 @@ async function run(button) {
       method: button.dataset.method, headers: { 'x-flowatlas-action-id': id },
     });
     result.textContent = `HTTP ${response.status}\n${JSON.stringify(await response.json(), null, 2)}`;
+    const complete = started.telemetry?.complete && response.headers.get('x-flowatlas-telemetry') === 'complete';
+    if (!complete) result.textContent += '\nบันทึกหลักฐานไม่ครบ: ตัวรับหลักฐานไม่พร้อมใช้งาน ผล API แสดงตามการทำงานจริง';
     link.href = started.viewerUrl;
-    link.hidden = false;
+    link.textContent = complete ? 'เปิดแผนที่ใน FlowAtlas ↗' : 'เปิดหลักฐานบางส่วนใน FlowAtlas ↗';
+    link.hidden = !started.telemetry?.complete;
   } catch (error) {
     result.textContent = error.message;
   } finally {
