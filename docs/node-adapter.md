@@ -80,6 +80,6 @@ async function viewMessage(browserActionId) {
 - action-start ของ registered project ต้องส่ง codeDigest ตรง snapshot ของ collector (409 เมื่อไม่ตรง) event ต่อมาต้องมี projectId เดียวกัน; restart ทั้ง collector/target หลังเปลี่ยนไฟล์ที่ลงทะเบียน
 - ใช้ project ID เดิมกับแอปเดิมเสมอ กราฟเก่ายังคง snapshot เดิม ถ้าถอน registration จะอ่านกราฟ JSON เก่าได้ แต่ source ไม่พร้อมใช้งาน และเติม event ไม่ได้ ไม่มี source archive ทุกเวอร์ชัน
 - ไม่มี authentication, symbol verification จาก runtime หรือ OpenTelemetry spans; เหตุการณ์ยังเชื่อ sender บนเครื่อง ใช้กับแอปตัวอย่างในเครื่องที่เชื่อถือได้
-- In-app browser ที่ใช้ QA ปฏิเสธเปิด source link โดยตรง; HTTP source/content/hash ผ่าน integration tests แต่ยังไม่ได้ตรวจ source UI ใน browser อื่น
+- In-app browser ที่ใช้ QA ปฏิเสธเปิด source link โดยตรง; Linux Chromium headless เปิด source popup ของทั้งสาม handler ได้ และ source ที่เปลี่ยนหลัง capture ตอบ 409 ตามจริง ยังไม่ยืนยันสาเหตุที่ IAB block
 
 รายละเอียด persistence/recovery อยู่ใน [storage.md](storage.md) และผลทดสอบอยู่ใน [QUALITY.md](QUALITY.md)

@@ -234,3 +234,15 @@
 - Linux VM: 48 กรณีผ่าน ไม่มี failure หรือ skip บน Debian 12 / Node v24.18.0 พร้อม raw reports ที่นำกลับมาและตรวจ checksum แล้ว
 - ไม่ต้องแก้ app logic จากผล Linux รอบนี้; แก้เฉพาะ runner metadata และวิธีนำเข้า archive บน host ที่มี path ภาษาไทย
 - ข้อจำกัดของ trace/user trial/production จากรอบ 20 ยังเหลืออยู่; ไม่ใช้ผล Linux นี้อ้างว่า production ready
+
+## รอบ 23 — Linux Chromium UI และ source popup
+
+- เกณฑ์ปิดช่องว่าง: browser จริงบน Linux ต้องคลิก target ทั้งสามและเปิด graph/source, ค้นหา history, reload หลัง restart, ตรวจ viewport แคบ/source conflict/outage พร้อมภาพและ raw results
+- เพิ่ม optional scripts/browser-check.mjs รันผ่าน runner เดิม ไม่เพิ่ม app dependency; app แยก Git/process, collector/data แยก และคืน source หลัง mutation ทดสอบ
+- เตรียมเครื่องมือพบ dpkg pager รับคำสั่งเป็น input, npm ETIMEDOUT, host registry fetch EACCES และ host TTY Git ไม่อยู่ใน cwd; แก้ขั้นตอนใช้ pager=cat, wget archives พร้อม registry SHA-512, explicit TTY cwd และ non-TTY static checks
+- ชุด browser ผ่าน 8/8 (2026-09-30T14-47-44-954Z) บน Debian 12 / Node v24.18.0 / Chromium 153.0.8010.12 / Playwright 1.63.0 ไม่มี fail/cancelled/skip; uncaught pageerror 0
+- Source UI ใน Chromium เปิดได้ทั้งสาม handler และเปลี่ยน source แล้วได้ 409; ปัญหา IAB block ยังไม่ได้พิสูจน์สาเหตุ แต่ไม่เกิดใน Linux Chromium run นี้
+- ไม่พบ app bug ในขอบเขตที่ตรวจ จึงไม่แก้ app logic; narrow viewport ผ่าน containment/internal scroll เท่านั้น ไม่อ้างมือถือจริงหรือ touch usability
+- Import ครั้งแรกสร้าง destination directory ไม่ครบ ทำให้ Copy-Item ภาพล้มเหลว แม้ checksum ผ่าน; สร้าง directory ก่อน copy และเทียบไฟล์เดิมก่อนข้าม ผลสุดท้าย archive/raw/evidence/source hashes ตรงทั้งหมด
+- ตรวจภาพทั้ง 7 แล้ว ไทย/กราฟ/history/conflict/outage ตรงผล automated; VM ไม่มี process ของ QA workspace หรือ writer lock ค้าง ปิด SSH แล้ว หลักฐานและวิธีรันซ้ำใน linux-vm.md
+- สถานะ Linux: ชุดหลัก 47 + source 1 + browser 8 = 56 กรณีผ่าน แยกรอบตามหลักฐาน; ยังไม่พิสูจน์ GUI desktop/browser อื่น/มือถือจริง/Node 20–22/production/user trial หรือ trace capture มาตรฐาน

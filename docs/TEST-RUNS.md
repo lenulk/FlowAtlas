@@ -422,3 +422,31 @@
 - Environment: win32/x64; OS 10.0.26200; Node v24.18.0
 - commit: fc273a9d9a9eaee7651341c9e4162061c3de97e9; dirty: true
 - หลักฐาน: `reports/tests/2026-09-30T13-55-42-667Z.tap` และ `.json`
+
+## 2026-09-30 — เตรียม Linux browser QA
+
+- ตรวจ VM: Debian 12, Node v24.18.0, npm 11.16.0, พื้นที่ว่าง 15 GiB, ไม่มี DISPLAY หรือ browser executable; checkout เดิมมีเพียง docs/TEST-RUNS.md ที่ runner เพิ่มไว้
+- Tool failure: dpkg แสดงผลผ่าน pager ใน SSH TTY ทำให้ข้อความคำสั่งติดตั้งถูกอ่านเป็น pager input; ยังไม่ใช่ผลทดสอบแอป และยังไม่ได้ติดตั้งสำเร็จ
+- แก้ขั้นตอน: ออกจาก pager ตั้ง PAGER/DPKG_PAGER=cat ก่อนส่งคำสั่งใหม่; เก็บการติดตั้งเฉพาะ QA workspace
+
+- Installation check ไม่ผ่าน: VM npm ETIMEDOUT; browser CLI MODULE_NOT_FOUND เพราะแพ็กเกจยังไม่มี; host Node registry fetch ถูก sandbox ปฏิเสธ EACCES; VM wget HTTPS เข้าถึง registry ได้ จึงใช้ archive ที่ตรวจ integrity แทน
+- Host TTY git diff ไม่อยู่ใน repository แม้ระบุ workdir; ตรวจซ้ำ non-TTY ได้และ syntax/diff whitespace ผ่าน ใช้ตำแหน่งชัดเจนสำหรับ TTY ต่อไป
+
+- Playwright/playwright-core 1.63.0 archive ดาวน์โหลดผ่าน wget และ SHA-512 ตรงกับ registry integrity ทั้งคู่; install-deps --dry-run chromium ยืนยัน system dependencies มีครบ ยังไม่เปลี่ยน package ของระบบ
+
+## 2026-09-30T14-47-44-954Z — Linux browser
+
+- ชุด browser-check ผ่าน 8/8, fail/cancelled/skip 0, exit 0; Debian VM / Chromium headless / Node v24.18.0
+- ผ่าน: target 3 actions HTTP 200/200/503, กราฟ 5 nodes observed 3 + unknown 1, source popup ของ named handler ทั้งสาม, history ID/outcome/ไม่มีผล/Enter, restart, viewport 390px และ internal graph scroll, changed source 409, collector outage app HTTP 200 ไม่มีลิงก์กราฟเสีย และไม่มี pageerror
+- กำลังนำ raw reports และภาพกลับมาตรวจ SHA-256/visual; ยังไม่อ้างว่า visual QA เสร็จ
+
+
+- Import check: archive/file/source checksums ผ่าน แต่ Copy-Item ภาพไม่ผ่านเพราะยังไม่ได้สร้าง destination directory; raw TAP/JSON นำเข้าแล้ว แก้โดยสร้างโฟลเดอร์ก่อนและห้ามทับไฟล์ checksum ต่าง
+
+- Final import/visual: archive SHA-256 และ raw/evidence checksums ตรง; source hashes ทุกไฟล์ตรงกับ host; ตรวจภาพทั้ง 7 แล้ว กราฟ/ภาษาไทย/ประวัติ/error/outage แสดงตรงผลทดสอบ หน้าจอแคบมี horizontal scroll ภายในกราฟ/ตาราง
+- Runtime: Chromium 153.0.8010.12, Playwright 1.63.0, headless=true; browser-errors=[]; ไม่พบ QA workspace process หรือ writer lock ค้าง ปิด SSH สอง session แล้ว
+- หลักฐาน: reports/tests/2026-09-30T14-47-44-954Z.{tap,json}, reports/vm/browser-2026-09-30T14-47-45-088Z-468e9944/, reports/ui/linux-chromium-{graph,outage}.png
+
+
+- Final static review: browser script syntax, git diff whitespace และเอกสาร local links 18 ลิงก์ผ่าน; raw JSON ยืนยัน Linux 8/8 exit 0; app source ไม่มี diff
+- Static check รอบแรกพบ blank line ท้าย TEST-RUNS.md; ตัดบรรทัดว่างท้ายไฟล์แล้วตรวจซ้ำก่อน commit
