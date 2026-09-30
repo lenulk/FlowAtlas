@@ -257,3 +257,14 @@
 - ขอบเขต: คำสั่งช่วยลดขั้นตอนเปิดใช้งานแอปที่ลงทะเบียนแล้วเท่านั้น ยังต้องใส่ adapter ในแอปจริงเอง และไม่มี OpenTelemetry SDK หรือการดึงโค้ดภายในอัตโนมัติ; ไม่อ้างว่าใช้งานกับทุกเว็บแอปได้
 - Windows ชุดหลักหลังเพิ่ม inspector ผ่าน 50/50 (`2026-09-30T15-22-43-835Z`) ไม่มี failed/skipped; ไม่มีการเปลี่ยนพฤติกรรม src collector/adapter ในรอบนี้
 - ปรับ shutdown ของ CLI ให้ส่ง SIGTERM โดยตรงเพื่อเลี่ยง race กับ stdin ของแอป และ forward stdout ของแอปหลัง readiness; Windows focused ล่าสุด 3/3 (`2026-09-30T17-53-55-845Z`), Linux focused ล่าสุด 3/3 (`2026-09-30T17-55-39-917Z`) ไม่มี failed/skipped/lock ค้าง ตรวจ checksums ของหลักฐาน VM หลังนำเข้าผ่าน
+
+## รอบ 25 — ตรวจความพร้อมของเส้นทางเรียกใช้จริง
+
+- เกณฑ์: เรียก `inspect` ครั้งเดียวแล้วใช้ browser คลิกครบ 3 action, เปิดกราฟและ source ของ action จริง, ปิดแล้วสองบริการและ writer lock หาย, เปิดใหม่แล้วประวัติ/กราฟเดิมยังอยู่
+- เพิ่ม optional `scripts/inspector-browser-check.mjs` เพื่อทดสอบเส้นทางนี้แบบ end-to-end บน Linux VM; ใช้ target/config/storage แยกใน `reports/` โดยไม่เปลี่ยน app logic
+- ผล Linux Chromium 1/1 ผ่าน (`2026-09-30T18-21-44-562Z`), failed/skipped 0; source popup ตรง handler, restored 3 actions, pageerror 0, ไม่มี process หรือ lock ค้าง; ตรวจภาพและ raw reports หลังนำเข้าพร้อม checksum แล้ว
+- ไม่พบ app bug จากรอบนี้ จึงไม่แก้ผลิตภัณฑ์เพื่อให้การทดสอบผ่าน; Windows regression ล่าสุด 50/50 ก่อนรอบนี้ และไม่มี app logic เปลี่ยนหลังรอบนั้น
+- สรุปความพร้อม: **ต้นแบบใช้งานได้สำหรับแอป Node ตัวอย่างที่ลงทะเบียนและติด adapter แล้ว แต่ยังไม่สมบูรณ์เป็นเครื่องมือทั่วไปหรือระบบใช้งานจริง** ต้องทดลองกับแอปงานจริงของผู้ใช้, วัดประโยชน์/ความถูกต้องกับผู้ใช้, ทำ trace capture มาตรฐาน และกำหนด schema/การดูแลข้อมูลสำหรับใช้งานจริง
+- ขอบเขตหลักฐาน: Browser test ใช้ Chromium headless บน VM; ไม่ใช่ Linux desktop GUI, browser อื่น, มือถือจริง, production load หรือการยืนยันว่าจะ instrument แอปที่ไม่แก้โค้ดได้
+- ขั้นตอนตรวจหลักฐาน: PowerShell `-LiteralPath` ไม่ขยาย wildcard จึงเปลี่ยนเฉพาะคำสั่งแสดงรายการเป็น `-Path` และยืนยันภาพทั้งสองอยู่ครบ; ไม่มีความเสี่ยงต่อข้อมูลทดสอบ
+- ขั้นตอนบันทึก Git: environment ไม่มี commit identity ทำให้คำสั่ง commit แรก fail; staged files ไม่เสียหาย ใช้ identity `Codex <codex@localhost>` จาก commit ก่อนหน้ากับคำสั่ง commit เดียว ไม่แตะ config ถาวร

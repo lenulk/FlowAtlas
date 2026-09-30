@@ -1,0 +1,134 @@
+// Optional end-to-end audit of the on-demand command in a real browser.
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { createRequire } from 'node:module';
+import { spawn } from 'node:child_process';
+import { randomUUID } from 'node:crypto';
+import { mkdirSync, writeFileSync, existsSync } from 'node:fs';
+import { dirname, join, relative, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { createTargetApp, targetFiles } from './create-target-app.mjs';
+
+const root = dirname(dirname(fileURLToPath(import.meta.url)));
+const run = `inspector-browser-${new Date().toISOString().replace(/[:.]/g, '-')}-${randomUUID().slice(0, 8)}`;
+const work = join(root, 'reports', 'storage', run);
+const evidence = join(root, 'reports', 'vm', run);
+mkdirSync(evidence, { recursive: true });
+const target = createTargetApp(join(work, 'target'));
+const config = join(work, 'config.json');
+const dataDir = join(work, 'state');
+writeFileSync(config, JSON.stringify({ projects: [{ id: 'message-app', root: relative(root, target), files: targetFiles }] }, null, 2));
+let current;
+async function launch() {
+  const child = spawn(process.execPath, ['scripts/inspect.mjs', '--project', 'message-app',
+    '--config', relative(root, config), '--data-dir', relative(root, dataDir)], {
+    cwd: root, stdio: ['pipe', 'pipe', 'pipe'],
+    env: { ...process.env, FLOWATLAS_COLLECTOR_PORT: '0', FLOWATLAS_INVENTORY_PORT: '0' },
+  });
+  let output = '';
+  child.stdout.on('data', (chunk) => { output += chunk; });
+  child.stderr.on('data', (chunk) => { output += chunk; });
+  const ready = await new Promise((resolveReady, rejectReady) => {
+    let settled = false;
+    const finish = (error, value) => {
+      if (settled) return;
+      settled = true; clearTimeout(timer); child.stdout.off('data', inspect);
+      if (error) rejectReady(error); else resolveReady(value);
+    };
+    const inspect = () => {
+      const collector = output.match(/FlowAtlas: (http:\/\/127\.0\.0\.1:\d+)/);
+      const app = output.match(/App: (http:\/\/127\.0\.0\.1:\d+)/);
+      if (collector && app) finish(null, { collector: collector[1], app: app[1] });
+    };
+    const timer = setTimeout(() => finish(new Error(`Inspector startup timeout: ${output}`)), 12000);
+    child.stdout.on('data', inspect);
+    child.once('error', (error) => finish(error));
+    child.once('exit', (code) => finish(new Error(`Inspector exited before ready (${code}): ${output}`)));
+    inspect();
+  });
+  return current = { child, output: () => output, ...ready };
+}
+async function stop() {
+  const session = current;
+  if (!session) return;
+  current = null;
+  const { child } = session;
+  if (child.exitCode !== null || child.signalCode !== null) return;
+  const exited = new Promise((resolveExit) => child.once('exit', resolveExit));
+  const timer = setTimeout(() => child.kill(), 8000);
+  child.stdin.write('stop\n');
+  try { assert.equal(await exited, 0, session.output()); } finally { clearTimeout(timer); }
+}
+
+test('on-demand command supports a complete browser journey and persisted replay', { timeout: 60000 }, async () => {
+  assert.ok(process.env.FLOWATLAS_PLAYWRIGHT_PACKAGE, 'Set FLOWATLAS_PLAYWRIGHT_PACKAGE to Playwright package.json');
+  const require = createRequire(resolve(process.env.FLOWATLAS_PLAYWRIGHT_PACKAGE));
+  const { chromium } = require('playwright');
+  const browser = await chromium.launch({ headless: true });
+  const context = await browser.newContext({ viewport: { width: 1365, height: 900 } });
+  const browserErrors = [], actions = [];
+  context.on('page', (page) => page.on('pageerror', (error) => browserErrors.push(error.message)));
+  try {
+    let { app, collector } = await launch();
+    const page = await context.newPage();
+    assert.equal((await page.goto(app)).status(), 200);
+    for (const [name, http, outcome, symbol] of [
+      ['view-message', 200, 'success', 'viewMessage'],
+      ['send-message', 200, 'success', 'sendMessage'],
+      ['fail-message', 503, 'error', 'failMessage'],
+    ]) {
+      const previousResult = await page.locator('#result').innerText();
+      await page.locator(`button[data-name="${name}"]`).click();
+      await page.waitForFunction(({ expected, previous }) => {
+        const result = document.querySelector('#result')?.textContent;
+        return result !== previous && result?.startsWith(`HTTP ${expected}\n`);
+      }, { expected: http, previous: previousResult });
+      assert.equal(await page.locator('#warning').isVisible(), false);
+      const viewerOpened = context.waitForEvent('page');
+      await page.locator('#viewer').click();
+      const viewer = await viewerOpened;
+      await viewer.locator('#trace-content').waitFor({ state: 'visible' });
+      const id = await viewer.locator('#action-id').innerText();
+      const graphResponse = await context.request.get(`${collector}/flowatlas/actions/${id}`);
+      assert.equal(graphResponse.status(), 200);
+      const graph = await graphResponse.json();
+      assert.equal(graph.name, name); assert.equal(graph.outcome, outcome);
+      assert.equal(graph.codeVersion.projectId, 'message-app');
+      assert.equal(await viewer.locator('#map .map-node').count(), 5);
+      assert.equal(await viewer.locator('#map .map-edge.observed').count(), 3);
+      assert.equal(await viewer.locator('#map .map-edge.unknown').count(), 1);
+      const handler = viewer.locator('#evidence details').nth(1);
+      await handler.locator('summary').click();
+      assert.match(await handler.locator('a').innerText(), new RegExp(symbol));
+      const sourceOpened = context.waitForEvent('page');
+      await handler.locator('a').click(); const source = await sourceOpened;
+      await source.waitForLoadState();
+      assert.match(await source.locator('body').innerText(), new RegExp(`async function ${symbol}\\(`));
+      await source.close();
+      if (name === 'fail-message') await viewer.screenshot({ path: join(evidence, 'inspector-graph.png'), fullPage: true });
+      await viewer.close();
+      actions.push({ id, name, outcome, nodes: graph.nodes.length, edges: graph.edges.length });
+    }
+    await stop();
+    await assert.rejects(fetch(app));
+    await assert.rejects(fetch(collector));
+    assert.equal(existsSync(join(dataDir, '.writer.lock')), false);
+    ({ app, collector } = await launch());
+    const viewer = await context.newPage();
+    assert.equal((await viewer.goto(`${collector}/?actionId=${actions[0].id}`)).status(), 200);
+    await viewer.locator('#trace-content').waitFor({ state: 'visible' });
+    assert.equal(await viewer.locator('#action-id').innerText(), actions[0].id);
+    await viewer.locator('#history-status').waitFor();
+    await viewer.waitForFunction(() => document.querySelectorAll('#history-list tr').length === 3);
+    assert.equal(await viewer.locator('#history-list tr').count(), 3);
+    await viewer.screenshot({ path: join(evidence, 'inspector-restart.png'), fullPage: true });
+    assert.deepEqual(browserErrors, []);
+    writeFileSync(join(evidence, 'result.json'), JSON.stringify({ platform: process.platform,
+      browser: browser.version(), actions, restored: true, browserErrors }, null, 2) + '\n');
+    await stop();
+    await assert.rejects(fetch(app));
+    await assert.rejects(fetch(collector));
+    assert.equal(existsSync(join(dataDir, '.writer.lock')), false);
+  } finally { await stop(); await browser.close(); }
+  console.log(`Inspector browser evidence: ${relative(root, evidence)}`);
+});

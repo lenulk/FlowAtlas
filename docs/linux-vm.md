@@ -67,6 +67,19 @@ node scripts/run-tests.mjs scripts/browser-check.mjs
 
 สคริปต์สร้าง app/data แยกใน reports/storage และคงหลักฐานไว้ การทดสอบ browser เป็น optional gate จึงไม่เพิ่ม dependency ให้ app หรือชุดหลัก
 
+## Inspector end-to-end บน Linux Chromium
+
+รัน `scripts/inspector-browser-check.mjs` ผ่าน test runner บน VM เดิม โดยใช้ Playwright/Chromium runtime ข้างต้น ผล 1/1 ผ่าน (`2026-09-30T18-21-44-562Z`), failed/skipped 0 ทดสอบ `inspect` เริ่ม collector และ target พร้อมกัน, คลิก 3 actions, เปิดกราฟและ source popup, `stop` แล้วพอร์ตปิด, เริ่มใหม่แล้วประวัติและกราฟทั้งสามกลับมา; pageerror 0 และไม่เหลือ writer lock/process ของ QA workspace ดู raw TAP/JSON ใน `reports/tests/`, ภาพและ result JSON ใน `reports/vm/inspector-browser-2026-09-30T18-21-44-748Z-3c4f3f41/` ตรวจ checksums หลังนำเข้าจาก VM แล้ว
+
+```bash
+FLOWATLAS_PLAYWRIGHT_PACKAGE="$PWD/reports/vm/browser-runtime/node_modules/playwright/package.json" \
+PLAYWRIGHT_BROWSERS_PATH="$PWD/reports/vm/browser-runtime/browsers" \
+FLOWATLAS_TEST_PURPOSE='Linux VM on-demand inspector full Chromium journey' \
+node scripts/run-tests.mjs scripts/inspector-browser-check.mjs
+```
+
+VM checkout ฐาน `530e221` แบบ dirty; ส่ง `inspect.mjs` รุ่นปัจจุบันและสคริปต์ทดสอบเข้าไป ตรวจ SHA-256 ของไฟล์ใน runner JSON ตรงกับ host แล้ว จึงอ้างผลเฉพาะไฟล์ที่ทดสอบ ไม่อ้างว่าเป็น clean commit `e6232db`.
+
 ## ขอบเขตที่ยังไม่ได้ตรวจ
 
 ยังไม่ยืนยัน Linux GUI desktop, browser engine อื่น, มือถือจริง/touch, Linux distro/architecture อื่น, Node 20/22, filesystem ที่แชร์กับ Windows/OneDrive, power loss, production load หรือ OpenTelemetry/Playwright capture การใช้ Playwright ทดสอบ UI ไม่ใช่การเพิ่ม browser trace recorder ให้ผลิตภัณฑ์

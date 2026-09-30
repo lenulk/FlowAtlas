@@ -503,3 +503,15 @@
 - Environment: win32/x64; OS 10.0.26200; Node v24.18.0
 - commit: 649c6dacbb84bed522a16d21866c113c1b0d7f39; dirty: true
 - หลักฐาน: `reports/tests/2026-09-30T17-53-55-845Z.tap` และ `.json`
+
+## 2026-09-30T18-21-44-562Z — Inspector + Chromium บน Linux VM
+
+- จุดประสงค์: ตรวจตั้งแต่คำสั่ง `inspect` ไปถึงคลิกในแอป, กราฟ/source, ปิด และเปิดใหม่ดูประวัติ
+- ผล: ผ่าน 1/1; failed 0; skipped 0; exit 0 บน Debian 12 / Node v24.18.0 / Chromium headless 153.0.8010.12
+- คลิก view/send/fail ได้ HTTP 200/200/503; กราฟแต่ละ action มี 5 nodes/4 edges, observed 3 และ unknown 1; source popup พบ handler ที่ตรงกัน
+- หลัง `stop` ทั้งสองพอร์ตปิดและไม่มี writer lock; เปิดใหม่แล้วพบ 3 actions และกราฟเก่า; browser pageerror 0
+- หลักฐาน: `reports/tests/2026-09-30T18-21-44-562Z.{tap,json}`, `reports/vm/inspector-browser-2026-09-30T18-21-44-748Z-3c4f3f41/{result.json,inspector-graph.png,inspector-restart.png}` และ `reports/vm/inspector-browser-results.tgz`
+- ตรวจ SHA-256 ของ archive หลังส่งกลับ (`7fe65322862fc60e01bbdba20feeb8f33703470a603ce069e86ee086fdf86821`) และไฟล์ทั้งหมดกับ manifest จาก VM ผ่าน; ตรวจภาพทั้งสองด้วยตาแล้ว ไม่พบ UI defect ในขอบเขตนี้
+- VM ใช้ checkout ฐาน `530e221` แบบ dirty โดยส่งสคริปต์ทดสอบและ `inspect.mjs` รุ่นปัจจุบันเพิ่ม; SHA-256 ของไฟล์ใน runner JSON ตรงกับ host ไม่ใช่การทดสอบ clean checkout ของ commit ปัจจุบัน
+- ตรวจรายการภาพครั้งแรกใช้ `Get-ChildItem -LiteralPath` กับ wildcard จึงหาไฟล์ไม่พบ; รันใหม่ด้วย `-Path` พบภาพทั้งสองครบ (205432 และ 172186 bytes) ไม่กระทบผลทดสอบหรือไฟล์
+- บันทึก Git ครั้งแรกไม่สำเร็จเพราะ environment นี้ไม่มี `user.name`/`user.email`; staged files ยังครบ ตรวจ `git log` พบ commit เดิมใช้ `Codex <codex@localhost>` จึงใช้ identity เดิมเฉพาะคำสั่ง commit ไม่เปลี่ยน global/local config
