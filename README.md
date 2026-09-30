@@ -43,6 +43,8 @@ node scripts/run-tests.mjs
 
 ตัวรันทดสอบบันทึกผลสำเร็จและล้มเหลวทุกครั้งไว้ใน `reports/tests/` (TAP + JSON) และเพิ่มรายการใน [TEST-RUNS.md](docs/TEST-RUNS.md) การวิเคราะห์และการแก้แต่ละรอบอยู่ใน [QUALITY.md](docs/QUALITY.md) ใช้ `npm test` ได้เมื่อ npm ในเครื่องพร้อมใช้งาน
 
+ทดสอบทั้ง Windows และ Linux VM (Debian 12) ด้วย Node v24.18.0 แล้ว ชุดหลัก 47 กรณีและ source แยก 1 กรณีผ่านบนทั้งสองระบบ รายงานใหม่ระบุ OS/architecture อัตโนมัติ ผล Linux และคำสั่งรันซ้ำอยู่ใน [linux-vm.md](docs/linux-vm.md) ยังไม่ได้ตรวจ GUI browser บน Linux หรือ Node 20/22
+
 เมื่อตรวจ source link ให้รันแยกจากชุดหลัก:
 
 ```powershell

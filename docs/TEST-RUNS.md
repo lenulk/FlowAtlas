@@ -7,6 +7,30 @@
 - พบ VMware CLI แต่ไม่มี VM ที่ running ในรายการของ CLI; ไม่ใช้ข้อมูลนี้แทน VM ที่ผู้ใช้ระบุผ่าน SSH
 - Probe official Node v24.18.0 checksum URL: web tool เปิดไม่ได้ แต่ wget บน VM ตรวจ URL สำเร็จ (exit 0); จะ verify checksum ก่อนใช้ runtime
 - ยังไม่เริ่มชุดทดสอบ Linux ในขั้นนี้ ไม่เก็บ credential ในโค้ดหรือรายงาน
+
+## Linux VM main — 2026-09-30T14-00-32-338Z
+
+- จุดประสงค์: Linux VM Debian 12: main integration suite
+- ผลบน VM: ผ่าน 47/47; failed 0; skipped 0; runner exit 0
+- Runtime: Linux x86_64 / Node v24.18.0; Git 2.39.5; source commit `530e221945e5aa13d29c6c938337580c506d6a59`
+- เตรียม Git จาก official Debian repositories (ใช้ sources list ชั่วคราวเฉพาะ apt command), Node จาก official archiveใน QA directory; Node archive และ Git bundle SHA-256 ตรวจผ่านก่อนรัน
+- หลักฐาน: VM runner บันทึก TAP/JSON อัตโนมัติ; กำลังนำ raw reports กลับโฟลเดอร์โครงการ
+
+## Linux VM source — 2026-09-30T14-01-44-229Z
+
+- จุดประสงค์: Linux VM Debian 12: isolated source snapshot and restart
+- ผลบน VM: ผ่าน 1/1; failed 0; skipped 0; runner exit 0
+- ตรวจ source content/hash, changed/deleted files, graph รุ่นเดิมหลัง restart และปฏิเสธการเติมเหตุการณ์ข้าม code snapshot
+- ผลนี้เป็น Linux VM จริง แยกจาก Windows browser UI test; กำลังนำ TAP/JSON กลับไว้ใน reports/tests
+
+## Linux report import tool failure — 2026-09-30
+
+- SCP รับ archive กลับสำเร็จ และ SHA-256 ของ archive ตรง VM
+- Windows tar.exe เปิด archive ด้วย absolute path ที่มีอักษรไทยไม่สำเร็จ (filename ถูกแสดงเป็น ?); ยังไม่ได้แตกไฟล์หรือเขียนทับ raw reports
+- แก้ขั้นตอนนำเข้าให้ tar ใช้ relative ASCII paths จาก project cwd; PowerShell checksum/file operations ยังคงใช้ LiteralPath ตามเดิม
+- ผลหลังใช้ relative paths: แตกไฟล์และนำเข้า TAP/JSON 4 ไฟล์สำเร็จ ตรวจ archive SHA-256 และ file checksums ตรง VM; metadata ระบุ linux/x64, Node v24.18.0, kernel 6.1.0-53-amd64 และ commit ที่ทดสอบถูกต้อง
+- หลักฐานกลับมาแล้วที่ reports/tests และ `reports/vm/linux-2026-09-30T14-00-32-338Z/`; ตรวจ VM ไม่เหลือ Node process/writer lock และปิด SSH session สำเร็จ
+- Final review: actual diff/runner syntax/git diff --check ผ่าน; local documentation links 22 ลิงก์มีปลายทางครบ
 ## Final registered-project review — 2026-09-30
 
 - อ่าน actual diff รวม registration/adapter/template/tests และตรวจด้วย `node --check`: syntax 32 ไฟล์ผ่าน; `git diff --check` ผ่าน

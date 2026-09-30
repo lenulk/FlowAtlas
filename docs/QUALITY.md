@@ -218,3 +218,19 @@
 - เพิ่ม platform/arch/osRelease ใน test runner เพื่อไม่ให้รายงานของ VM ปะปนกับ Windows; ไม่เปลี่ยน test behavior หรือข้อมูล graph
 - เตรียม runtime จาก official Node archive พร้อม SHA-256 และ Git จาก Debian repository โดยไม่แก้ repository sources ของระบบถาวร; ผลต้องตรวจหลังติดตั้งจริง
 - Windows runner check 3/3 ผ่าน (`2026-09-30T13-55-42-667Z`); อ่าน JSON ยืนยัน win32/x64/OS 10.0.26200 พร้อม counts ถูกต้อง และ diff whitespace ผ่าน
+
+## รอบ 22 — ผล Linux และการนำเข้ารายงาน
+
+- Main บน Debian 12 VM ผ่าน 47/47 (`2026-09-30T14-00-32-338Z`) และ isolated source ผ่าน 1/1 (`2026-09-30T14-01-44-229Z`), ไม่มี skipped/failure
+- Node v24.18.0 ตรวจ archive SHA-256 ผ่าน; source bundle SHA-256 ผ่านก่อน clone/checkout commit `530e221945e5aa13d29c6c938337580c506d6a59`; ไม่ใช้ simulation หรือ WSL แทน VM
+- ตรวจหลังทดสอบไม่เหลือ Node QA process หรือ writer lock บน VM; ปิด SSH session แล้ว คง QA workspace/runtime ไว้สำหรับรันซ้ำ
+- พบปัญหา host import: Windows tar.exe ไม่อ่าน absolute path ที่มีภาษาไทย ทั้งที่ PowerShell อ่านและตรวจ checksum ได้; ใช้ relative ASCII paths แก้ที่ขั้นตอนนำเข้า ไม่แก้ผล test ที่ผ่านแล้ว
+- ผลนำเข้า: archive + raw report 4 ไฟล์ SHA-256 ตรงทั้งหมด; อ่าน JSON บน Windows ยืนยัน platform=linux, counts 47/47 + 1/1, failure/skip 0, commit ตรง และ Node/kernel ตาม VM
+- ขอบเขต: ตรวจ Node/HTTP/filesystem บน Linux VM แล้ว แต่ Linux GUI/browser และ distro/Node version อื่นยังไม่ทดสอบ รายละเอียด/วิธีรันซ้ำอยู่ใน [linux-vm.md](linux-vm.md)
+
+## สถานะล่าสุดหลัง Linux VM
+
+- Windows: ชุดหลัก 47 + isolated source 1 ผ่านในรอบ 20; runner environment check เพิ่ม 3/3 ผ่านบน Windows ในรอบ 21
+- Linux VM: 48 กรณีผ่าน ไม่มี failure หรือ skip บน Debian 12 / Node v24.18.0 พร้อม raw reports ที่นำกลับมาและตรวจ checksum แล้ว
+- ไม่ต้องแก้ app logic จากผล Linux รอบนี้; แก้เฉพาะ runner metadata และวิธีนำเข้า archive บน host ที่มี path ภาษาไทย
+- ข้อจำกัดของ trace/user trial/production จากรอบ 20 ยังเหลืออยู่; ไม่ใช้ผล Linux นี้อ้างว่า production ready
