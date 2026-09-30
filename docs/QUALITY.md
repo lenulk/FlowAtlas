@@ -400,3 +400,8 @@
 - จะกำหนด screenshot deadline 20 วินาทีแยกจาก interactive actions 8 วินาที, ไม่ retry และยัง fail หากเกินเพดาน; ต้องตรวจผล hosted อีกครั้งก่อนปิด QA risk
 - พบ secondary failure: package check รันแม้ pack/install ถูก skipped เพราะ if !cancelled ไม่ตรวจ prerequisite; จดเป็น repair ถัดไป ไม่ถือ ENOENT missing-installed-package ว่า package regression
 - Local Edge journeys ผ่าน 2/2 (2026-09-30T21-39-22-368Z) พร้อม deadlines ที่แยก; ผลนี้ไม่ใช่ repro/หลักฐานการแก้ screenshot timeout บน hosted Windows ยังต้องรอ CI
+## รอบ 40 — CI prerequisites ของ package gates
+
+- จาก failed log รอบ 39 package journey ถูกเรียกเมื่อ pack/install skipped จึงเพิ่ม ENOENT ที่ไม่ใช่ package regression
+- ให้ pack/install รันได้หลัง failure ของ gate อิสระเมื่อยังไม่ canceled เพื่อเก็บหลักฐานเพิ่ม; journey ขึ้นกับ install success, reinstall ขึ้นกับ journey success, replay ขึ้นกับ reinstall success โดยใช้ step outcome จริง ไม่ continue-on-error
+- ตรวจ workflow diff ด้วยมือ: step IDs มีหนึ่งแห่งและ dependencies เรียงตาม execution, upload artifacts ยัง always; ไม่มี runtime app change ไม่สร้าง unit test ที่ mirror YAML ต้องใช้ hosted workflow ตรวจจริงก่อนรับรอง

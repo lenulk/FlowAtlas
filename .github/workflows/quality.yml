@@ -60,6 +60,8 @@ jobs:
           FLOWATLAS_TEST_PURPOSE: CI Chromium independent browser journey
         run: node scripts/run-tests.mjs scripts/independent-browser-check.mjs
       - name: Pack and install in disposable workspace
+        id: package_install
+        if: ${{ !cancelled() }}
         run: |
           New-Item -ItemType Directory -Path reports/releases -Force | Out-Null
           npm pack --pack-destination reports/releases --cache reports/releases/npm-cache --json > reports/releases/pack-result.json
@@ -78,11 +80,14 @@ jobs:
           "FLOWATLAS_INSTALLED_ROOT=$taskInstalledRoot" >> $env:GITHUB_ENV
           "FLOWATLAS_PACKAGE_WORKSPACE=$taskWorkspace" >> $env:GITHUB_ENV
       - name: Installed package journey and replay
-        if: ${{ !cancelled() }}
+        id: package_journey
+        if: ${{ !cancelled() && steps.package_install.outcome == 'success' }}
         env:
           FLOWATLAS_TEST_PURPOSE: CI offline installed package journey and replay
         run: node scripts/run-tests.mjs scripts/package-check.mjs
       - name: Uninstall and reinstall without changing workspace data
+        id: package_reinstall
+        if: ${{ !cancelled() && steps.package_journey.outcome == 'success' }}
         run: |
           $taskState = $env:FLOWATLAS_PACKAGE_WORKSPACE + '/data/actions/state.json'
           $taskBefore = (Get-FileHash -Algorithm SHA256 -LiteralPath $taskState).Hash
@@ -95,6 +100,7 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw 'QA reinstall failed' }
           if ((Get-FileHash -Algorithm SHA256 -LiteralPath $taskState).Hash -ne $taskBefore) { throw 'Workspace changed during reinstall' }
       - name: Replay and capture after reinstall
+        if: ${{ !cancelled() && steps.package_reinstall.outcome == 'success' }}
         env:
           FLOWATLAS_TEST_PURPOSE: CI workspace history after uninstall and reinstall
         run: node scripts/run-tests.mjs scripts/package-check.mjs

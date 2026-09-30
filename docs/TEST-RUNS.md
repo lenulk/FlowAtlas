@@ -1058,3 +1058,7 @@
 - Environment: win32/x64; OS 10.0.26200; Node v24.18.0
 - commit: f22f11acae12fc10ef215d428319a8d1aa1c69f9; dirty: true
 - หลักฐาน: `reports/tests/2026-09-30T21-39-22-368Z.tap` และ `.json`
+
+## Manual workflow dependency review — 2026-10-01
+
+- Read failed step conclusions: install skipped → journey ENOENT; reviewed updated step IDs and prerequisites install→journey→reinstall→replay, independent gates retain failure status and artifact upload always; git diff whitespace check used before commit
