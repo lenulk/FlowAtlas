@@ -127,7 +127,7 @@
 - การแก้: ตรวจ digest เมื่อ ensure/ingest action เดิม, ตอบ 409 เมื่อรุ่นต่างกัน และไม่ finish/mutate graph เก่าใน error handler
 - ผลหลัง guard: ชุดหลัก 36/36 ผ่าน (`2026-09-30T11-27-43-620Z`) และ isolated snapshot 1/1 ผ่าน (`2026-09-30T11-27-51-901Z`)
 
-## สถานะล่าสุด
+## สถานะหลังรอบ 12
 
 - Automated: 39 กรณีผ่าน (38 ชุดหลัก + 1 isolated source check), Node v24.18.0
 - Manual: ตารางเพิ่ม 5 actions, filter error, restart โหลดครบ, ค้นชื่อและเปิดกราฟ/source รุ่นเดิมผ่าน; QA server ปิดแบบ graceful และเก็บข้อมูลทดสอบแยกไว้ใน reports/storage
@@ -143,3 +143,70 @@
 - ตรวจ final diff และ syntax 25 ไฟล์ผ่าน; JSON รายงานชุดหลักยืนยัน 38 passed / 0 failed / 0 skipped; QA state ยังมี 5 actions และไม่มี writer lock หลัง graceful stop
 - ตรวจลิงก์ไฟล์ในเอกสาร 12 ลิงก์ ปลายทางมีอยู่ครบ
 - เกณฑ์ storage/history ของรอบนี้ผ่านภายในขอบเขตที่ทดสอบ; production stress test ยังไม่มี workload เป้าหมาย และไม่ได้เพิ่มการทดสอบโดยไม่มีความเสี่ยงที่ต้องตอบ
+
+## รอบ 13 — source snapshot ของแอปคนละโครงการ
+
+- เริ่มจาก commit `7b03328`, working tree สะอาด; ingestion เดิมใช้ snapshot ของ collector เท่านั้น
+- เกณฑ์: ลงทะเบียนแอปแยกด้วย root/ไฟล์ที่อนุญาต, ตรวจ project ID และ digest ก่อนรับ action, source link อ่านเฉพาะไฟล์ที่ลงทะเบียน, persistence/restart รักษารุ่นเดิม และปฏิเสธการเติมข้อมูลข้ามโครงการ/รุ่น
+- ผลก่อนเพิ่ม: 0/3 ผ่าน (`2026-09-30T12-55-03-741Z`); endpoint registration ยังไม่มี, project ID ถูกละเลย และ config ผิดยังเปิด server ได้
+- การเปลี่ยน: local config เท่านั้น (ไม่มี HTTP ให้ลงทะเบียน path), root ต้องอยู่ในโฟลเดอร์โครงการ, allowlist 1–64 code files, ตรวจ symlink/path escape และ source size, snapshot ระบุ projectId และใช้ Git commit เฉพาะเมื่อ Git root เป็นแอปนั้นจริง
+- ยังต้องตรวจ: adapter ที่ใช้ซ้ำได้และ HTTP integration จาก Node process ใน repository แยก; ไม่ถือว่าการลงทะเบียนเป็นการพิสูจน์ตัวตน event หรือ OpenTelemetry
+- ผลหลัง registration: 3/3 ผ่าน (`2026-09-30T12-58-18-358Z`)
+
+## รอบ 14 — ตัวเชื่อม Node.js ที่ใช้ซ้ำได้
+
+- เพิ่ม adapter แบบ explicit instrumentation: start/handler/fetch/finish, correlation + traceparent จริง, best effort timeout และ capture status; ไม่ patch global fetch
+- ตรวจ privacy ของ telemetry ด้วย request ที่มี body/token/query/cookie แล้ว event ต้องไม่มีค่าเหล่านั้น; business response/body ต้องอ่านได้ตามเดิม
+- ผล focused: 4/4 ผ่าน (`2026-09-30T13-01-26-645Z`) รวม collector หยุด/ค้าง และ downstream transport failure; ขอบเขตเป็น custom metadata protocol ยังไม่ใช่ OpenTelemetry SDK
+- integration ที่เพิ่มต่อใช้ adapter สำเนาใน Git repository ใหม่ใต้ reports/storage และ Node process ใหม่ มี mock destination ที่ไม่มี instrumentation ภายใน
+- รอบ integration แรกค้าง: stop handler ปิด readline แต่ pipe stdin ของ child ยังไม่จบ; timeout kill ทำให้ cleanup assertion ล้มและข้ามการปิด collector จึงหยุด runner และบันทึกด้วยมือ แก้ทั้ง child stdin และ finally ของ harness ก่อนตรวจกราฟต่อ
+
+## รอบ 15 — ช่องว่างหลักฐานของบริการที่ไม่มี source route
+
+- ผลหลังแก้ harness: 0/1 ผ่าน (`2026-09-30T13-08-58-912Z`) child ปิดปกติและ runner บันทึกผลได้; พบกราฟไม่มี unknown coverage gap เมื่อ outbound event ไม่ประกาศ routeFile
+- สาเหตุ: ingestion สร้าง unknown เฉพาะใน branch ที่มี route source; adapter ของแอปจริงไม่ควรต้องประกาศ source ของบริการที่ไม่ได้ติดตั้ง trace
+- แก้: เมื่อได้รับ HTTP response แต่ไม่มี route source ให้ต่อ coverage gap โดยตรงจาก external request พร้อมเหตุผลว่าขาดทั้ง source route และ internal spans ไม่เพิ่ม inferred route ที่ไม่มีหลักฐาน
+- ผลหลังแก้: integration/adapter/registration 8/8 ผ่าน (`2026-09-30T13-09-53-688Z`) และ child ปิดด้วย exit 0; failed-run collector PID 8500 ตรวจด้วย Get-Process แล้วไม่เหลือ process เก็บ state/lock ของรอบล้มไว้เพื่อการวิเคราะห์
+
+## รอบ 16 — ขอบเขต filesystem ของ registration
+
+- ตรวจ junction จริงบน Windows ทั้ง path component และ root ที่เปลี่ยนหลัง capture, config path นอกโครงการ, config ผิดชนิด และ HTTP status ของ project/digest ผิดให้ตรงกรณี
+- ผล: 4/4 ผ่าน (`2026-09-30T13-12-57-241Z`); ไม่มีการอ่านเนื้อไฟล์ปลายทางที่ไม่ได้รับอนุญาต
+- ตรวจ generator เพิ่มก่อน manual QA: ไม่เขียนทับ app เดิม, ปฏิเสธ config symlink, validate config เดิมก่อนเพิ่ม, เก็บ field อื่นไว้ และเปลี่ยน config ด้วย temp/rename
+
+## รอบ 17 — เก็บ test artifacts ภายในโครงการ
+
+- อ่าน test เดิมก่อนชุดรวมพบ code-version test ใช้ OS temp directory ซึ่งไม่ตรงคำสั่งผู้ใช้ให้เก็บทุกอย่างในโครงการ
+- ย้าย disposable Git fixture ไป reports/storage พร้อม guard ก่อน cleanup; behavior ของการตรวจ commit/dirty/digest เดิมต้องยังผ่าน
+- ผล focused: 1/1 ผ่าน (`2026-09-30T13-15-03-111Z`)
+
+## รอบ 18 — ชุดรวมและ UI ของ repository แยก
+
+- ชุดหลัก 47/47 ผ่าน (`2026-09-30T13-15-24-174Z`), isolated source 1/1 ผ่าน (`2026-09-30T13-15-44-920Z`)
+- สร้างแอปพร้อมใช้ใน apps/message-app ซึ่งมี Git repository แยก และ config ในโครงการ; Node target อ่าน adapter สำเนาในแอป ไม่ import collector runtime
+- UI จริง: view/send HTTP 200, fail HTTP 503, viewer error 5 nodes มี observed 3 + unknown 1; restart collector แล้วยังมี 3 actions และกราฟเดิม
+- UI source link แสดง project handler ถูกต้อง แต่ IAB ปฏิเสธเปิด source URL ด้วย ERR_BLOCKED_BY_CLIENT; source HTTP content/hash/status ตรวจด้วย integration แล้ว สาเหตุระดับ browser client ยังไม่ได้ยืนยัน และไม่ได้ข้าม browser protection
+- UI outage จริงผ่าน: collector หยุดแล้ว target ยังตอบ HTTP 200 / MSG-1 พร้อมคำเตือน capture ขาดและไม่มีลิงก์กราฟที่เปิดไม่ได้
+
+## รอบ 19 — type guard ของ project provenance
+
+- Actual diff review พบ regex coerces boolean projectId และ array codeDigest เป็น string จึงอาจยอมรับ config ผิดชนิด
+- Regression ก่อนแก้: 6/8 ผ่าน (`2026-09-30T13-23-32-533Z`); adapter และ registration รับชนิดผิดจริง
+- แก้: ตรวจ typeof ก่อน regex ใน snapshot/adapter และ validator ของ graph/storage; รักษารูปแบบเดิมของ graph ที่ไม่มี projectId
+- ผล: ชุดหลัก 47/47 ผ่าน (`2026-09-30T13-24-50-762Z`), isolated source 1/1 ผ่าน (`2026-09-30T13-25-17-418Z`)
+
+## รอบ 20 — handler symbol ของ fixture ต้องตรงฟังก์ชันที่เรียก
+
+- Final source review พบตัวอย่างใหม่ใช้ชื่อ viewMessage/sendMessage/failMessage เป็น route metadata แต่ยังไม่ได้มี named functions เหล่านี้ แม้ source declaration เป็น inferred ก็ไม่ควรแสดง symbol ที่ไม่มีจริง
+- Regression ก่อนแก้: 0/1 ผ่าน (`2026-09-30T13-26-54-960Z`) source ของ handler ไม่มีฟังก์ชันที่ชื่อเดียวกับ symbol
+- แก้ fixture ให้ route เรียก named functions จริงทั้งสาม และแต่ละฟังก์ชันบันทึก handler-entry จากภายในฟังก์ชันนั้น; source association ยังเป็น declared/inferred และความแท้ของผู้ส่งยังอยู่ในขอบเขต trusted local process
+- ผลหลังแก้: ชุดหลัก 47/47 ผ่าน (`2026-09-30T13-28-10-353Z`); graph/source check ของ independent repository ตรวจ named function ครบทั้งสาม
+- Final isolated source 1/1 ผ่าน (`2026-09-30T13-31-58-491Z`); final static review ผ่าน syntax 32 ไฟล์, local links 18 ลิงก์ และ git diff --check; manual state มี 3 actions ไม่มี writer lock และ target repository สะอาดที่ commit `0c40ee2`
+
+## สถานะล่าสุดหลังรอบ 20
+
+- Automated: 48 กรณีผ่าน (47 ชุดหลัก + 1 isolated source) บน Windows / Node v24.18.0; ทุก completed run มี TAP/JSON และ log รวม failed regressions
+- Manual UI: 3 actions สำเร็จ/ล้มเหลว, graph พร้อม gap, restart โหลดประวัติเดิม และ collector outage ผ่าน; source URL ถูก IAB block และแยกข้อจำกัดนี้จาก HTTP integration ที่ผ่าน
+- แอปพร้อมทดลอง: apps/message-app มี repository แยก, local config และ adapter สำเนาในแอป; เอกสารการติดตั้งใน node-adapter.md เซิร์ฟเวอร์ QA ทั้งสองปิดด้วย exit 0
+- ยังไม่พิสูจน์: OpenTelemetry SDK/Playwright capture, แอปธุรกิจจริงของผู้ใช้/คุณค่าจาก user trial, Node 20/22, browser อื่น/มือถือ, production load, forced crash/power loss และ OneDrive ข้ามเครื่อง
+- ข้อจำกัดใหม่: explicit allowlist/root ภายในโครงการ, declaration ของ symbol เชื่อ sender, adapter ไม่ตาม redirects, telemetry ไม่มี retry; source link ใน IAB ต้องตรวจต่อใน browser อื่นหรือเพิ่ม source viewer

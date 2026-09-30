@@ -16,6 +16,7 @@ UI และ `/flowatlas/status` แสดง mode ตามจริง ค่�
 - โหลดไฟล์ด้วยการตรวจ schema/กราฟ, source paths/hashes/digest และ duplicate IDs หากเสียจะหยุด startup พร้อมเก็บต้นฉบับไว้
 - source ของ action เก่าอ่านไฟล์ปัจจุบันได้เมื่อ hash ตรง snapshot; ไฟล์เปลี่ยน/หายตอบ 409 ไม่มีการเก็บเนื้อไฟล์โค้ดทุกเวอร์ชันไว้ใน state
 - action ที่ code digest ต่างจาก runtime ปัจจุบันเปิดอ่านได้ แต่ API/ingest ปฏิเสธการเติมเหตุการณ์ด้วย 409 เพื่อไม่ปะปนรุ่นโค้ด
+- registered project เก็บ projectId และ snapshot ของแอปเป้าหมายใน graph เดิม; source resolver ใช้ root/allowlist จาก local config ไม่เชื่อ absolute path ในไฟล์ state เมื่อถอน registration จะอ่านกราฟเก่าได้แต่ source/การเติม event ไม่พร้อมใช้งาน
 
 ทดสอบ restart ทั้ง HTTP server ใน process เดิมและการปิด Node process แล้วเปิด process ใหม่จริง ทดสอบ write failure โดยสร้าง filesystem obstruction ใน directory ทดสอบที่ทิ้งได้ แล้วตรวจว่า state ก่อนหน้าไม่ถูกเปลี่ยนและเขียนต่อได้หลังแก้ obstruction
 

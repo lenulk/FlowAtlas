@@ -2,15 +2,17 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
 import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
-import { tmpdir } from 'node:os';
-import { join, resolve, sep } from 'node:path';
+import { join, resolve, sep, dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { getCodeVersion } from '../src/flowatlas.mjs';
 
 test('code version distinguishes a commit from changed working-tree files', () => {
-  const root = mkdtempSync(join(tmpdir(), 'flowatlas-version-'));
+  const storage = join(dirname(dirname(fileURLToPath(import.meta.url))), 'reports', 'storage');
+  mkdirSync(storage, { recursive: true });
+  const root = mkdtempSync(join(storage, 'flowatlas-version-'));
   const safeRoot = resolve(root);
-  const safeTemp = resolve(tmpdir());
-  if (!safeRoot.startsWith(`${safeTemp}${sep}`)) throw new Error('Temporary test path escaped the temp directory');
+  const safeTemp = resolve(storage);
+  if (!safeRoot.startsWith(`${safeTemp}${sep}`)) throw new Error('Temporary test path escaped the project storage directory');
   try {
     for (const folder of ['src', 'public', 'examples']) mkdirSync(join(root, folder));
     writeFileSync(join(root, 'src', 'app.mjs'), 'export const value = 1;\n');

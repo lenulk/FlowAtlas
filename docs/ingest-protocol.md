@@ -7,6 +7,8 @@
 3. `outbound-result` แจ้งผลคำขอไปบริการปลายทาง
 4. `finish` แจ้งผลสุดท้าย
 
+สำหรับแอปที่ลงทะเบียนผ่าน local config: `action-start` เพิ่ม `projectId` และ `codeDigest` ของแอปเป้าหมาย (digest ไม่ตรงเป็น 409); ทุก event ต่อมาต้องมี projectId เดียวกับ action (ผิดเป็น 400) source ของกราฟใช้ files ของ project snapshot ไม่ใช้ collector snapshot รายละเอียด adapter/config อยู่ใน [node-adapter.md](node-adapter.md) เส้นทางเดิมที่ไม่ส่ง projectId ยังรองรับ fixture ภายใน collector
+
 ตัวอย่างเหตุการณ์:
 
 ```json
@@ -35,6 +37,6 @@ fixture เก็บ action IDs ในเครื่องเพื่อทำ
 
 ตัวรับเชื่อเหตุการณ์จากโปรเซสในเครื่องที่ส่งมา ยังไม่มีการพิสูจน์ตัวตนหรือการตรวจสอบว่า client เป็นมนุษย์คลิกจริง `traceparent` ที่ส่งต่อได้รับการ echo กลับจากบริการจำลอง เพื่อแสดงว่าค่าถึงปลายทาง แต่บริการนั้นยังไม่มี span ภายใน ข้อมูลที่ไม่เห็นจึงคงเป็น `unknown`
 
-ตัวรับรู้จัก file hash เฉพาะไฟล์ใน repository นี้ โปรโตคอลนี้จึงยังไม่รองรับ source link ของแอปที่อยู่ใน repository อื่น และยังไม่ใช่ OTLP/OpenTelemetry ingestion ก่อนต่อแอปจริงต้องกำหนดวิธีลงทะเบียน source snapshot และตรวจสิทธิ์ตัวส่งเหตุการณ์
+ตัวรับรู้จัก file hash ของ collector และไฟล์ที่ลงทะเบียนแบบ explicit สำหรับ project อื่นภายในโฟลเดอร์โครงการ ไม่รับ root/path registration จาก HTTP โปรโตคอลยังไม่ใช่ OTLP/OpenTelemetry ingestion และต้องเพิ่มการตรวจสิทธิ์ผู้ส่งก่อนใช้ในระบบที่ไม่เชื่อถือทุก process ในเครื่อง
 
 ส่งเฉพาะ metadata ที่จำเป็น ห้ามใส่ request body, token, cookie หรือข้อมูลส่วนตัวใน event ตัวรับฟังเฉพาะ `127.0.0.1` และไม่มี authentication

@@ -1,0 +1,9 @@
+{
+  "projects": [
+    {
+      "id": "message-app",
+      "root": "apps/message-app",
+      "files": ["server.mjs", "index.html", "node-adapter.mjs", "project-sources.mjs"]
+    }
+  ]
+}

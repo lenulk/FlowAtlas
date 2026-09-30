@@ -1,0 +1,85 @@
+# เชื่อมแอป Node.js ที่อยู่คนละ repository
+
+ตัวเชื่อมนี้ใช้ explicit instrumentation และโปรโตคอล metadata ของ FlowAtlas ยังไม่ใช่ OpenTelemetry SDK หรือ browser trace recorder ตัวอย่างพร้อมใช้เก็บใน `apps/message-app` ซึ่งมี Git repository ของตัวเองและไม่ import runtime ของ collector
+
+## ทดลองตัวอย่าง
+
+จากโฟลเดอร์ FlowAtlas สร้างตัวอย่าง (ทำครั้งเดียว; จะไม่เขียนทับแอปเดิม):
+
+```powershell
+node scripts/create-target-app.mjs
+```
+
+สคริปต์คัดลอกแอปกับ adapter ลง `apps/message-app` และเพิ่ม registration ลง `flowatlas.config.json` ทั้งสองเป็นข้อมูลในเครื่องที่ไม่ใส่ Git ของ collector โดยปริยาย ตัว template และ generator อยู่ใน Git เพื่อสร้างใหม่ได้ สำหรับชุดที่จัดเตรียมในรอบนี้ สร้างแอปและ Git repository แยกไว้แล้ว ไม่ต้องรัน generator ซ้ำ
+
+เปิดสองเทอร์มินัลในโฟลเดอร์ FlowAtlas:
+
+```powershell
+# เทอร์มินัลแรก: collector + แผนที่
+node src/server.mjs
+```
+
+```powershell
+# เทอร์มินัลที่สอง: แอปเป้าหมาย + mock message service
+node apps/message-app/server.mjs
+```
+
+เปิด `http://127.0.0.1:4190` เพื่อทดลองดูข้อความ/ส่งข้อความ/บริการล้มเหลว กดลิงก์แผนที่เพื่อดูกราฟที่พอร์ต 4173 บริการ mock ไม่มี trace ภายใน กราฟจึงจบด้วย unknown coverage gap เมื่อได้รับ response ปิดตัวอย่างด้วย Ctrl+C หรือพิมพ์ `stop` แล้ว Enter; collector ปิดด้วย Ctrl+C
+
+## ลงทะเบียนแอปอื่นภายในโฟลเดอร์โครงการ
+
+นำสำเนา `src/node-adapter.mjs` และ `src/project-sources.mjs` ไปไว้ด้วยกันในแอปเป้าหมาย ไม่ต้องติดตั้งแพ็กเกจเพิ่ม เพิ่ม local config ตาม [flowatlas.config.example.json](../flowatlas.config.example.json) แล้ว restart collector
+
+- `id`: string เริ่มด้วย a–z ตามด้วย a–z/0–9/underscore/hyphen สูงสุด 64 ตัว; ไม่ซ้ำกัน
+- `root`: directory ของแอปภายในโฟลเดอร์ FlowAtlas และอยู่นอก src/public/examples/Git/config ของ collector เพื่อเก็บทุกอย่างตามข้อกำหนดโครงการนี้
+- `files`: 1–64 ไฟล์ที่อนุญาตให้อ่านแบบ explicit, relative ต่อ root, ใช้ `/`; รองรับ mjs/cjs/js/ts/tsx/jsx/html/css สูงสุด 1 MiB ต่อไฟล์ ไม่รับ dotfiles, traversal, node_modules หรือ symlink ใน source path
+- สูงสุด 16 registrations; config JSON ไม่เกิน 64 KiB เลือก config อื่นด้วย `FLOWATLAS_CONFIG` ภายในโครงการ
+
+ไม่มี endpoint ลงทะเบียน path ผ่าน HTTP การลงทะเบียนต้องมาจากไฟล์ที่ผู้ดูแลในเครื่องกำหนด `GET /flowatlas/projects/{id}` คืน projectId/commit/dirty/digest/file hashes โดยไม่ส่ง absolute root
+
+Git commit/dirty เป็นของแอปเป้าหมายเฉพาะเมื่อ Git root ตรง directory ของแอป หากมีเพียง Git repository ของโฟลเดอร์แม่จะเป็น null และใช้ digest ระบุโค้ดแทน dirty ตรวจเฉพาะไฟล์ที่ลงทะเบียน
+
+## ตัวอย่าง instrumentation
+
+```javascript
+import { createFlowAtlasClient, captureProjectVersion } from './node-adapter.mjs';
+import { dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const appRoot = dirname(fileURLToPath(import.meta.url));
+const projectId = 'my-app';
+const version = captureProjectVersion(appRoot, ['server.mjs', 'node-adapter.mjs', 'project-sources.mjs'], projectId);
+const client = createFlowAtlasClient({ projectId, codeDigest: version.digest });
+
+async function viewMessage(browserActionId) {
+  const capture = await client.start({ id: browserActionId, name: 'view-message' });
+  await capture.handler({ method: 'GET', path: '/api/message', symbol: 'viewMessage', file: 'server.mjs' });
+  try {
+    const response = await capture.fetch('http://127.0.0.1:4191/message', {
+      symbol: 'viewMessage', destination: 'message service', signal: AbortSignal.timeout(5000),
+    });
+    await capture.finish(response.ok ? 'success' : 'error');
+    return response;
+  } catch (error) {
+    await capture.finish('error');
+    throw error;
+  }
+}
+```
+
+แอปต้องเชื่อม action ID จาก browser ให้ตรงคำขอและตรวจการใช้ซ้ำเอง สร้าง capture แยกสำหรับแต่ละ action และรอ handler-entry ก่อน outbound/finish; อย่าแชร์ capture ระหว่าง requests ถ้า business fetch throw ให้บันทึก finish error ใน error handler ของแอป การรายงานชื่อไฟล์/symbol ต้องมาจากจุดที่ instrument จริง การเชื่อม symbol กับ source declaration ยังคง inferred ไม่ใช่ผลจาก stack inspection
+
+`capture.fetch()` รับ URL/string และ fetch options พร้อม symbol/destination ส่ง action ID + traceparent จริง วัดเวลาเมื่อได้รับ response headers แล้วคืน Response เดิมให้แอปอ่าน body เอง HTTP 4xx/5xx ถูกบันทึกเป็น completed request พร้อม status; แอปตัดสินผล action ผ่าน finish แยกต่างหาก
+
+## ความล้มเหลวและขอบเขต
+
+- Collector timeout/rejection/outage ทำให้ `capture.complete` เป็น false และ viewerUrl เป็น null; หยุดส่ง event ต่อใน capture นั้น แต่ business fetch ยังทำงานตามจริง ไม่มี retry queue
+- รอ collector สูงสุด 500 ms ต่อ event โดยปริยาย ปรับ timeoutMs ได้ 1–5000; ไม่ใช่ระบบส่ง telemetry ที่ไม่มี overhead
+- ส่งเฉพาะ field ที่กำหนด ไม่ส่ง headers/cookies/request body/response body และ outbound URL เก็บเฉพาะ pathname ไม่มี query; caller ต้องไม่ใส่ความลับในชื่อ action/service/destination/handler path
+- Adapter ไม่ตาม HTTP redirects เพื่อไม่ให้ correlation ไปยังปลายทางที่ไม่ได้กำหนด; แอปที่ต้องตาม redirects ต้องกำหนด integration เพิ่ม ไม่ถือว่าทดสอบแล้ว
+- action-start ของ registered project ต้องส่ง codeDigest ตรง snapshot ของ collector (409 เมื่อไม่ตรง) event ต่อมาต้องมี projectId เดียวกัน; restart ทั้ง collector/target หลังเปลี่ยนไฟล์ที่ลงทะเบียน
+- ใช้ project ID เดิมกับแอปเดิมเสมอ กราฟเก่ายังคง snapshot เดิม ถ้าถอน registration จะอ่านกราฟ JSON เก่าได้ แต่ source ไม่พร้อมใช้งาน และเติม event ไม่ได้ ไม่มี source archive ทุกเวอร์ชัน
+- ไม่มี authentication, symbol verification จาก runtime หรือ OpenTelemetry spans; เหตุการณ์ยังเชื่อ sender บนเครื่อง ใช้กับแอปตัวอย่างในเครื่องที่เชื่อถือได้
+- In-app browser ที่ใช้ QA ปฏิเสธเปิด source link โดยตรง; HTTP source/content/hash ผ่าน integration tests แต่ยังไม่ได้ตรวจ source UI ใน browser อื่น
+
+รายละเอียด persistence/recovery อยู่ใน [storage.md](storage.md) และผลทดสอบอยู่ใน [QUALITY.md](QUALITY.md)

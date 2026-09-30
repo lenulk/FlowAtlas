@@ -33,6 +33,8 @@ node examples/independent-app/server.mjs
 
 รายละเอียด payload และขอบเขตความเชื่อมั่นอยู่ใน [โปรโตคอลรับเหตุการณ์รุ่นทดลอง](docs/ingest-protocol.md)
 
+เพิ่มตัวเชื่อม Node.js ที่คัดลอกไปใช้ในอีก repository ได้ พร้อม local registration ของไฟล์ต้นทางแล้ว ตัวอย่าง `apps/message-app` จัดเตรียมไว้ในเครื่องนี้ เปิด collector ด้วยคำสั่งเดิม แล้วเปิดอีกเทอร์มินัลรัน `node apps/message-app/server.mjs` และเข้าพอร์ต 4190 ตัวอย่างมี mock ที่พอร์ต 4191; ใช้ Git repository แยกจาก collector รายละเอียดการสร้างใหม่/ติดตั้ง/ข้อจำกัดอยู่ใน [node-adapter.md](docs/node-adapter.md)
+
 ทดสอบด้วย:
 
 ```powershell
@@ -79,15 +81,16 @@ node scripts/run-tests.mjs scripts/source-check.mjs
 
 ## ข้อจำกัดปัจจุบัน
 
-- ตัวอย่างนี้ใช้ Node.js และจุด instrumentation ที่ใส่ไว้เอง ยังไม่ติดตั้งกับเว็บแอปอื่นโดยอัตโนมัติ
-- แอปที่แยกโปรเซสยังเป็น fixture ภายใน repository เดียวกัน และส่งเหตุการณ์ด้วยโปรโตคอลทดลองของ FlowAtlas มีการส่งต่อ `traceparent` แบบ W3C แต่ยังไม่ได้ใช้ OpenTelemetry SDK หรือบันทึก Playwright trace
+- ตัวอย่างนี้ใช้ Node.js และจุด instrumentation ที่ใส่ไว้เอง มี adapter และ explicit source registration สำหรับอีก repository ภายในโฟลเดอร์โครงการแล้ว แต่ยังไม่ติดตั้ง instrumentation อัตโนมัติ
+- examples/independent-app เป็น fixture ภายใน repository ของ collector ส่วน apps/message-app เป็น fixture ใน repository แยก ทั้งคู่ส่งเหตุการณ์ด้วยโปรโตคอลทดลองของ FlowAtlas มีการส่งต่อ `traceparent` แบบ W3C แต่ยังไม่ได้ใช้ OpenTelemetry SDK หรือบันทึก Playwright trace
 - fixture ส่ง telemetry แบบ best effort และยังทำงานธุรกิจได้เมื่อ collector หยุดทำงาน พร้อมแสดง capture ไม่ครบ รอ collector สูงสุด 500 ms ต่อเหตุการณ์และหยุดส่ง action นั้นเมื่อส่งไม่สำเร็จ ยังไม่มี retry queue; กราฟบางส่วนอาจค้าง `running` หาก finish ส่งไม่ถึง
 - บริการสต็อกเป็น mock ภายในโครงการ ไม่ใช่บริการภายนอกจริง และไม่มี trace ภายในบริการ
 - CLI เก็บ actions ล่าสุด 100 รายการลงดิสก์ แต่ละกราฟไม่เกิน 100 nodes / 200 edges (เกินแล้วตอบ 413) และ state ไม่เกิน 64 MiB ยังไม่มี archive ระยะยาว; รายการเกินขอบเขตจะถูกแทนด้วยรายการใหม่
 - การเขียนไฟล์เป็น synchronous และมี writer lock เหมาะกับการทดลองในเครื่องเดียว ยังไม่พิสูจน์ความทนไฟดับหรือ OneDrive sync ระหว่างหลายเครื่อง; หาก process ถูกบังคับปิด lock อาจค้าง ต้องตรวจและกู้คืนตาม storage.md
 - ยังไม่มีการทดสอบกับนักพัฒนาใหม่หรือผู้แก้ incident จริง เกณฑ์วัดผลด้านบนเป็นแผนทดลอง
+- ทดสอบอีก repository ด้วย fixture ที่สร้างในโครงการแล้ว ยังไม่ได้ติดตั้งกับแอปงานจริงของผู้ใช้; ยังไม่มี OpenTelemetry SDK/Playwright capture
 - เปิดเฉพาะ `127.0.0.1` และ endpoint รับเหตุการณ์ยังไม่มีการตรวจสิทธิ์ จึงเหมาะกับการทดลองในเครื่องที่เชื่อถือได้เท่านั้น
 
 ## สถานะ
 
-มีต้นแบบที่รันได้พร้อมแอปทดลอง 3 actions, แอป fixture อีกโปรเซส 3 actions, แผนที่หลักฐาน, การเก็บผลถาวร, รายการย้อนหลัง/ตัวกรอง, JSON API และชุดทดสอบ ขั้นต่อไปคือแทนเหตุการณ์ที่ส่งเองด้วย trace จากเครื่องมือมาตรฐาน และทดลองกับเว็บแอปภายนอก repository ก่อนทดสอบกับผู้ใช้จริง
+มีต้นแบบที่รันได้พร้อมแอปทดลอง, fixture คนละ repository, Node adapter/source registration, แผนที่หลักฐาน, การเก็บผลถาวร, รายการย้อนหลัง/ตัวกรอง, JSON API และชุดทดสอบ ขั้นต่อไปคือเพิ่ม trace จากเครื่องมือมาตรฐาน และทดลองกับแอปงานจริงก่อนทดสอบคุณค่ากับผู้ใช้

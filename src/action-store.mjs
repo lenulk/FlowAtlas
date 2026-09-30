@@ -3,6 +3,7 @@ import { join } from 'node:path';
 import { randomUUID, createHash } from 'node:crypto';
 import { hostname } from 'node:os';
 import { validateGraph } from './evidence-contract.mjs';
+import { validSourcePath } from './project-sources.mjs';
 
 const maxBytes = 64 * 1024 * 1024;
 export class StorageError extends Error {
@@ -17,10 +18,12 @@ function validateSavedAction(action) {
   if (!/^[A-Za-z0-9_-]{8,80}$/.test(action?.id ?? '') || action.name.length > 200
     || action.nodes.length > 100 || action.edges.length > 200) issues.push('invalid action bounds');
   const files = action.codeVersion?.files;
+  const projectId = action.codeVersion?.projectId;
+  if (projectId !== undefined && (typeof projectId !== 'string' || !/^[a-z][a-z0-9_-]{0,63}$/.test(projectId))) issues.push('invalid project ID');
   if (!files || Array.isArray(files) || Object.keys(files).length > 2048) issues.push('invalid source snapshot');
   else {
     for (const [file, hash] of Object.entries(files)) {
-      if (!/^(src|public|examples)\//.test(file) || /[\\:\x00]/.test(file)
+      if ((projectId === undefined ? !/^(src|public|examples)\//.test(file) : !validSourcePath(file)) || /[\\:\x00]/.test(file)
         || file.split('/').some((part) => !part || part === '.' || part === '..')
         || !/^[a-f0-9]{64}$/.test(hash)) issues.push('invalid source path or hash');
     }

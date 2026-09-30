@@ -1,10 +1,15 @@
 import { createInterface } from 'node:readline';
 import { randomUUID } from 'node:crypto';
+import { dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { startServers } from '../src/server.mjs';
+import { readProjectConfig } from '../src/project-sources.mjs';
 
 // Manual browser QA with an isolated, retained data directory in this project.
 const dataDir = process.env.FLOWATLAS_DATA_DIR ?? `reports/storage/ui-${randomUUID()}`;
-const options = { dataDir, port: Number(process.env.PORT ?? 4173), inventoryPort: Number(process.env.INVENTORY_PORT ?? 4174) };
+const root = dirname(dirname(fileURLToPath(import.meta.url)));
+const options = { dataDir, port: Number(process.env.PORT ?? 4173), inventoryPort: Number(process.env.INVENTORY_PORT ?? 4174),
+  projects: readProjectConfig(root, process.env.FLOWATLAS_CONFIG ?? 'flowatlas.config.json') };
 let servers = await startServers(options);
 console.log(`QA: http://127.0.0.1:${servers.port}; data: ${dataDir}`);
 console.log('Commands: restart, stop');
@@ -14,6 +19,7 @@ try {
     if (line.trim() === 'stop') break;
     if (line.trim() === 'restart') {
       await servers.close();
+      options.projects = readProjectConfig(root, process.env.FLOWATLAS_CONFIG ?? 'flowatlas.config.json');
       servers = await startServers(options);
       console.log(`Restarted: http://127.0.0.1:${servers.port}; retained: ${servers.atlas.actions.size}`);
     }

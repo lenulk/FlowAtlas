@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="th"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Message App · Registered project</title>
+<style>body{font:16px system-ui;background:#eff3ed;color:#20353d;max-width:760px;margin:70px auto;padding:20px}main{background:white;padding:32px;border-radius:20px}h1{margin-top:0}p{line-height:1.7}button{font:inherit;cursor:pointer;border:1px solid #c8d8cc;border-radius:8px;padding:12px 18px;background:#e9f3d0;margin:4px}button:focus-visible,a:focus-visible{outline:3px solid #175a79;outline-offset:3px}pre{white-space:pre-wrap;background:#f4f7f3;padding:18px;border-radius:8px}a{color:#236774}[hidden]{display:none}</style>
+<main><p>แอปเป้าหมายที่ลงทะเบียนกับ FlowAtlas</p><h1>Message App</h1>
+<p>ทดลองเรียกบริการข้อความ แล้วเปิดแผนที่หลักฐานจาก collector ที่ทำงานแยกโปรเซส บริการข้อความเป็น mock ที่ไม่มี trace ภายใน</p>
+<button data-name="view-message" data-method="GET" data-path="/api/message">ดูข้อความ</button>
+<button data-name="send-message" data-method="POST" data-path="/api/send">ส่งข้อความ</button>
+<button data-name="fail-message" data-method="POST" data-path="/api/fail">ทดลองบริการล้มเหลว</button>
+<pre id="result" role="status">เลือกการกระทำเพื่อเริ่ม</pre><p id="warning" hidden>บันทึกหลักฐานไม่ครบ แต่ผลการทำงานของแอปแสดงตามจริง</p><a id="viewer" hidden target="_blank" rel="noopener">เปิดแผนที่ใน FlowAtlas ↗</a></main>
+<script>
+document.querySelectorAll('button').forEach((button)=>button.addEventListener('click',async()=>{
+  const buttons=document.querySelectorAll('button');buttons.forEach((b)=>b.disabled=true);
+  const viewer=document.querySelector('#viewer');viewer.hidden=true;document.querySelector('#warning').hidden=true;
+  try{
+    const id=crypto.randomUUID();
+    const started=await fetch('/action-start',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({id,name:button.dataset.name,clientTime:new Date().toISOString()})});
+    if(!started.ok)throw new Error(`เริ่มไม่สำเร็จ (${started.status})`);
+    const response=await fetch(button.dataset.path,{method:button.dataset.method,headers:{'x-flowatlas-action-id':id}});
+    const body=await response.json();document.querySelector('#result').textContent=`HTTP ${response.status}\n${body.message??body.error}\nAction: ${id}`;
+    document.querySelector('#warning').hidden=body.complete===true;
+    if(body.viewerUrl){viewer.href=body.viewerUrl;viewer.hidden=false;}
+  }catch(error){document.querySelector('#result').textContent=error.message;}
+  finally{buttons.forEach((b)=>b.disabled=false);}
+}));
+</script></html>

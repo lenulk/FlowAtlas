@@ -8,11 +8,13 @@
 
 ## สถานะปัจจุบัน
 
-มีแอปตัวอย่างสามการกระทำ แผนที่หลักฐาน JSON API และชุดทดสอบแล้ว มี fixture อีกแอปที่รันคนละโปรเซสและส่งเหตุการณ์ผ่าน HTTP แต่ยังอยู่ใน repository เดียวกันและใช้ instrumentation ที่เขียนเฉพาะตัวอย่าง CLI เก็บผลล่าสุด 100 actions ลงดิสก์และเปิดกราฟเดิมหลัง restart ได้ ยังไม่พิสูจน์การติดตั้งกับแอปภายนอก repository
+มีแอปตัวอย่างสามการกระทำ แผนที่หลักฐาน JSON API และชุดทดสอบแล้ว CLI เก็บผลล่าสุด 100 actions ลงดิสก์และเปิดกราฟเดิมหลัง restart ได้ เพิ่ม Node adapter ที่ใช้ซ้ำได้และ source registration ของแอปคนละ repository ภายในโฟลเดอร์โครงการ ทดสอบสำเนา adapter ใน Git repository แยกผ่าน HTTP จริงแล้ว ยังไม่ทดลองกับแอปงานจริงของผู้ใช้
 
 เริ่มระยะ 1 แล้วด้วยตัวตรวจสัญญาข้อมูลที่ตรวจชนิดหลักฐาน correlation ID รุ่นไฟล์ต้นทาง และช่องว่างของ trace พร้อมกรณีทดสอบที่ป้องกันการติดป้าย `observed` ให้ข้อมูลจากเวลาใกล้กันหรือ coverage gap ตัวตรวจนี้ยืนยันความสอดคล้องของข้อมูลที่ตัวเก็บส่งมา แต่ยังไม่ได้พิสูจน์ความแท้ของเหตุการณ์จากแอปอิสระ งานนั้นเป็นเกณฑ์ของระยะ 2
 
-เริ่มระยะ 2 ด้วยเว็บแอป fixture ที่รันคนละโปรเซสและส่งเหตุการณ์ผ่าน HTTP เข้า FlowAtlas แล้ว มีการส่งต่อ W3C `traceparent` ไปยังบริการจำลองและตรวจว่าบริการได้รับค่าเดียวกัน นี่ยังไม่ใช่ OpenTelemetry SDK, Playwright trace หรือการติดตั้งกับ repository ภายนอก จึงยังไม่ผ่านเกณฑ์ระยะ 2 ทั้งหมด
+fixture แรกของระยะ 2 รันคนละโปรเซสและส่งเหตุการณ์ผ่าน HTTP เข้า FlowAtlas มีการส่งต่อ W3C `traceparent` ไปยังบริการจำลองและตรวจว่าบริการได้รับค่าเดียวกัน แต่ยังอยู่ใน repository ของ collector การรองรับ repository แยกเพิ่มในรอบถัดมาดังต่อไปนี้; OpenTelemetry SDK/Playwright capture ยังเหลืออยู่
+
+ต่อระยะ 2/3 ด้วย registered project snapshot (projectId/commit/digest), source allowlist และ portable adapter แล้ว `apps/message-app` เป็น repository แยกที่อยู่ภายในโฟลเดอร์โครงการเพื่อทำตามข้อกำหนดผู้ใช้ ทดสอบ 3 actions, source hash/content, collector outage และ reload จาก disk; named handler functions บันทึก entry ภายในฟังก์ชันจริง ยังเป็น fixture ที่เราสร้างเองและ custom metadata ไม่ถือว่าทดสอบกับระบบธุรกิจจริงหรือ trace มาตรฐานแล้ว รายละเอียดใน [node-adapter.md](docs/node-adapter.md)
 
 เพิ่มวงรอบตรวจคุณภาพที่บันทึกทุกการรันใน [TEST-RUNS.md](docs/TEST-RUNS.md) และวิเคราะห์ใน [QUALITY.md](docs/QUALITY.md) แล้ว ครอบคลุมข้อมูลผิดรูปแบบ, atomic ingestion, destination/trace correlation, 20 actions พร้อมกัน, collector outage/timeout, retention และ source mismatch; การผ่านชุดทดสอบยังไม่แทนเกณฑ์การทดลองกับแอปภายนอกและผู้ใช้จริง
 

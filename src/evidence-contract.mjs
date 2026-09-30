@@ -108,6 +108,8 @@ export function validateGraph(graph) {
   if (!['running', 'success', 'error'].includes(graph?.outcome)) issues.push('invalid action outcome');
   if (graph?.finishedAt !== null && !isTime(graph?.finishedAt)) issues.push('invalid finish time');
   if (!/^[a-f0-9]{64}$/.test(graph?.codeVersion?.digest ?? '')) issues.push('invalid code digest');
+  const projectId = graph?.codeVersion?.projectId;
+  if (projectId !== undefined && (typeof projectId !== 'string' || !/^[a-z][a-z0-9_-]{0,63}$/.test(projectId))) issues.push('invalid project ID');
   if (!graph?.codeVersion?.files || typeof graph.codeVersion.files !== 'object') issues.push('code file hashes are missing');
   if (!Array.isArray(graph?.nodes) || !Array.isArray(graph?.edges)) {
     issues.push('nodes or edges are missing');

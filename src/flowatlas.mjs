@@ -41,15 +41,16 @@ export function sourceRef(version, file, symbol) {
 }
 
 export class FlowAtlas {
-  constructor(version, limit = 100, store = null) {
+  constructor(version, limit = 100, store = null, projectSources = null) {
     if (!Number.isInteger(limit) || limit < 1 || limit > 100) throw new Error('Invalid action limit');
     this.version = version;
     this.limit = limit;
     this.store = store;
+    this.projectSources = projectSources;
     this.actions = new Map((store?.load(limit) ?? []).map((action) => [action.id, action]));
   }
 
-  start(id, name, clientTime = null, origin = 'client-reported') {
+  start(id, name, clientTime = null, origin = 'client-reported', version = this.version) {
     if (!/^[A-Za-z0-9_-]{8,80}$/.test(id)) throw new Error('Invalid action ID');
     if (typeof name !== 'string' || !name.trim() || name.length > 200) throw new Error('Invalid action name');
     if (clientTime !== null && (typeof clientTime !== 'string' || clientTime.length > 64
@@ -58,7 +59,7 @@ export class FlowAtlas {
     const action = {
       schemaVersion: '0.1', id, name, clientTime,
       startedAt: new Date().toISOString(), finishedAt: null, outcome: 'running',
-      codeVersion: this.version,
+      codeVersion: version,
       nodes: [{ id: 'action', type: 'user-action', label: name, origin }], edges: [],
     };
     const next = new Map(this.actions);
@@ -71,12 +72,13 @@ export class FlowAtlas {
 
   ensure(id, name = 'Unregistered action') {
     const existing = this.actions.get(id);
-    this.assertCurrentVersion(existing);
+    this.assertCurrentVersion(existing, this.version);
     return existing ?? this.start(id, name, null, 'unverified');
   }
 
-  assertCurrentVersion(action) {
-    if (action && action.codeVersion.digest !== this.version.digest) {
+  assertCurrentVersion(action, current = action?.codeVersion.projectId
+    ? this.projectSources?.version(action.codeVersion.projectId) : this.version) {
+    if (action && (!current || action.codeVersion.projectId !== current.projectId || action.codeVersion.digest !== current.digest)) {
       const error = new Error('Action belongs to a different code snapshot; start a new action');
       error.code = 'FLOWATLAS_SNAPSHOT_MISMATCH';
       throw error;

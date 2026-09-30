@@ -9,6 +9,7 @@ import { createInventoryService } from './inventory-service.mjs';
 import { validateGraph } from './evidence-contract.mjs';
 import { ingestEvent } from './ingest.mjs';
 import { JsonActionStore } from './action-store.mjs';
+import { ProjectSources, readProjectConfig } from './project-sources.mjs';
 
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
 const staticFiles = new Map([
@@ -58,8 +59,9 @@ function placeOrder(inventoryUrl, actionId) {
   });
 }
 
-export async function startServers({ port = 4173, inventoryPort = 4174, dataDir = null, actionLimit = 100 } = {}) {
+export async function startServers({ port = 4173, inventoryPort = 4174, dataDir = null, actionLimit = 100, projects = [] } = {}) {
   const version = getCodeVersion(root);
+  const projectSources = new ProjectSources(root, projects);
   let store = null;
   let atlas;
   try {
@@ -73,7 +75,7 @@ export async function startServers({ port = 4173, inventoryPort = 4174, dataDir 
       }
       store = new JsonActionStore(directory);
     }
-    atlas = new FlowAtlas(version, actionLimit, store);
+    atlas = new FlowAtlas(version, actionLimit, store, projectSources);
   } catch (error) { store?.close(); throw error; }
   const inventory = createInventoryService();
   let actualInventoryPort;
@@ -99,6 +101,12 @@ export async function startServers({ port = 4173, inventoryPort = 4174, dataDir 
 
       if (request.method === 'GET' && url.pathname === '/flowatlas/status') {
         sendJson(response, 200, { storage: store ? 'disk' : 'memory', actionLimit: atlas.limit, retainedActions: atlas.actions.size });
+        return;
+      }
+
+      if (request.method === 'GET' && url.pathname.startsWith('/flowatlas/projects/')) {
+        const registered = projectSources.version(decodeURIComponent(url.pathname.slice('/flowatlas/projects/'.length)));
+        sendJson(response, registered ? 200 : 404, registered ?? { error: 'Project is not registered' });
         return;
       }
 
@@ -150,9 +158,9 @@ export async function startServers({ port = 4173, inventoryPort = 4174, dataDir 
         }
         let content;
         try {
-          content = readFileSync(join(root, file));
+          content = snapshot.projectId ? projectSources.read(snapshot, file) : readFileSync(join(root, file));
         } catch (error) {
-          if (error.code !== 'ENOENT') throw error;
+          if (!snapshot.projectId && error.code !== 'ENOENT') throw error;
           sendJson(response, 409, { error: 'Source is unavailable for the captured code snapshot' });
           return;
         }
@@ -291,6 +299,7 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === resolve(process.argv[1
     port: Number(process.env.PORT ?? 4173),
     inventoryPort: Number(process.env.INVENTORY_PORT ?? 4174),
     dataDir: process.env.FLOWATLAS_MEMORY_ONLY === '1' ? null : process.env.FLOWATLAS_DATA_DIR ?? 'data/actions',
+    projects: readProjectConfig(root, process.env.FLOWATLAS_CONFIG ?? 'flowatlas.config.json'),
   });
   console.log(`FlowAtlas MVP: http://127.0.0.1:${servers.port}`);
   const stop = () => servers.close().catch((error) => { console.error(error.message); process.exitCode = 1; });

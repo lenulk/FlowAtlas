@@ -21,12 +21,24 @@ export function ingestEvent(atlas, event) {
 
   if (event.kind === 'action-start') {
     const name = requiredText(event.name, 'name');
-    atlas.start(actionId, name, event.clientTime ?? null);
+    let version = atlas.version;
+    if (event.projectId !== undefined) {
+      version = atlas.projectSources?.version(requiredText(event.projectId, 'projectId'));
+      if (!version) throw new Error('Project is not registered');
+      if (typeof event.codeDigest !== 'string') throw new Error('Project code digest is required');
+      if (event.codeDigest !== version.digest) {
+        const error = new Error('Project code digest differs from the registered snapshot');
+        error.code = 'FLOWATLAS_SNAPSHOT_MISMATCH';
+        throw error;
+      }
+    }
+    atlas.start(actionId, name, event.clientTime ?? null, 'client-reported', version);
     return { actionId };
   }
 
   const original = atlas.get(actionId);
   if (!original) throw new Error('Action has not been started');
+  if (event.projectId !== original.codeVersion.projectId) throw new Error('Project identity does not match the action');
   atlas.assertCurrentVersion(original);
   // Validate and build on a copy; rejected events must never partially alter a graph.
   const action = structuredClone(original);
@@ -108,6 +120,12 @@ export function ingestEvent(atlas, event) {
       });
       atlas.edge(action, routeNode, gapNode, 'unknown', {
         type: 'coverage-gap', reason: 'No internal spans were captured from the destination service.',
+      });
+    } else if (event.outcome === 'completed') {
+      const gapNode = `unknown:${destinationKey}:${path}`;
+      atlas.node(action, { id: gapNode, type: 'unknown', label: 'Untraced internal work' });
+      atlas.edge(action, externalNode, gapNode, 'unknown', {
+        type: 'coverage-gap', reason: 'No route source or internal spans were captured from the destination service.',
       });
     }
     atlas.commit(original, action);
