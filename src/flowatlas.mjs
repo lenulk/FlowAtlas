@@ -23,12 +23,16 @@ export function getCodeVersion(root) {
     .update(Object.entries(files).map(([file, hash]) => `${file}\0${hash}`).join('\n'))
     .digest('hex');
   let commit = null;
+  let dirty = null;
   try {
     commit = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: root, stdio: ['ignore', 'pipe', 'ignore'] }).toString().trim();
+    dirty = execFileSync('git', ['status', '--porcelain', '--', 'src', 'public', 'examples'], {
+      cwd: root, stdio: ['ignore', 'pipe', 'ignore'],
+    }).toString().trim().length > 0;
   } catch {
     // A file digest still identifies the running code before the first commit.
   }
-  return { commit, digest, files };
+  return { commit, dirty, digest, files };
 }
 
 export function sourceRef(version, file, symbol) {
