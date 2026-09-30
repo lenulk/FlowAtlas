@@ -88,7 +88,13 @@ export async function startServers({ port = 4173, inventoryPort = 4174, dataDir 
   const inventoryUrl = `http://127.0.0.1:${actualInventoryPort}`;
 
   const app = createServer(async (request, response) => {
-    const url = new URL(request.url, 'http://localhost');
+    let url;
+    try { url = new URL(request.url, 'http://localhost'); }
+    catch {
+      request.resume();
+      sendJson(response, 400, { error: 'Invalid request URL' });
+      return;
+    }
     let currentActionId = null;
     try {
       response.setHeader('referrer-policy', 'no-referrer');

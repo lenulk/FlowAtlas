@@ -385,3 +385,11 @@
 - Offline package 1/1 (2026-09-30T21-31-28-841Z) ผ่าน: capture 3 actions/source/restart, token ไม่เข้า state และ credential เก่าอ่าน session ใหม่ไม่ได้; isolated source 1/1 (2026-09-30T21-32-07-228Z) ผ่าน ยังรอ hosted CI สำหรับ commit ใหม่
 - Review หุ้ม Playwright operations ที่รับ credential เพื่อไม่ให้ error call-log แสดงรหัส; รหัสอยู่ใน process memory/environment และถือว่า target app เชื่อถือได้ ไม่ป้องกัน same-user malware หรือพิสูจน์การคลิกของมนุษย์ ไม่มี per-project roles/export policy/OTel privacy จึงยังไม่ปิด FA-06 ทั้งหมด
 - พบ hypothesis ใน code inspection: URL parsing ของ HTTP handler อยู่ก่อน try/catch อาจทำให้ malformed request target ล้ม process; ยังไม่มี repro เก็บเป็นงาน input-boundary รอบถัดไปก่อน real-app pilot
+
+## รอบ 38 — malformed HTTP request target
+
+- เกณฑ์: request target ที่ URL parser อ่านไม่ได้ต้องได้ 400 โดยไม่ล้ม collector; authorized request หลังจากนั้นยังทำงานได้
+- Regression ก่อนแก้ไม่ผ่าน 0/1 (`2026-09-30T21-34-28-782Z`): raw HTTP path `http://[` ได้ socket error (status sentinel 0) แทน 400; code inspection พบ URL parse ก่อน try/catch ใน async callback จึงไม่มี error response path
+- เพิ่ม bounded URL parse failure response ไม่มี input/token/stack ใน response ไม่เปลี่ยนการ parse route ที่ถูกต้องหรือ retry requests
+- Collector focused 9/9 (`2026-09-30T21-35-13-081Z`) ผ่าน แต่ neighboring workflow inspection พบ inventory listener ใน process เดียวกันมี parser ก่อน error handling เช่นกัน; expanded regression 0/1 (`2026-09-30T21-36-03-320Z`) ผ่าน collector path แล้วล้มที่ inventory path จึงแก้ทั้งสอง listener ของ principal issue นี้
+- หลังแก้ทั้งสอง listener focused Windows ผ่าน 14/14 (2026-09-30T21-36-41-853Z), failed/skipped 0; malformed targets ได้ 400, inventory stock ยังคง 2, collector ยังรับ authorized status และ action/session flows ผ่าน ไม่รัน source snapshot gate ซ้ำเพราะไม่ได้เปลี่ยน source serving

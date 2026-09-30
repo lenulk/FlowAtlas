@@ -1009,3 +1009,37 @@
 - หลักฐาน: `reports/tests/2026-09-30T21-32-07-228Z.tap` และ `.json`
 
 - Manual visual check: inspected inspector-restart.png ของ Edge run 2026-09-30T21-24-37-309Z เห็นประวัติ 3 actions และ graph พร้อม observed/unknown; pairing input ไม่อยู่ในภาพ ตรวจ diff whitespace ผ่านก่อน staging
+
+## 2026-09-30T21-34-28-782Z
+
+- จุดประสงค์: Regression: unauthenticated malformed request target must not crash collector
+- ผล: ไม่ผ่าน — 0/1; failed 1; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: 678a2478bc999c1a09f3642f1979e5492d852670; dirty: true
+- หลักฐาน: `reports/tests/2026-09-30T21-34-28-782Z.tap` และ `.json`
+- ไม่ผ่าน: malformed request URLs return 400 without terminating the authenticated collector
+
+## 2026-09-30T21-35-13-081Z
+
+- จุดประสงค์: Verify malformed HTTP URL recovery, session access and input boundaries
+- ผล: ผ่าน — 9/9; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: 678a2478bc999c1a09f3642f1979e5492d852670; dirty: true
+- หลักฐาน: `reports/tests/2026-09-30T21-35-13-081Z.tap` และ `.json`
+
+## 2026-09-30T21-36-03-320Z
+
+- จุดประสงค์: Regression of neighboring inventory port: malformed URLs must not crash shared collector process
+- ผล: ไม่ผ่าน — 0/1; failed 1; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: 678a2478bc999c1a09f3642f1979e5492d852670; dirty: true
+- หลักฐาน: `reports/tests/2026-09-30T21-36-03-320Z.tap` และ `.json`
+- ไม่ผ่าน: malformed request URLs return 400 without terminating the authenticated collector
+
+## 2026-09-30T21-36-41-853Z
+
+- จุดประสงค์: Verify malformed request protection on both listeners, preserved inventory and valid action/session flows
+- ผล: ผ่าน — 14/14; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: 678a2478bc999c1a09f3642f1979e5492d852670; dirty: true
+- หลักฐาน: `reports/tests/2026-09-30T21-36-41-853Z.tap` และ `.json`
