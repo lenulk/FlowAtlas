@@ -281,3 +281,23 @@
 - ตัด timer ใน `stopApp` หลัง child ออกแล้ว รันรอบสุดท้ายผ่าน 1/1 (`2026-09-30T18-48-22-675Z`); HTTP baseline 2/2, graph/source ตรงทั้งสาม, พอร์ตปิด, lock ของรอบสำเร็จไม่มี, ภาพอ่านได้
 - รอบ timeout เหลือ stale lock แม้ PID เจ้าของหยุดแล้ว; ตรวจเจ้าของและลบเฉพาะ lock ของรอบ QA ที่ถูกยุติ ตรวจพื้นที่ของ browser test ทั้งสี่รอบไม่มี lock ค้าง
 - ข้อจำกัด: เว็บนี้เป็น fixture ที่สร้างเพื่อเชื่อม FlowAtlas อยู่แล้วและอยู่ใน repository เดียวกับ collector แม้รันคนละโปรเซส ผลนี้เพิ่มหลักฐาน browser บน Windows/Edge แต่ยังไม่พิสูจน์ว่าใช้กับเว็บภายนอกทั่วไปหรือเว็บงานจริงได้โดยไม่ติด adapter
+
+## รอบ 27 — ลดขั้นตอนลงทะเบียนแอป Node.js
+
+- ผู้ใช้ต้องการพัฒนาต่อจากข้อจำกัดด้านการติดตั้ง; ยังไม่มีแอปงานจริงให้ลอง จึงเลือกแก้เฉพาะขั้นตอนคัดลอก adapter และ local source registration ก่อน
+- เกณฑ์: คำสั่งเดียวลงทะเบียนแอปที่อยู่ในโครงการ, คัดลอก adapter ที่ขาด, แล้ว `inspect` เปิดแอปและ capture action ได้; เมื่อ adapter ชน/ID ซ้ำ/ไฟล์หาย ต้องไม่เขียนทับ config หรือไฟล์ของแอป
+- เพิ่ม `scripts/register-app.mjs` ใช้ source allowlist แบบ explicit และตรวจ project/config path, content ของ adapter, จำนวนรายการ และการลงทะเบียนที่อ่านได้จริงก่อนเขียน config แบบ temp + rename; rollback adapter ที่เพิ่งคัดลอกเมื่อเกิดข้อผิดพลาด
+- Windows focused 3/3 ผ่าน (`2026-09-30T19-25-18-874Z`) รวม full action→graph ผ่าน `inspect` กับแอปจำลองที่เริ่มจาก template ไม่มี adapter; ตรวจ failure/duplicate ไม่เปลี่ยนไฟล์เดิม
+- ขอบเขต: registration ไม่เพิ่ม instrumentation เข้าแอปอัตโนมัติ ยังต้องส่ง action ID จาก browser/handler; ไม่มีผลทดลองกับแอปธุรกิจจริงของผู้ใช้
+- Final contract review พบว่า CLI ไม่ตรวจเพดาน config 64 KiB แบบเดียวกับ inspector; regression ก่อนแก้ผ่าน 3/4 (`2026-09-30T19-31-18-377Z`) เพราะ CLI ยอมลงทะเบียน config ที่ inspector เปิดไม่ได้ ต้องปฏิเสธก่อนคัดลอกไฟล์/เขียน config
+- แก้ให้ตรวจขนาด config เดิมและผลลัพธ์หลังเพิ่มรายการก่อนคัดลอก adapter; regression ตรวจทั้งไฟล์เกินเพดานและไฟล์เดิมใกล้เพดานที่เพิ่มแล้วเกิน ผ่าน 4/4 (`2026-09-30T19-32-00-469Z`), failed/skipped 0; config/target คงเดิมเมื่อปฏิเสธ
+- Windows full suite ก่อน size fix ผ่าน 53/53 (`2026-09-30T19-26-53-644Z`); หลัง fix รัน focused 4/4 เพราะเปลี่ยนเฉพาะ registration CLI และ test ของมัน ไม่เปลี่ยน collector/adapter behavior
+- Linux VM รุ่นแรก 3/3 (`2026-09-30T19-28-58-659Z`) และรุ่นสุดท้ายหลัง size fix 4/4 (`2026-09-30T19-33-24-713Z`) ผ่าน; ตรวจ source hashes, raw TAP/JSON, archive และไม่พบ writer lock ค้าง รายละเอียดใน `docs/linux-vm.md`
+- ยังไม่พิสูจน์การติดตั้งบนแอปธุรกิจจริง และการบันทึก event ยังเป็น explicit instrumentation; CLI ลดงานตั้งค่าเท่านั้น
+
+## ประเด็นที่พบระหว่าง final suite — storage recovery บน Windows
+
+- Full suite หลัง size fix ผ่าน 53/54 (`2026-09-30T19-36-03-609Z`); `test/persistence.test.mjs` คาด 202 หลังคืนไฟล์จากการจำลอง write obstruction แต่ได้ 503 ขณะที่ registration focused และ Linux focused ผ่าน
+- ข้อนี้อยู่ใน storage recovery ไม่ได้แตะโดย registration CLI; เก็บ failed TAP/JSON แล้ว ตรวจ focused test ซ้ำเพื่อแยกว่าล้มเหลวสม่ำเสมอหรือเกิดตามจังหวะ filesystem/OneDrive ก่อนแก้ app logic
+- Focused persistence ผ่าน 9/9 (`2026-09-30T19-37-07-095Z`), full suite แบบ serial ผ่าน 54/54 (`2026-09-30T19-37-39-594Z`) และ default parallel retry ผ่าน 54/54 (`2026-09-30T19-38-27-532Z`); จึงยังไม่ระบุสาเหตุแน่ชัดหรือแก้ storage แบบคาดเดา เก็บเป็นความเสี่ยง intermittent บน Windows/OneDrive หากเกิดซ้ำให้บันทึก `StorageError.cause` ของคำขอที่ได้ 503 ก่อนเลือกวิธีแก้
+- ตัวตรวจลิงก์เอกสารครั้งแรกพลาดเพราะ `Split-Path -Parent` ให้ค่าว่างสำหรับไฟล์ที่ root; รันใหม่โดยใช้ `.` และหยุดเมื่อเกิด error ตรวจ local links 24 จุดผ่าน ไม่มี source/doc target หาย

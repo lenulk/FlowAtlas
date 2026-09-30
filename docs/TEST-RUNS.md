@@ -562,3 +562,95 @@
 - Environment: win32/x64; OS 10.0.26200; Node v24.18.0
 - commit: d83e26d86a9a0f67100e394be67d6bec91d777bd; dirty: true
 - หลักฐาน: `reports/tests/2026-09-30T18-48-22-675Z.tap` และ `.json`
+
+## 2026-09-30T19-25-18-874Z
+
+- จุดประสงค์: Registration CLI setup, rollback, and inspector integration
+- ผล: ผ่าน — 3/3; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: 2c972a1dc43fca3fc91004709c8a8c6c69af093d; dirty: true
+- หลักฐาน: `reports/tests/2026-09-30T19-25-18-874Z.tap` และ `.json`
+
+## 2026-09-30T19-26-43-135Z
+
+- จุดประสงค์: Final registration CLI and inspector focused regression
+- ผล: ผ่าน — 3/3; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: 2c972a1dc43fca3fc91004709c8a8c6c69af093d; dirty: true
+- หลักฐาน: `reports/tests/2026-09-30T19-26-43-135Z.tap` และ `.json`
+
+## 2026-09-30T19-26-53-644Z
+
+- จุดประสงค์: Windows full regression after Node app registration CLI
+- ผล: ผ่าน — 53/53; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: 2c972a1dc43fca3fc91004709c8a8c6c69af093d; dirty: true
+- หลักฐาน: `reports/tests/2026-09-30T19-26-53-644Z.tap` และ `.json`
+
+## 2026-09-30T19-31-18-377Z
+
+- จุดประสงค์: Regression: registration must reject unreadable oversized config
+- ผล: ไม่ผ่าน — 3/4; failed 1; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: 2c972a1dc43fca3fc91004709c8a8c6c69af093d; dirty: true
+- หลักฐาน: `reports/tests/2026-09-30T19-31-18-377Z.tap` และ `.json`
+- ไม่ผ่าน: registration rejects a config that inspector cannot load
+
+## 2026-09-30T19-32-00-469Z
+
+- จุดประสงค์: Registration config size contract repair
+- ผล: ผ่าน — 4/4; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: 2c972a1dc43fca3fc91004709c8a8c6c69af093d; dirty: true
+- หลักฐาน: `reports/tests/2026-09-30T19-32-00-469Z.tap` และ `.json`
+
+## 2026-09-30T19-28-58-659Z — Linux VM ลงทะเบียนแอป (รุ่นก่อน size fix)
+
+- Debian 12 / Node v24.18.0 focused ผ่าน 3/3, failed/skipped 0; แอปจำลองที่เริ่มโดยไม่มี adapter ถูกลงทะเบียนและเรียกผ่าน `inspect` ได้กราฟจริง
+- ส่ง `scripts/register-app.mjs` และ `test/register-app.test.mjs` ไป VM ด้วย archive SHA-256 ที่ตรวจผ่าน; source hashes ตรง host ในรอบนั้น (`26639c92...`, `3102b8a2...`), `inspect.mjs`/`project-sources.mjs` ตรง host; ไม่พบ writer lock ใน QA storage
+- นำ raw TAP/JSON กลับเข้า `reports/tests/` แล้วตรวจ SHA-256 ตรง VM; รอบนี้ยังไม่มีการทดสอบ config เกิน 64 KiB จึงใช้ผลรุ่นสุดท้ายด้านล่างเป็นเกณฑ์ปิดงาน
+
+## 2026-09-30T19-33-24-713Z — Linux VM รุ่นสุดท้าย
+
+- หลังเพิ่ม regression ของ config size ผ่าน 4/4, failed/skipped 0 บน Debian 12 / Node v24.18.0; ไม่มี writer lock ใน QA storage หลังจบ
+- `register-app-final.tgz` ผ่าน SHA-256 ก่อนนำเข้า VM; script/test hashes ตรง host (`bed083f4...`, `3c15af3d...`)
+- นำ `reports/vm/register-app-final-results.tgz` กลับเข้าโครงการ ตรวจ SHA-256 archive `003a31c5be4b39c14c975e72e7ee679d1457efd0ea37ccc314cea22f22f279e5` และ raw `reports/tests/2026-09-30T19-33-24-713Z.{json,tap}` ตรง VM ทั้งสองไฟล์; JSON ยืนยัน platform=linux, passed=4, failed=0, skipped=0
+- VM ใช้ QA checkout เดิมแบบ dirty พร้อมไฟล์ที่ส่งเข้าไปและตรวจ hashes แล้ว ไม่อ้างว่าเป็น clean checkout ของ commit ปัจจุบัน
+
+## 2026-10-01 — ตรวจลิงก์เอกสารด้วยมือ
+
+- คำสั่งตรวจครั้งแรกใช้ `Split-Path -Parent` กับ README/PLAN ที่อยู่ root แล้วได้ค่าว่าง ทำให้ `Join-Path` error และผลสรุปครั้งนั้นใช้ไม่ได้
+- แก้คำสั่งให้ใช้ `.` เมื่อไฟล์อยู่ root และเปิด `$ErrorActionPreference='Stop'`; ตรวจ local Markdown links 24 จุดในเอกสารที่แก้แล้ว ทุกปลายทางมีอยู่จริง
+
+## 2026-09-30T19-36-03-609Z
+
+- จุดประสงค์: Final Windows release regression after registration size fix
+- ผล: ไม่ผ่าน — 53/54; failed 1; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: 2c972a1dc43fca3fc91004709c8a8c6c69af093d; dirty: true
+- หลักฐาน: `reports/tests/2026-09-30T19-36-03-609Z.tap` และ `.json`
+- ไม่ผ่าน: a filesystem write failure returns 503 without committing the rejected event or action
+
+## 2026-09-30T19-37-07-095Z
+
+- จุดประสงค์: Investigate Windows storage recovery failure after obstruction
+- ผล: ผ่าน — 9/9; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: 2c972a1dc43fca3fc91004709c8a8c6c69af093d; dirty: true
+- หลักฐาน: `reports/tests/2026-09-30T19-37-07-095Z.tap` และ `.json`
+
+## 2026-09-30T19-37-39-594Z
+
+- จุดประสงค์: Serial Windows full regression to isolate filesystem contention
+- ผล: ผ่าน — 54/54; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: 2c972a1dc43fca3fc91004709c8a8c6c69af093d; dirty: true
+- หลักฐาน: `reports/tests/2026-09-30T19-37-39-594Z.tap` และ `.json`
+
+## 2026-09-30T19-38-27-532Z
+
+- จุดประสงค์: Repeat default Windows full regression after transient storage recovery failure
+- ผล: ผ่าน — 54/54; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: 2c972a1dc43fca3fc91004709c8a8c6c69af093d; dirty: true
+- หลักฐาน: `reports/tests/2026-09-30T19-38-27-532Z.tap` และ `.json`

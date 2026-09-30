@@ -34,7 +34,15 @@ node apps/message-app/server.mjs
 
 ## ลงทะเบียนแอปอื่นภายในโฟลเดอร์โครงการ
 
-นำสำเนา `src/node-adapter.mjs` และ `src/project-sources.mjs` ไปไว้ด้วยกันในแอปเป้าหมาย ไม่ต้องติดตั้งแพ็กเกจเพิ่ม เพิ่ม local config ตาม [flowatlas.config.example.json](../flowatlas.config.example.json) แล้ว restart collector
+วางแอป Node.js ที่มีอยู่แล้วภายในโฟลเดอร์โครงการ เช่น `apps/my-app` แล้วรันจากโฟลเดอร์ FlowAtlas:
+
+```powershell
+node scripts/register-app.mjs --id my-app --root apps/my-app --entry server.mjs --source src/routes.mjs
+```
+
+`--source` เพิ่มซ้ำได้สำหรับไฟล์ที่ต้องการให้เปิดหลักฐานต้นทาง; ถ้าไม่มีไฟล์อื่นให้ตัด `--source` ออก คำสั่งตรวจแอปและไฟล์ก่อนเขียน คัดลอก `node-adapter.mjs` กับ `project-sources.mjs` ไปที่ root ของแอปเฉพาะเมื่อยังไม่มี และเพิ่ม registration ใน `flowatlas.config.json` โดยไม่เขียนทับ adapter ที่เนื้อหาต่างกัน ID ซ้ำหรือไฟล์หายจะถูกปฏิเสธ หากต้องใช้ config แยกให้ระบุ `--config reports/storage/my-config.json` โดยสร้าง directory แม่ไว้ก่อน
+
+คำสั่งลงทะเบียนไม่แก้ server/browser code ของแอป ต้องเพิ่ม action ID และ instrumentation ตามตัวอย่างด้านล่างเอง ถ้า entry ไม่อยู่ที่ `server.mjs` ให้ระบุ `--entry` ตอนเรียก `inspect` ด้วย แอปที่ไม่พิมพ์ `Registered app: http://127.0.0.1:<port>` ให้ระบุ `--app-url` ของแอปที่ฟังในเครื่อง การเพิ่มไฟล์ที่ลงทะเบียนแล้วต้อง restart collector และแอป หากต้องการทำแบบ manual ให้นำสำเนา adapter สองไฟล์ไปไว้ด้วยกันในแอป เพิ่ม local config ตาม [ตัวอย่าง](../flowatlas.config.example.json) แล้ว restart collector
 
 - `id`: string เริ่มด้วย a–z ตามด้วย a–z/0–9/underscore/hyphen สูงสุด 64 ตัว; ไม่ซ้ำกัน
 - `root`: directory ของแอปภายในโฟลเดอร์ FlowAtlas และอยู่นอก src/public/examples/Git/config ของ collector เพื่อเก็บทุกอย่างตามข้อกำหนดโครงการนี้

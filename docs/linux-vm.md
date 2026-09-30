@@ -80,6 +80,18 @@ node scripts/run-tests.mjs scripts/inspector-browser-check.mjs
 
 VM checkout ฐาน `530e221` แบบ dirty; ส่ง `inspect.mjs` รุ่นปัจจุบันและสคริปต์ทดสอบเข้าไป ตรวจ SHA-256 ของไฟล์ใน runner JSON ตรงกับ host แล้ว จึงอ้างผลเฉพาะไฟล์ที่ทดสอบ ไม่อ้างว่าเป็น clean commit `e6232db`.
 
+## คำสั่งลงทะเบียนแอป Node.js
+
+ทดสอบ `scripts/register-app.mjs` และ `test/register-app.test.mjs` บน QA VM เดิม โดยส่งสองไฟล์เข้า checkout เดิม (dirty) ผ่าน archive ที่ตรวจ SHA-256 แล้ว รุ่นสุดท้าย `2026-09-30T19-33-24-713Z` ผ่าน 4/4, failed/skipped 0 บน Debian 12 / Node v24.18.0 ครอบคลุมลงทะเบียนแอปจำลองและเรียกผ่าน `inspect` จนได้ action graph, ปฏิเสธ adapter ที่เนื้อหาไม่ตรง/ID ซ้ำโดยไม่เขียนทับ, และปฏิเสธ config เกิน 64 KiB ทั้งก่อนและหลังเพิ่มรายการ ไม่พบ writer lock ค้าง
+
+Raw TAP/JSON เก็บใน `reports/tests/2026-09-30T19-33-24-713Z.{tap,json}` พร้อม archive `reports/vm/register-app-final-results.tgz`; ตรวจ SHA-256 ของ archive และ raw files หลังนำเข้า host ตรง VM ใช้ source hashes ของ script/test และ `inspect.mjs`/`project-sources.mjs` เทียบกับ host ไม่อ้างว่าเป็น clean commit ของ branch ปัจจุบัน รุ่นก่อน size fix ผ่าน 3/3 (`2026-09-30T19-28-58-659Z`) และเก็บ raw reports แยกไว้
+
+```bash
+PATH=/home/test/FlowAtlas-MVP-linux-qa-20260930-fc273a9/runtime/node-v24.18.0-linux-x64/bin:$PATH \
+FLOWATLAS_TEST_PURPOSE='Linux VM final registration CLI size contract' \
+node scripts/run-tests.mjs test/register-app.test.mjs
+```
+
 ## ขอบเขตที่ยังไม่ได้ตรวจ
 
 ยังไม่ยืนยัน Linux GUI desktop, browser engine อื่น, มือถือจริง/touch, Linux distro/architecture อื่น, Node 20/22, filesystem ที่แชร์กับ Windows/OneDrive, power loss, production load หรือ OpenTelemetry/Playwright capture การใช้ Playwright ทดสอบ UI ไม่ใช่การเพิ่ม browser trace recorder ให้ผลิตภัณฑ์

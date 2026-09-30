@@ -23,6 +23,8 @@ node scripts/inspect.mjs --project message-app
 
 คำสั่งพิมพ์ URL ของแอปและ FlowAtlas เปิด URL ของแอป กด **ดูข้อความ**, **ส่งข้อความ** หรือ **ทดลองบริการล้มเหลว** แล้วเปิดแผนที่จากลิงก์ กด `stop` แล้ว Enter เพื่อปิดทั้งสองเซิร์ฟเวอร์ ประวัติอยู่ใน `data/actions` ภายในโครงการ หากยังไม่มี `apps/message-app` หรือ local config ให้รัน `node scripts/create-target-app.mjs` ก่อน สำหรับแอป Node อื่น ให้ลงทะเบียนและใส่ adapter ตาม [คู่มือ](docs/node-adapter.md) แล้วใช้ `--project ID --entry ไฟล์เริ่มแอป`; ไฟล์ entry ต้องอยู่ใน allowlist ของการลงทะเบียน แอปที่ไม่พิมพ์ `Registered app: http://127.0.0.1:<port>` ระบุ `--app-url http://127.0.0.1:<port>` ได้
 
+สำหรับแอป Node.js ที่มีอยู่แล้วและเก็บไว้ใต้โฟลเดอร์ FlowAtlas ใช้ `node scripts/register-app.mjs --id my-app --root apps/my-app --entry server.mjs --source src/routes.mjs` เพื่อคัดลอก adapter ที่ยังไม่มีและลงทะเบียนไฟล์ต้นทางโดยไม่เขียนทับ adapter ที่ต่างกัน คำสั่งนี้ยังไม่ใส่ instrumentation ในแอปให้เอง; ต้องส่ง action ID จาก browser และเรียก adapter ใน handler ตาม [คู่มือ](docs/node-adapter.md) ก่อนใช้ `inspect`
+
 ตัวอย่างร้านค้าภายใน FlowAtlas ยังเรียกแยกได้ด้วย:
 
 ```powershell
