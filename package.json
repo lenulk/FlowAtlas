@@ -3,6 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
+  "bin": {
+    "flowatlas": "scripts/cli.mjs"
+  },
+  "files": ["src/", "public/", "examples/", "scripts/", "docs/", "PLAN.md", "AGENTS.md"],
   "engines": {
     "node": ">=20"
   },

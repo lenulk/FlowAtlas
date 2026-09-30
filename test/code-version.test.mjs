@@ -18,6 +18,10 @@ test('code version distinguishes a commit from changed working-tree files', () =
     writeFileSync(join(root, 'src', 'app.mjs'), 'export const value = 1;\n');
     writeFileSync(join(root, 'public', 'index.html'), '<!doctype html>\n');
     writeFileSync(join(root, 'examples', 'demo.mjs'), 'export const demo = true;\n');
+    const installed = getCodeVersion(root);
+    assert.equal(installed.commit, null, 'A packaged tool must not inherit its parent repository commit');
+    assert.equal(installed.dirty, null);
+    assert.match(installed.digest, /^[a-f0-9]{64}$/);
     execFileSync('git', ['init', '-q'], { cwd: root });
     execFileSync('git', ['config', 'core.autocrlf', 'false'], { cwd: root });
     execFileSync('git', ['add', '.'], { cwd: root });

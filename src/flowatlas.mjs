@@ -1,6 +1,6 @@
 import { createHash, randomUUID } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
-import { readFileSync, readdirSync } from 'node:fs';
+import { readFileSync, readdirSync, realpathSync } from 'node:fs';
 import { join } from 'node:path';
 import { validateEdge } from './evidence-contract.mjs';
 
@@ -25,10 +25,14 @@ export function getCodeVersion(root) {
   let commit = null;
   let dirty = null;
   try {
-    commit = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: root, stdio: ['ignore', 'pipe', 'ignore'] }).toString().trim();
-    dirty = execFileSync('git', ['status', '--porcelain', '--', 'src', 'public', 'examples'], {
-      cwd: root, stdio: ['ignore', 'pipe', 'ignore'],
-    }).toString().trim().length > 0;
+    const gitRoot = execFileSync('git', ['rev-parse', '--show-toplevel'], { cwd: root,
+      stdio: ['ignore', 'pipe', 'ignore'] }).toString().trim();
+    if (realpathSync(gitRoot) === realpathSync(root)) {
+      commit = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: root, stdio: ['ignore', 'pipe', 'ignore'] }).toString().trim();
+      dirty = execFileSync('git', ['status', '--porcelain', '--', 'src', 'public', 'examples'], {
+        cwd: root, stdio: ['ignore', 'pipe', 'ignore'],
+      }).toString().trim().length > 0;
+    }
   } catch {
     // A file digest still identifies the running code before the first commit.
   }

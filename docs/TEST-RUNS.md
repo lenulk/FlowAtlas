@@ -739,3 +739,78 @@
 ## 2026-10-01 — ตรวจเครื่องมืออ่าน CI configuration
 
 - Node bundled ไม่มี module yaml ที่พาธที่ลอง (`MODULE_NOT_FOUND`); ยังไม่ได้ parse workflow ด้วยคำสั่งนี้ จะตรวจ YAML จาก runtime ที่มีจริงหรือ hosted Actions validation
+
+## 2026-10-01 — ตรวจสถานะ hosted CI
+
+- Push master ไป GitHub สำเร็จ (56346f2 → 07c660c)
+- API list workflow runs แบบไม่ยืนยันตัวตนตอบ 404; จึงยังไม่อ้างว่า CI ไม่ทำงานหรือผ่าน จะตรวจด้วยสิทธิ์ GitHub ที่ใช้ push โดยไม่แสดง credential
+
+## 2026-09-30T20-28-29-329Z
+
+- จุดประสงค์: FA-03 CLI doctor: clean preflight, owner files, failure boundaries and occupied ports
+- ผล: ผ่าน — 11/11; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: 07c660ca31551dea74860c84fe77899bc381f274; dirty: true
+- หลักฐาน: `reports/tests/2026-09-30T20-28-29-329Z.tap` และ `.json`
+
+## 2026-10-01 — ตรวจ CI และ package tooling
+
+- API ด้วยสิทธิ์ GitHub ในหน่วยความจำอ่าน run 36772248570 ได้: Windows Node 22.23.3/24.21.0 และ Ubuntu Node 24.21.0 success; Ubuntu Node 22.23.3 ยัง in_progress ณตรวจ ไม่สรุปว่า matrix ผ่านทั้งหมด
+- `npm pack` ครั้งแรกไม่ผ่าน EPERM เมื่อสร้าง temporary cache ที่ AppData/Local/npm-cache นอก sandbox; ยังไม่มี artifact สำเร็จ เปลี่ยน cache ไป reports/releases/npm-cache แล้วตรวจใหม่
+
+## 2026-10-01 — clean package installation บน Windows
+
+- npm pack เมื่อใช้ project-local cache ผ่าน: flowatlas-mvp-0.1.0.tgz, 40 files, 94,274 bytes; inspected pack inventory ไม่มี reports/data/apps/tools/node_modules/Git/local config
+- offline install ลง disposable reports/storage/package-install-3f10bab9de6f4f09943e143c1ea576d8 ผ่าน (1 package, ไม่มี runtime dependency); generated flowatlas.cmd --version แสดง 0.1.0
+- CLI ที่ติดตั้งแล้ว demo สร้างแอปเฉพาะใน package QA และ doctor --json ผ่าน 7 checks; ยังต้องตรวจ action→graph→stop/restart และ package source identity ก่อนรับรองเส้นทางติดตั้ง
+
+## 2026-09-30T20-32-34-313Z
+
+- จุดประสงค์: FA-03 package identity regression before rejecting inherited Git root
+- ผล: ไม่ผ่าน — 0/1; failed 1; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: 07c660ca31551dea74860c84fe77899bc381f274; dirty: true
+- หลักฐาน: `reports/tests/2026-09-30T20-32-34-313Z.tap` และ `.json`
+- ไม่ผ่าน: code version distinguishes a commit from changed working-tree files
+
+## 2026-09-30T20-33-11-024Z
+
+- จุดประสงค์: FA-03 CLI package identity and preflight affected integration
+- ผล: ผ่าน — 12/12; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: 07c660ca31551dea74860c84fe77899bc381f274; dirty: true
+- หลักฐาน: `reports/tests/2026-09-30T20-33-11-024Z.tap` และ `.json`
+
+## 2026-09-30T20-35-13-248Z
+
+- จุดประสงค์: FA-03 offline installed package: three actions, graph/source, Git identity, stop and restart
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: 07c660ca31551dea74860c84fe77899bc381f274; dirty: true
+- หลักฐาน: `reports/tests/2026-09-30T20-35-13-248Z.tap` และ `.json`
+
+## 2026-10-01 — ตรวจ artifact หลังแก้ package identity
+
+- เก็บ artifact ก่อนแก้แยกเป็น flowatlas-mvp-0.1.0-before-identity-fix.tgz ไม่เขียนทับหลักฐานเดิม; npm pack และ offline install ใหม่ผ่านใน reports/storage/package-install-4408c296344f40f0976d102c14faf78a
+- ใช้ scripts/package-check.mjs ผ่าน test runner ยืนยัน running integration จากไฟล์ที่แพ็กจริง; ยังไม่ทดสอบ update/uninstall หรือ user trial และยังไม่ถือว่า release artifact พร้อมเผยแพร่ทั่วไป
+
+## 2026-09-30T20-36-52-292Z
+
+- จุดประสงค์: FA-03 full regression after CLI doctor and package code-version root fix
+- ผล: ผ่าน — 60/60; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: 07c660ca31551dea74860c84fe77899bc381f274; dirty: true
+- หลักฐาน: `reports/tests/2026-09-30T20-36-52-292Z.tap` และ `.json`
+
+## 2026-09-30T20-37-06-171Z
+
+- จุดประสงค์: FA-03 isolated source after package code-version root fix
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: 07c660ca31551dea74860c84fe77899bc381f274; dirty: true
+- หลักฐาน: `reports/tests/2026-09-30T20-37-06-171Z.tap` และ `.json`
+
+## 2026-10-01 — ตรวจเอกสาร/CLI ก่อน commit
+
+- git diff --check ผ่าน; local links ใน PLAN/README/install/ci รวม 27 จุดมีปลายทางครบ
+- ตรวจ scope package allowlist, CLI dispatcher/preflight และ inherited Git root fix; ไม่เพิ่ม runtime dependency หรือทำ npm publish

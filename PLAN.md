@@ -35,7 +35,7 @@ FlowAtlas v1 เป็นเครื่องมือในเครื่อ�
 4. เปิดแผนที่และหลักฐาน: กรณี success/error/capture ขาดแยกกัน มี trace/span IDs และรุ่นโค้ด; ไม่เดาเส้นที่ไม่มีหลักฐาน
 5. ปิดเครื่องมือ แอปทำงานตามโหมดที่เลือก ข้อมูลเก่ายังเปิดได้; restart, export, delete และ recovery มีวิธีตรวจผล
 
-ชื่อคำสั่งแพ็กเกจอย่าง `flowatlas doctor` เป็นรูปแบบที่เสนอ ยังไม่มีในผลิตภัณฑ์ ปัจจุบันมี `node scripts/register-app.mjs` และ `node scripts/inspect.mjs`
+มี CLI `node scripts/cli.mjs` และ executable `flowatlas` ใน package สำหรับ demo/register/doctor/inspect แล้ว ดู [วิธีติดตั้ง](docs/install.md) ยังต้องตรวจ update/uninstall, workspace ที่ไม่ผูกกับ package directory และ integration ของแอปทั่วไปก่อนผ่าน R1 ทั้งระยะ
 
 ## ระยะพัฒนาและเกณฑ์ผ่าน
 

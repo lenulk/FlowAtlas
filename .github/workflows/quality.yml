@@ -59,6 +59,26 @@ jobs:
         env:
           FLOWATLAS_TEST_PURPOSE: CI Chromium independent browser journey
         run: node scripts/run-tests.mjs scripts/independent-browser-check.mjs
+      - name: Pack and install in disposable workspace
+        run: |
+          New-Item -ItemType Directory -Path reports/releases -Force | Out-Null
+          npm pack --pack-destination reports/releases --cache reports/releases/npm-cache --json > reports/releases/pack-result.json
+          if ($LASTEXITCODE -ne 0) { throw 'Package build failed' }
+          $taskPack = Get-Content -Raw reports/releases/pack-result.json | ConvertFrom-Json
+          if ($taskPack.files | Where-Object { $_.path -match '^(reports|data|apps|tools|node_modules|\.git)/' -or $_.path -eq 'flowatlas.config.json' }) { throw 'Private paths entered package' }
+          $taskInstall = 'reports/storage/package-install'
+          $taskArtifact = (Resolve-Path -LiteralPath ('reports/releases/' + $taskPack.filename)).Path
+          npm install --prefix $taskInstall --cache reports/releases/npm-cache --offline --ignore-scripts --no-audit --no-fund $taskArtifact
+          if ($LASTEXITCODE -ne 0) { throw 'Offline package install failed' }
+          $taskInstalledRoot = (Resolve-Path -LiteralPath ($taskInstall + '/node_modules/flowatlas-mvp')).Path
+          node ($taskInstalledRoot + '/scripts/cli.mjs') demo
+          if ($LASTEXITCODE -ne 0) { throw 'Installed demo failed' }
+          "FLOWATLAS_INSTALLED_ROOT=$taskInstalledRoot" >> $env:GITHUB_ENV
+      - name: Installed package journey and replay
+        if: ${{ !cancelled() }}
+        env:
+          FLOWATLAS_TEST_PURPOSE: CI offline installed package journey and replay
+        run: node scripts/run-tests.mjs scripts/package-check.mjs
       - name: Save evidence including failed runs
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
@@ -71,3 +91,4 @@ jobs:
             reports/vm/inspector-browser-*/
             reports/browser/independent-browser-*/
             docs/TEST-RUNS.md
+            reports/releases/pack-result.json

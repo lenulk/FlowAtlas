@@ -328,3 +328,14 @@
 - เพิ่ม workflow `quality.yml` matrix Node 22.23.3/24.21.0 บน windows-2025/ubuntu-24.04 จากรุ่น LTS ใน official Node index; Playwright 1.63.0 แยก tools/qa พร้อม lockfile ไม่เพิ่ม runtime dependency ของ app; permissions contents:read, checkout ไม่เก็บ credentials
 - npm package-lock-only และ npm ci ของ QA tools ผ่าน; Node bundled ไม่มี module yaml ในพาธที่ลอง จึงไม่อ้างว่าคำสั่งนั้นตรวจ YAML สำเร็จ
 - ผู้ใช้ให้พัฒนาต่อจนใช้งานจริงและ push GitHub; การตั้ง heartbeat รายชั่วโมงถูก automatic approval review ปฏิเสธ เพราะยังไม่มี authorization ตารางเวลาโดยตรงและมี repeated repository side effects ส่งคำถามอนุญาตตารางเวลาแล้ว ยังไม่มี automation ถูกสร้าง ไม่ใช้วิธีอื่นเลี่ยงการปฏิเสธ งานที่อนุญาตในรอบปัจจุบันทำต่อได้
+
+## รอบ 31 — CLI และ preflight ก่อนใช้งาน
+
+- เกณฑ์: เรียกผ่าน `flowatlas` ได้จาก working directory อื่น; doctor ตรวจ registration/entry/adapters/storage/ports โดยไม่เปิดแอปหรือแก้ไฟล์เจ้าของ; packaged installation เรียก demo→doctor→inspect→action→graph→stop/restart ได้
+- เพิ่ม CLI dispatcher และ doctor พร้อม human/JSON output; ใช้ source registration validator เดิม, ตรวจ syntax ของ entry และ adapter version, ตรวจ lock/สิทธิ์ parent ของ storage และพอร์ต loopback ไม่ลบ lock หรือ kill เจ้าของพอร์ต
+- Focused Windows 11/11 (`2026-09-30T20-28-29-329Z`) ผ่าน รวม doctor 4 cases และ inspector/registration integrations เดิม; ยืนยัน failure syntax/mismatch/lock/occupied port/path escape ไม่แก้ไฟล์เจ้าของ
+- การแพ็กครั้งแรกถูก EPERM ที่ npm cache นอก workspace จึงไม่ถือว่า package สร้างสำเร็จ เปลี่ยนเฉพาะ cache ไป reports/releases ในโครงการ ไม่แก้โค้ดเพื่อกลบ permission ของ tooling
+- Clean package install ผ่านเมื่อใช้ local cache; ระหว่าง code review พบ collector `getCodeVersion()` อาจรับ commit ของ Git repository แม่เมื่อติดตั้ง package ใต้ repository อื่น Regression ก่อนแก้ไม่ผ่าน 0/1 (`2026-09-30T20-32-34-313Z`) โดยได้ parent commit แทน null จึงแก้ให้เช็ค Git root ตรง tool root แบบเดียวกับ target snapshot; file digest ยังมีเสมอ
+- หลังแก้ inherited Git identity focused suite ผ่าน 12/12 (`2026-09-30T20-33-11-024Z`); offline package gate ผ่าน 1/1 (`2026-09-30T20-35-13-248Z`) จาก artifact ติดตั้งใหม่: 3 business actions, graph/source, stop ปิดพอร์ตและ lock, restart โหลดกราฟเดิมตรงกัน และ tool/target ไม่รับ parent commit
+- Package สำหรับ QA ยังผูก apps/config/data กับ package root และ update อาจแทนที่ directory นี้; ต้องเพิ่ม workspace แยกจาก installation พร้อม backup/update/uninstall checks ก่อนรับรอง R1 หรือเผยแพร่ทั่วไป ไม่ถือว่าผ่านทั้งระยะจาก smoke test นี้
+- Windows full regression หลัง CLI/identity ผ่าน 60/60 (`2026-09-30T20-36-52-292Z`) และ isolated source 1/1 (`2026-09-30T20-37-06-171Z`), failed/skipped 0; เพิ่ม offline package gate ใน CI สำหรับตรวจ Windows/Linux บน runtime matrix ด้วย ยังรอ hosted evidence ของ source ใหม่นี้
