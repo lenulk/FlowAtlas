@@ -1,5 +1,12 @@
 # บันทึกการรันทดสอบ
 
+## Linux VM preparation — 2026-09-30
+
+- ผู้ใช้ระบุให้ทดสอบผ่าน SSH บน VM; เชื่อมต่อสำเร็จเป็น Debian GNU/Linux 12 / kernel 6.1.0-53-amd64 / x86_64 ไม่มี Node.js/Git ใน PATH และไม่มี project shared folder ที่ตรวจพบ
+- ตรวจ WSL ก่อนคำชี้แจง VM: sandbox ปฏิเสธ enumerate ด้วย E_ACCESSDENIED; read-only check นอก sandboxพบ Kali WSL2 หยุดอยู่ ไม่ใช้เป็นผล Linux VM
+- พบ VMware CLI แต่ไม่มี VM ที่ running ในรายการของ CLI; ไม่ใช้ข้อมูลนี้แทน VM ที่ผู้ใช้ระบุผ่าน SSH
+- Probe official Node v24.18.0 checksum URL: web tool เปิดไม่ได้ แต่ wget บน VM ตรวจ URL สำเร็จ (exit 0); จะ verify checksum ก่อนใช้ runtime
+- ยังไม่เริ่มชุดทดสอบ Linux ในขั้นนี้ ไม่เก็บ credential ในโค้ดหรือรายงาน
 ## Final registered-project review — 2026-09-30
 
 - อ่าน actual diff รวม registration/adapter/template/tests และตรวจด้วย `node --check`: syntax 32 ไฟล์ผ่าน; `git diff --check` ผ่าน
@@ -383,3 +390,11 @@
 - ผล: ผ่าน — 1/1; failed 0; skipped 0
 - Node: v24.18.0; commit: 7b033281433bad92b2d63cd3bc574a7191e1bb34; dirty: true
 - หลักฐาน: `reports/tests/2026-09-30T13-31-58-491Z.tap` และ `.json`
+
+## 2026-09-30T13-55-42-667Z
+
+- จุดประสงค์: รอบ 21 ตรวจ runner ที่ระบุ OS ก่อนย้ายไป Linux VM
+- ผล: ผ่าน — 3/3; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: fc273a9d9a9eaee7651341c9e4162061c3de97e9; dirty: true
+- หลักฐาน: `reports/tests/2026-09-30T13-55-42-667Z.tap` และ `.json`

@@ -210,3 +210,11 @@
 - แอปพร้อมทดลอง: apps/message-app มี repository แยก, local config และ adapter สำเนาในแอป; เอกสารการติดตั้งใน node-adapter.md เซิร์ฟเวอร์ QA ทั้งสองปิดด้วย exit 0
 - ยังไม่พิสูจน์: OpenTelemetry SDK/Playwright capture, แอปธุรกิจจริงของผู้ใช้/คุณค่าจาก user trial, Node 20/22, browser อื่น/มือถือ, production load, forced crash/power loss และ OneDrive ข้ามเครื่อง
 - ข้อจำกัดใหม่: explicit allowlist/root ภายในโครงการ, declaration ของ symbol เชื่อ sender, adapter ไม่ตาม redirects, telemetry ไม่มี retry; source link ใน IAB ต้องตรวจต่อใน browser อื่นหรือเพิ่ม source viewer
+
+## รอบ 21 — เตรียมการตรวจ Linux VM
+
+- ผู้ใช้เลือก SSH VM แยก; inspect พบ Debian 12 x86_64 และไม่มี Node/Git จึงยังไม่มีผล Linux test
+- เกณฑ์: ทดสอบ main + isolated source บน Linux จริง ด้วย source commit ที่ระบุ และเก็บ raw reports กลับในโครงการ; แยกผล Windows/Linux และ failure/skip ตามจริง
+- เพิ่ม platform/arch/osRelease ใน test runner เพื่อไม่ให้รายงานของ VM ปะปนกับ Windows; ไม่เปลี่ยน test behavior หรือข้อมูล graph
+- เตรียม runtime จาก official Node archive พร้อม SHA-256 และ Git จาก Debian repository โดยไม่แก้ repository sources ของระบบถาวร; ผลต้องตรวจหลังติดตั้งจริง
+- Windows runner check 3/3 ผ่าน (`2026-09-30T13-55-42-667Z`); อ่าน JSON ยืนยัน win32/x64/OS 10.0.26200 พร้อม counts ถูกต้อง และ diff whitespace ผ่าน

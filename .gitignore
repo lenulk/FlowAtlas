@@ -3,6 +3,8 @@ node_modules/
 coverage/
 reports/tests/
 reports/storage/
+reports/ssh/
+reports/vm/
 data/
 apps/
 flowatlas.config.json

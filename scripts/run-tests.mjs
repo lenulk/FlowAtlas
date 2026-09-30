@@ -3,6 +3,7 @@ import { mkdirSync, writeFileSync, appendFileSync, existsSync, readdirSync, read
 import { createHash } from 'node:crypto';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { release } from 'node:os';
 
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
 const startedAt = new Date();
@@ -39,13 +40,14 @@ const count = (name) => Number(output.match(new RegExp(`^# ${name} (\\d+)$`, 'm'
 const failures = [...output.matchAll(/^not ok \d+ - (.+)$/gm)].map((match) => match[1]);
 const result = {
   runId, startedAt: startedAt.toISOString(), finishedAt: new Date().toISOString(),
-  node: process.version, commit, dirty, digest, files, purpose, args, exitCode,
+  node: process.version, platform: process.platform, arch: process.arch, osRelease: release(),
+  commit, dirty, digest, files, purpose, args, exitCode,
   tests: count('tests'), passed: count('pass'), failed: count('fail'), skipped: count('skipped'), failures,
 };
 writeFileSync(join(reports, `${runId}.tap`), output);
 writeFileSync(join(reports, `${runId}.json`), JSON.stringify(result, null, 2) + '\n');
 const log = join(root, 'docs', 'TEST-RUNS.md');
 if (!existsSync(log)) writeFileSync(log, '# บันทึกการรันทดสอบ\n\nสร้างโดย `node scripts/run-tests.mjs` ทุกครั้ง รายละเอียด TAP และ metadata อยู่ใน `reports/tests/` เวลาเป็น UTC; การวิเคราะห์และการแก้อยู่ใน [QUALITY.md](QUALITY.md)\n');
-appendFileSync(log, `\n## ${runId}\n\n- จุดประสงค์: ${purpose}\n- ผล: ${exitCode === 0 ? 'ผ่าน' : 'ไม่ผ่าน'} — ${result.passed}/${result.tests}; failed ${result.failed}; skipped ${result.skipped}\n- Node: ${result.node}; commit: ${commit ?? 'ไม่มี'}; dirty: ${dirty}\n- หลักฐาน: \`reports/tests/${runId}.tap\` และ \`.json\`\n${failures.map((name) => `- ไม่ผ่าน: ${name}\n`).join('')}`);
+appendFileSync(log, `\n## ${runId}\n\n- จุดประสงค์: ${purpose}\n- ผล: ${exitCode === 0 ? 'ผ่าน' : 'ไม่ผ่าน'} — ${result.passed}/${result.tests}; failed ${result.failed}; skipped ${result.skipped}\n- Environment: ${result.platform}/${result.arch}; OS ${result.osRelease}; Node ${result.node}\n- commit: ${commit ?? 'ไม่มี'}; dirty: ${dirty}\n- หลักฐาน: \`reports/tests/${runId}.tap\` และ \`.json\`\n${failures.map((name) => `- ไม่ผ่าน: ${name}\n`).join('')}`);
 console.log(`\nSaved test results: reports/tests/${runId}.json`);
 process.exitCode = exitCode;
