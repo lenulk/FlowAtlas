@@ -1896,3 +1896,109 @@ First matched3×1000 measurement: all6000 measured business responses pluswarmup
 - commit: d5d1d839257e13ad8baa6f95047acc43b2b45a15; dirty: true
 - หลักฐาน: `reports/tests/2026-10-01T17-38-13-419Z.tap` และ `.json`
 - Round55 actual test diff reviewed: same businessresponses and capturechecks, new deterministic metadata-outagecase; focused5/5 sufficient for fixture-only change. No production/timeout/queue/retry edits or main-failure erasure.
+- Round54d5d1d83 andRound5552ef5bc pushed successfully; README independent edit preserved. Exact newCI is pending; no gate claimed before results.
+- Read-only lifecycle inspection referenced nonexistent test/cli.test.mjs; actual CLI tests found via file inventory. No source error inferred. CLI wrapper force-stop can leave inherited childservices, now separate owned-process regression round.
+
+## 2026-10-01T17-43-27-283Z
+
+- จุดประสงค์: Round56 reproduce CLI owner disappearance leaves managed descendants
+- ผล: ไม่ผ่าน — 0/1; failed 1; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: 52ef5bcb158b0b228ddb6ec0bd2dc1c782e0e57a; dirty: true
+- หลักฐาน: `reports/tests/2026-10-01T17-43-27-283Z.tap` และ `.json`
+- ไม่ผ่าน: force stopping the CLI wrapper closes its owned inspector, target, ports and writer lock
+
+## 2026-10-01T17-44-53-228Z
+
+- จุดประสงค์: Round56 owned CLI disappearance plain and actual SDK shutdown ports locks and acknowledgement
+- ผล: ไม่ผ่าน — 6/8; failed 2; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: 52ef5bcb158b0b228ddb6ec0bd2dc1c782e0e57a; dirty: true
+- หลักฐาน: `reports/tests/2026-10-01T17-44-53-228Z.tap` และ `.json`
+- ไม่ผ่าน: force stopping the CLI wrapper closes owned services and lock (plain HTTP)
+- ไม่ผ่าน: force stopping the CLI wrapper closes owned services and lock (HTTP SDK flush)
+- Exact52ef5bc hosted job snapshot inspected; actual completion/failures shown in output. In-progress local lifecycle repair doesnotalter that committed revision.
+- Exact52ef5bc hosted run36900991262 completed cancelled: Ubuntu22/24 succeeded; Windows22/24 cancelled, so matrix is unverified, no failure guessed. Local newownerIPC focused6/8failed bothowner-kill cases; normalstop/startupfailure/crash/actualSDK6casespassed. Capture fixed ownerstate diagnostics next before further implementation.
+
+## 2026-10-01T17-46-33-775Z
+
+- จุดประสงค์: Round56 fixed lifecycle state diagnosis no raw output or credentials
+- ผล: ไม่ผ่าน — 0/2; failed 2; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: 52ef5bcb158b0b228ddb6ec0bd2dc1c782e0e57a; dirty: true
+- หลักฐาน: `reports/tests/2026-10-01T17-46-33-775Z.tap` และ `.json`
+- ไม่ผ่าน: force stopping the CLI wrapper closes owned services and lock (plain HTTP)
+- ไม่ผ่าน: force stopping the CLI wrapper closes owned services and lock (HTTP SDK flush)
+
+## 2026-10-01T17-47-53-686Z
+
+- จุดประสงค์: Round56 fixed error code diagnosis of owner shutdown stale lock
+- ผล: ไม่ผ่าน — 0/2; failed 2; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: 52ef5bcb158b0b228ddb6ec0bd2dc1c782e0e57a; dirty: true
+- หลักฐาน: `reports/tests/2026-10-01T17-47-53-686Z.tap` และ `.json`
+- ไม่ผ่าน: force stopping the CLI wrapper closes owned services and lock (plain HTTP)
+- ไม่ผ่าน: force stopping the CLI wrapper closes owned services and lock (HTTP SDK flush)
+- Round56 fixed error diagnosis17-47-53-686Z0/2: processes/portsclosed, stale lock retained, noEPIPE/ECONNRESET/IPC errorcodes. Consulted officialNode/libuv Windows processownership behavior before choosing nextchange; notattributedtostorage.
+- Read-only remote fetch completed to inspect why exact52ef5bc CI was cancelled; working files preserved, no merge/rebase/reset.
+- Correction: remote fetch succeeded but following elevated Git log/count lacked per-command safe.directory and failed; earlier completed-inventory wording was premature. Read current remote identity again in sandbox; worktree untouched.
+
+## 2026-10-01T17-50-38-923Z
+
+- จุดประสงค์: Round56 Windows managed inspector survives parent job only to perform bounded IPC cleanup
+- ผล: ผ่าน — 12/12; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: 52ef5bcb158b0b228ddb6ec0bd2dc1c782e0e57a; dirty: true
+- หลักฐาน: `reports/tests/2026-10-01T17-50-38-923Z.tap` และ `.json`
+
+## 2026-10-01T17-51-48-168Z
+
+- จุดประสงค์: Round56 owner disconnect before initialization and after ready plain or actual SDK
+- ผล: ไม่ผ่าน — 2/3; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: 52ef5bcb158b0b228ddb6ec0bd2dc1c782e0e57a; dirty: true
+- หลักฐาน: `reports/tests/2026-10-01T17-51-48-168Z.tap` และ `.json`
+- ไม่ผ่าน: an owner channel disconnected before inspector initialization prevents target launch and releases storage
+
+## 2026-10-01T17-54-27-458Z
+
+- จุดประสงค์: Round56 startup owner proof then abnormal plain and SDK shutdown
+- ผล: ผ่าน — 13/13; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: 52ef5bcb158b0b228ddb6ec0bd2dc1c782e0e57a; dirty: true
+- หลักฐาน: `reports/tests/2026-10-01T17-54-27-458Z.tap` และ `.json`
+
+## 2026-10-01T17-55-30-048Z
+
+- จุดประสงค์: Round56 final owner lifetime ready/startup/silent owner failure and affected integration
+- ผล: ไม่ผ่าน — 13/14; failed 1; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: 52ef5bcb158b0b228ddb6ec0bd2dc1c782e0e57a; dirty: true
+- หลักฐาน: `reports/tests/2026-10-01T17-55-30-048Z.tap` และ `.json`
+- ไม่ผ่าน: startup owner disconnected prevents target launch and releases storage
+- Remote40f3a15 README commit verified byte-identical to concurrent localREADME, then fast-forwarded without altering that content or unrelated lifecycle edits. No forcepush or source merge needed.
+
+## 2026-10-01T17-56-40-001Z
+
+- จุดประสงค์: Round56 final fail-closed startup ownership and existing CLI SDK workspace integration
+- ผล: ผ่าน — 14/14; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: 40f3a15afaf08b55db563aadf85924d73d8bad95; dirty: true
+- หลักฐาน: `reports/tests/2026-10-01T17-56-40-001Z.tap` และ `.json`
+
+## 2026-10-01T17-57-50-854Z
+
+- จุดประสงค์: Round56 default main regression after CLI ownership lifecycle repair
+- ผล: ผ่าน — 113/113; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: 40f3a15afaf08b55db563aadf85924d73d8bad95; dirty: true
+- หลักฐาน: `reports/tests/2026-10-01T17-57-50-854Z.tap` และ `.json`
+
+## 2026-10-01T17-59-10-723Z
+
+- จุดประสงค์: Round56 unchanged paired benchmark verifies CLI owner handshake normal start stop accounting
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: 40f3a15afaf08b55db563aadf85924d73d8bad95; dirty: true
+- หลักฐาน: `reports/tests/2026-10-01T17-59-10-723Z.tap` และ `.json`
+- Round56 selected actualdiff/whitespace/docs reviewed, focused14/default113/unchangedload1 passed; finalLuna read-onlyreview accepted boundedownerdisconnectscope. Historicalfailedfixtures retained; no old unknownprocesses killed, no broadproductioncertification.

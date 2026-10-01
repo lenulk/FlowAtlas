@@ -25,8 +25,16 @@ if (!workspace) {
 } else if (!Object.hasOwn(commands, command)) {
   console.error('Unknown command. Run flowatlas --help'); process.exitCode = 1;
 } else {
+  const managedInspector = command === 'inspect';
   const child = spawn(process.execPath, [join(root, 'scripts', commands[command]), ...args],
-    { cwd: workspace, stdio: 'inherit', env: { ...process.env, FLOWATLAS_WORKSPACE_ROOT: workspace } });
+    { cwd: workspace, stdio: managedInspector ? ['inherit', 'inherit', 'inherit', 'ipc'] : 'inherit',
+      detached: managedInspector && process.platform === 'win32', windowsHide: true,
+      env: { ...process.env, FLOWATLAS_WORKSPACE_ROOT: workspace, ...(managedInspector ? { FLOWATLAS_CLI_OWNER: '1' } : {}) } });
+  if (managedInspector) child.on('message', (message) => {
+    if (message === 'flowatlas:owner-check' && child.connected) {
+      child.send('flowatlas:owner-alive', () => {}); // A disappearing inspector needs no reply.
+    }
+  });
   const forward = (signal) => child.kill(signal);
   const interrupt = () => forward('SIGINT');
   const terminate = () => forward('SIGTERM');

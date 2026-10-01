@@ -35,6 +35,20 @@ function parse(args) {
   }
   return options;
 }
+function confirmOwner() {
+  if (!process.connected || typeof process.send !== 'function') return Promise.resolve(false);
+  return new Promise((resolveOwner) => {
+    const finish = (alive) => {
+      clearTimeout(timer); process.off('message', message); process.off('disconnect', disconnected); resolveOwner(alive);
+    };
+    const message = (value) => { if (value === 'flowatlas:owner-alive') finish(true); };
+    const disconnected = () => finish(false);
+    const timer = setTimeout(() => finish(false), 1000);
+    process.on('message', message); process.once('disconnect', disconnected);
+    try { process.send('flowatlas:owner-check', (error) => { if (error) finish(false); }); }
+    catch { finish(false); }
+  });
+}
 async function stopTarget(child) {
   if (!child || child.exitCode !== null || child.signalCode !== null) return;
   const exited = once(child, 'exit');
@@ -110,11 +124,24 @@ async function runInspector(args = process.argv.slice(2)) {
     try { await stopTarget(target); } finally { await servers.close(); }
   })();
   const onSignal = () => stop().catch((error) => { console.error(error); process.exitCode = 1; });
+  const managedOwner = process.env.FLOWATLAS_CLI_OWNER === '1';
+  if (managedOwner) {
+    // The private parent channel carries only fixed lifecycle messages, without app data.
+    process.once('disconnect', onSignal);
+    process.channel?.unref();
+  }
   process.once('SIGINT', onSignal);
   process.once('SIGTERM', onSignal);
   try {
+    // The CLI may have disappeared while storage/listeners were initializing.
+    if (managedOwner && !(await confirmOwner())) {
+      await stop();
+      throw new Error('CLI ownership confirmation failed');
+    }
+    if (managedOwner && (stopping || !process.connected)) { await stop(); return; }
     const trace = flags['--trace'] === 'http';
     const targetEnv = { ...process.env };
+    delete targetEnv.FLOWATLAS_CLI_OWNER;
     if (trace) {
       for (const key of Object.keys(targetEnv)) if (key.startsWith('OTEL_')) delete targetEnv[key];
       Object.assign(targetEnv, { OTEL_TRACES_EXPORTER: 'none', OTEL_METRICS_EXPORTER: 'none', OTEL_LOGS_EXPORTER: 'none',
@@ -149,6 +176,7 @@ async function runInspector(args = process.argv.slice(2)) {
     await stop();
     throw error;
   } finally {
+    if (managedOwner) process.off('disconnect', onSignal);
     process.off('SIGINT', onSignal);
     process.off('SIGTERM', onSignal);
   }
