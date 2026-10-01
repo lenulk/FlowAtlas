@@ -1,120 +1,83 @@
-# FlowAtlas MVP
+# FlowAtlas
 
-เรียกผ่าน CLI ได้แล้ว: `node scripts/cli.mjs --help`, `doctor`, `inspect` และ `register` ดู [วิธีติดตั้ง/แพ็กเกจ QA](docs/install.md), [แผนไปถึงการใช้งานจริง](PLAN.md) และ [CI](docs/ci.md) การผ่าน doctor ยืนยัน preflight ตามรายการที่ตรวจ ยังต้องตรวจ running integration
+FlowAtlas ช่วยให้นักพัฒนาเห็นว่า **การกระทำหนึ่งครั้งบนเว็บเดินทางผ่านโค้ดและบริการใดบ้าง** เช่น จากการกดปุ่ม ไปยัง handler, API และบริการที่แอปเรียกใช้ ผลลัพธ์เป็นแผนภาพพร้อมหลักฐานที่เปิดดูย้อนหลังได้
 
-`inspect` และ standalone collector ใช้ [session access](docs/session-access.md): ใส่ pairing code จาก interactive terminal ใน viewer ก่อนอ่านประวัติ/กราฟ/source การรัน collector กับ target แยกกันต้องใช้ environment credential เดียวกัน; ไม่ใส่รหัสใน URL หรือไฟล์
+เหมาะสำหรับทำความเข้าใจโค้ดที่เพิ่งเข้ามาดู หรือตามหาสาเหตุของปัญหาที่ผู้ใช้พบ ปัจจุบันเป็นเครื่องมือรุ่นทดลองสำหรับแอป Node.js ที่เชื่อม adapter แล้ว ตัวติดตามไม่ได้ค้นพบการทำงานภายในของแอปโดยอัตโนมัติ
 
-FlowAtlas เชื่อมการกระทำหนึ่งครั้งของผู้ใช้บนเว็บเข้ากับคำขอ API เส้นทางการรัน โค้ดที่เกี่ยวข้อง และบริการภายนอก แล้วแสดงเป็นแผนที่และคำอธิบายที่ตรวจสอบหลักฐานย้อนหลังได้ ข้อมูลชุดเดียวกันต้องอ่านได้ด้วยโปรแกรมเพื่อให้ AI coding agent สอบถามต่อได้
+## สิ่งที่ทำได้
 
-เป้าหมายคือเครื่องมือที่เรียกใช้เมื่ออยากตรวจการทำงานของแอป ปัจจุบันมีคำสั่งเดียวสำหรับแอป Node.js ที่ลงทะเบียนและติดตั้งตัวเชื่อมแล้ว; เปิด URL ของแอป กด action และเปิด FlowAtlas จากลิงก์ที่แอปแสดง เครื่องมือยังไม่สามารถเห็นฟังก์ชันภายในของแอปใด ๆ โดยไม่ติดตั้งตัวเชื่อม
+- เชื่อม browser action กับ handler และคำขอ HTTP ที่แอปบันทึกไว้
+- แสดงลำดับการทำงานและหลักฐานของ action รวมถึงกรณีสำเร็จหรือผิดพลาด
+- ดูประวัติ action และเปิดดูไฟล์ต้นทางที่ลงทะเบียนไว้
+- เรียกผ่าน CLI และเปิดหน้า viewer ในเครื่อง
 
-แผนพัฒนาจากต้นแบบไปสู่การทดลองกับเว็บแอปอิสระอยู่ใน [PLAN.md](PLAN.md)
+FlowAtlas เก็บข้อมูล action ไว้ในเครื่องตาม workspace ที่เลือก การเชื่อมแอปต้องเพิ่ม instrumentation เอง ขอบเขตหลักฐานขึ้นกับจุดที่แอปส่งข้อมูลเข้ามา กราฟจึงอาจแสดงส่วนที่ยังไม่ถูกติดตามว่าไม่ทราบ
 
-## ผู้ใช้กลุ่มแรก
+## สิ่งที่ต้องมี
 
-- นักพัฒนาที่เพิ่งเข้ามาทำงานกับเว็บแอปและต้องการเข้าใจว่าการกระทำหนึ่งครั้งทำงานผ่านส่วนใดบ้าง
-- ผู้แก้ incident ที่ต้องการตามจากอาการที่ผู้ใช้เห็นไปยังการรันและโค้ดที่เกี่ยวข้อง
+- Node.js 20.6 ขึ้นไป
+- npm
+- Windows, macOS หรือ Linux ที่รัน Node.js ได้
 
-## ลองใช้งาน
+## ติดตั้งและลองใช้งาน
 
-ต้องใช้ Node.js 20 ขึ้นไป ไม่ต้องติดตั้งแพ็กเกจเพิ่มเติม
+เปิด Terminal แล้วเข้าโฟลเดอร์โปรเจกต์:
 
-สำหรับแอปตัวอย่างที่ลงทะเบียนแล้ว ใช้คำสั่งเดียว:
-
-```powershell
-node scripts/inspect.mjs --project message-app
+```sh
+npm ci --ignore-scripts --no-audit --no-fund
 ```
 
-คำสั่งพิมพ์ URL ของแอปและ FlowAtlas เปิด URL ของแอป กด **ดูข้อความ**, **ส่งข้อความ** หรือ **ทดลองบริการล้มเหลว** แล้วเปิดแผนที่จากลิงก์ กด `stop` แล้ว Enter เพื่อปิดทั้งสองเซิร์ฟเวอร์ ประวัติอยู่ใน `data/actions` ภายในโครงการ หากยังไม่มี `apps/message-app` หรือ local config ให้รัน `node scripts/create-target-app.mjs` ก่อน สำหรับแอป Node อื่น ให้ลงทะเบียนและใส่ adapter ตาม [คู่มือ](docs/node-adapter.md) แล้วใช้ `--project ID --entry ไฟล์เริ่มแอป`; ไฟล์ entry ต้องอยู่ใน allowlist ของการลงทะเบียน แอปที่ไม่พิมพ์ `Registered app: http://127.0.0.1:<port>` ระบุ `--app-url http://127.0.0.1:<port>` ได้
+สร้างแอปตัวอย่างและเริ่มตรวจความพร้อม:
 
-สำหรับแอป Node.js ที่มีอยู่แล้วและเก็บไว้ใต้โฟลเดอร์ FlowAtlas ใช้ `node scripts/register-app.mjs --id my-app --root apps/my-app --entry server.mjs --source src/routes.mjs` เพื่อคัดลอก adapter ที่ยังไม่มีและลงทะเบียนไฟล์ต้นทางโดยไม่เขียนทับ adapter ที่ต่างกัน คำสั่งนี้ยังไม่ใส่ instrumentation ในแอปให้เอง; ต้องส่ง action ID จาก browser และเรียก adapter ใน handler ตาม [คู่มือ](docs/node-adapter.md) ก่อนใช้ `inspect`
-
-ตัวอย่างร้านค้าภายใน FlowAtlas ยังเรียกแยกได้ด้วย:
-
-```powershell
-node src/server.mjs
+```sh
+node scripts/cli.mjs demo
+node scripts/cli.mjs doctor
 ```
 
-เปิด `http://127.0.0.1:4173` แล้วกด **ดูสินค้า**, **ตรวจสต็อก** หรือ **สั่งซื้อ** หน้าเว็บจะแสดงแผนที่และหลักฐานของ action ล่าสุด บริการสต็อกจำลองฟังที่พอร์ต 4174 บนเครื่องเดียวกัน กดสั่งซื้อครั้งที่สามจะได้ HTTP 409 เพราะสินค้าในตัวอย่างมี 2 ชิ้น
+เริ่มแอปตัวอย่างพร้อมหน้า FlowAtlas:
 
-โปรแกรม CLI เก็บผลล่าสุด 100 actions ใน `data/actions/state.json` ภายในโครงการ ปิดแล้วเปิดใหม่จะโหลดรายการเดิม หน้าเว็บมีรายการย้อนหลัง ค้นด้วยชื่อหรือรหัส และกรองสำเร็จ/ผิดพลาด/ยังไม่มีผลสุดท้ายได้ กราฟเก่ายังคง evidence IDs กับรุ่นโค้ดที่ capture ไว้ บริการสต็อกจำลองเริ่มสต็อกใหม่เมื่อเปิดโปรแกรม แต่ประวัติการทำงานเดิมยังอยู่
-
-รายละเอียดการเก็บข้อมูล การสำรอง และการกู้คืนอยู่ใน [storage.md](docs/storage.md)
-
-หากต้องการลองกับเว็บแอปที่รันคนละโปรเซส ให้เปิดอีกเทอร์มินัลในโฟลเดอร์โครงการแล้วสั่ง:
-
-```powershell
-node examples/independent-app/server.mjs
+```sh
+node scripts/cli.mjs inspect
 ```
 
-เปิด `http://127.0.0.1:4180` แล้วเลือก **ดูข้อความ**, **ส่งข้อความ** หรือ **ทดลองบริการล้มเหลว** จากนั้นกดลิงก์ไปดูแผนที่ใน FlowAtlas แอปนี้ส่ง action ID และเหตุการณ์ handler/HTTP ผ่าน `POST /flowatlas/ingest` ไปยังตัวรับหลักฐานที่พอร์ต 4173 โดยไม่ส่ง request body, cookie หรือ token
+เปิด URL ของแอปที่ CLI แสดง แล้วกดปุ่มตัวอย่าง เช่น ดูหรือส่งข้อความ จากนั้นเปิดลิงก์ FlowAtlas เพื่อดูแผนภาพ หากระบบถาม pairing code ให้นำรหัสจาก Terminal ที่กำลังทำงานมาใส่ เมื่อเลิกใช้งาน พิมพ์ `stop` ใน Terminal แล้วกด Enter
 
-รายละเอียด payload และขอบเขตความเชื่อมั่นอยู่ใน [โปรโตคอลรับเหตุการณ์รุ่นทดลอง](docs/ingest-protocol.md)
+ข้อมูลตัวอย่างและประวัติจะถูกเก็บในโฟลเดอร์โปรเจกต์ หากต้องการใช้ workspace แยก ให้สร้างโฟลเดอร์ก่อน แล้วระบุ `--workspace PATH` ในแต่ละคำสั่ง:
 
-เพิ่มตัวเชื่อม Node.js ที่คัดลอกไปใช้ในอีก repository ได้ พร้อม local registration ของไฟล์ต้นทางแล้ว ตัวอย่าง `apps/message-app` จัดเตรียมไว้ในเครื่องนี้ เปิด collector ด้วยคำสั่งเดิม แล้วเปิดอีกเทอร์มินัลรัน `node apps/message-app/server.mjs` และเข้าพอร์ต 4190 ตัวอย่างมี mock ที่พอร์ต 4191; ใช้ Git repository แยกจาก collector รายละเอียดการสร้างใหม่/ติดตั้ง/ข้อจำกัดอยู่ใน [node-adapter.md](docs/node-adapter.md) ถ้า `doctor` แจ้ง adapter เก่า ให้หยุดแอปแล้วทำตาม [วิธีอัปเดตและย้อนกลับ](docs/adapter-update.md)
-
-ทดสอบด้วย:
-
-```powershell
-node scripts/run-tests.mjs
+```sh
+mkdir flowatlas-data
+node scripts/cli.mjs --workspace ./flowatlas-data demo
+node scripts/cli.mjs --workspace ./flowatlas-data doctor
+node scripts/cli.mjs --workspace ./flowatlas-data inspect
 ```
 
-ตัวรันทดสอบบันทึกผลสำเร็จและล้มเหลวทุกครั้งไว้ใน `reports/tests/` (TAP + JSON) และเพิ่มรายการใน [TEST-RUNS.md](docs/TEST-RUNS.md) การวิเคราะห์และการแก้แต่ละรอบอยู่ใน [QUALITY.md](docs/QUALITY.md) ใช้ `npm test` ได้เมื่อ npm ในเครื่องพร้อมใช้งาน
+## ใช้กับแอปของคุณ
 
-ทดสอบทั้ง Windows และ Linux VM (Debian 12) แล้ว ผลล่าสุดและ source revision ระบุใน [TEST-RUNS](docs/TEST-RUNS.md) และ [Linux VM](docs/linux-vm.md) หลังเพิ่ม workspace ชุดหลัก Windows ผ่าน 64/64 และ source แยก 1/1; hosted CI รุ่นก่อนหน้า `1b4213f` ผ่านครบ Windows/Ubuntu กับ Node 22.23.3/24.21.0 รวม browser และ offline package ([CI](docs/ci.md)) ต้องตรวจ matrix ใหม่เมื่อ source เปลี่ยน ยังไม่ได้ตรวจ Linux GUI desktop, มือถือจริง หรือ Node 20
+FlowAtlas ยังเชื่อมแอปที่มีอยู่ให้โดยอัตโนมัติไม่ได้ ขั้นตอนหลักคือ:
 
-เมื่อตรวจ source link ให้รันแยกจากชุดหลัก:
+1. ลงทะเบียนแอปและไฟล์ต้นทางที่อนุญาตให้ viewer อ่าน
+2. เพิ่ม adapter และ instrumentation ในจุดของ browser action และ handler ที่ต้องการติดตาม
+3. เริ่ม collector ด้วย `inspect --project ID` แล้วเปิดแอปและทำ action นั้น
+4. เปิดลิงก์ที่แสดงเพื่อดูกราฟและหลักฐาน
 
-```powershell
-node scripts/run-tests.mjs scripts/source-check.mjs
+อ่าน [คู่มือเชื่อมแอป Node.js](docs/node-adapter.md) สำหรับตัวอย่างและรูปแบบการตั้งค่า คำสั่งทั้งหมดดูได้ด้วย:
+
+```sh
+node scripts/cli.mjs --help
 ```
 
-ข้อมูลสำหรับโปรแกรมและ AI coding agent อ่านได้จาก `GET /flowatlas/actions` และ `GET /flowatlas/actions/{id}` โดยไม่ต้องอ่านหรือแปลหน้าเว็บ JSON ยังเป็นรูปแบบทดลอง (`schemaVersion: 0.1`)
+## ความเป็นส่วนตัวและขอบเขต
 
-รายการรองรับ query เช่น `GET /flowatlas/actions?q=order&outcome=error&limit=20` และสถานะการเก็บข้อมูลอ่านได้จาก `GET /flowatlas/status` ตัวเลือก `outcome` คือ `running`, `success`, `error`; `limit` เป็นจำนวนเต็ม 1–100 และค่าผิดจะได้ 400
+- ต้องเพิ่ม instrumentation ในแอปเอง FlowAtlas จะแสดงเฉพาะเหตุการณ์ที่เชื่อมไว้
+- Adapter ส่ง metadata ที่กำหนด เช่น action, handler, ปลายทาง และสถานะ ไม่ส่ง request body, response body, cookie หรือ token
+- pairing code ใช้ควบคุมการเข้าถึง session ของ viewer อย่าแชร์รหัสนี้
+- `doctor` ตรวจเงื่อนไขเบื้องต้น แต่ผลผ่านไม่ได้ยืนยันว่าแอปจริงเชื่อมและทำงานครบ
+- โปรเจกต์ยังอยู่ระหว่างพัฒนาและยังไม่ผ่านการทดลองกับแอปงานจริงอย่างครบถ้วน
 
-## ขอบเขตรุ่นแรก
+## เอกสารเพิ่มเติม
 
-1. ใช้เว็บแอปหนึ่งระบบและการกระทำของผู้ใช้ 2–3 แบบ
-2. บันทึกรายงานการกระทำจากหน้าเว็บ เวลา รุ่นโค้ด คำขอเครือข่าย และจุดที่ใส่ instrumentation ในเซิร์ฟเวอร์
-3. แสดงเส้นทางจากการกระทำไปยัง API การรัน โค้ด และบริการภายนอกเท่าที่มีหลักฐาน
-4. ให้ทุกความเชื่อมโยงมีสถานะ `observed`, `inferred` หรือ `unknown` พร้อมแหล่งหลักฐาน
-5. เปิดผลลัพธ์เป็น JSON และมีมุมมองแผนที่สำหรับคน
-
-## หลักฐานและความไม่แน่นอน
-
-- `observed`: พบความเชื่อมโยงในการรันที่บันทึกไว้ เช่น คำขอเครือข่ายหรือการเข้าสู่จุด instrumentation
-- `inferred`: อนุมานจากโค้ดหรือการตั้งค่าโดยไม่ได้เห็นความเชื่อมโยงนั้นในการรันครั้งนี้
-- `unknown`: ยังไม่มีหลักฐานพอที่จะยืนยันความเชื่อมโยง
-
-ทุกความเชื่อมโยงมีหลักฐานหรือเหตุผลที่ยังไม่ทราบ พร้อม digest ของไฟล์โค้ดเมื่อเซิร์ฟเวอร์เริ่ม หาก repository มี commit ระบบจะบันทึก commit และสถานะ `dirty` ของไฟล์โค้ดด้วย ลิงก์เปิดไฟล์ต้นทางจะตรวจ hash อีกครั้งและปฏิเสธเมื่อไฟล์เปลี่ยนหลังเริ่มเซิร์ฟเวอร์
-
-ลิงก์ source ของประวัติใช้ snapshot ของ action นั้น หากไฟล์ปัจจุบันเปลี่ยนหรือถูกลบจะตอบ 409 หากนำ action ID เก่ามาเติมเหตุการณ์เมื่อ code digest เปลี่ยนจะตอบ 409 และรักษากราฟเดิมไว้ ต้องสร้าง action ใหม่สำหรับโค้ดรุ่นใหม่
-
-ตัวตรวจใน `src/evidence-contract.mjs` ตรวจรูปแบบ graph ความสัมพันธ์ของชนิดหลักฐานกับสถานะ correlation ID และ source hash ก่อนส่ง JSON ออกมา การตรวจนี้ยืนยันความสอดคล้องภายในข้อมูลที่บันทึก ไม่ใช่การตรวจสอบอิสระว่าเหตุการณ์จาก client เกิดขึ้นจริง
-
-ชื่อ action มาจากรายงานของ client จึงไม่ได้พิสูจน์ว่ามนุษย์คลิกจริง หากเรียก API โดยไม่มีเหตุการณ์เริ่มจากหน้าเว็บ เส้นจาก action ไปยัง API จะเป็น `unknown` ส่วนการจับคู่คำขอขาออกกับ route ของบริการสต็อกเป็น `inferred` เพราะยังไม่มี trace ภายในบริการนั้น
-
-## วิธีพิสูจน์คุณค่า
-
-ทดสอบกับงานทำความเข้าใจระบบและงานวินิจฉัย incident ที่มีคำตอบอ้างอิง วัดความถูกต้อง เวลาในการหาคำตอบ และจำนวนครั้งที่แผนที่หรือคำอธิบายพาผู้ใช้ไปหาสาเหตุผิด เปรียบเทียบการทำงานกับและไม่มี FlowAtlas บนโจทย์เดียวกัน
-
-## ข้อจำกัดปัจจุบัน
-
-- ตัวอย่าง explicit adapter ใช้จุด instrumentation ที่ใส่ไว้เอง อีกโหมดคือ [OpenTelemetry HTTP tracing](docs/otel-http.md) ผ่าน inspect --trace http เพื่อเก็บ HTTP/Undici spans โดยไม่ต้องใส่ handler hooks; ไม่ยืนยัน business functions ทุกตัว
-- examples/independent-app เป็น fixture ภายใน repository ของ collector ส่วน apps/message-app เป็น fixture ใน repository แยก ทั้งคู่ส่งเหตุการณ์ด้วยโปรโตคอลทดลองของ FlowAtlas มีการส่งต่อ `traceparent` แบบ W3C แต่ยังไม่ได้ใช้ OpenTelemetry SDK หรือบันทึก Playwright trace
-- fixture ส่ง telemetry แบบ best effort และยังทำงานธุรกิจได้เมื่อ collector หยุดทำงาน พร้อมแสดง capture ไม่ครบ รอ collector สูงสุด 500 ms ต่อเหตุการณ์และหยุดส่ง action นั้นเมื่อส่งไม่สำเร็จ ยังไม่มี retry queue; กราฟบางส่วนอาจค้าง `running` หาก finish ส่งไม่ถึง
-- บริการสต็อกเป็น mock ภายในโครงการ ไม่ใช่บริการภายนอกจริง และไม่มี trace ภายในบริการ
-- CLI เก็บ actions ล่าสุด 100 รายการลงดิสก์ แต่ละกราฟไม่เกิน 100 nodes / 200 edges (เกินแล้วตอบ 413) และ state ไม่เกิน 64 MiB ยังไม่มี archive ระยะยาว; รายการเกินขอบเขตจะถูกแทนด้วยรายการใหม่
-- การเขียนไฟล์เป็น synchronous และมี writer lock เหมาะกับการทดลองในเครื่องเดียว ยังไม่พิสูจน์ความทนไฟดับหรือ OneDrive sync ระหว่างหลายเครื่อง; หาก process ถูกบังคับปิด lock อาจค้าง ต้องตรวจและกู้คืนตาม storage.md
-- ยังไม่มีการทดสอบกับนักพัฒนาใหม่หรือผู้แก้ incident จริง เกณฑ์วัดผลด้านบนเป็นแผนทดลอง
-- ทดสอบอีก repository และ SDK ด้วย fixtures ที่สร้างในโครงการแล้ว ยังไม่ได้ติดตั้งกับแอปงานจริงของผู้ใช้หรือทำ human trial; ยังไม่มี Playwright recorder เป็นฟีเจอร์ของผลิตภัณฑ์
-- CLI เปิดเฉพาะ loopback และป้องกัน endpoint ข้อมูลด้วย session bearer/pairing พร้อม Origin/Host checks ตาม [session access](docs/session-access.md); ยังไม่มี multiuser roles
-
-## สถานะ
-
-มี [browser action module](docs/browser-client.md) สำหรับจุดที่เลือกเปิด capture โดยใช้ scope แยกต่อคำขอ ทดสอบ concurrency กับ demo ใน Edge แล้ว; demo ที่สร้างใหม่ใช้ module นี้
-
-มีต้นแบบที่รันได้พร้อมแอปทดลอง, fixture คนละ repository, Node adapter/source registration, แผนที่หลักฐาน, การเก็บผลถาวร, รายการย้อนหลัง/ตัวกรอง, JSON API และชุดทดสอบ เส้นทางเรียกใช้ → คลิก 3 action → กราฟ/source → ปิด → เปิดใหม่ดูประวัติ ผ่านบน Linux VM/Chromium headless และเว็บ fixture อีกตัวที่รันคนละโปรเซสผ่านการคลิกบน Windows/Edge ([ผลทดสอบ](docs/TEST-RUNS.md)) แต่ยังไม่สมบูรณ์เป็นเครื่องมือใช้ได้กับทุกแอป มี opt-in HTTP tracing จาก OpenTelemetry แล้ว แต่ยังต้องเชื่อม client action/source mapping, ลด overhead และทดลองกับแอปงานจริงก่อนวัดคุณค่ากับผู้ใช้
-
-การวัดโหลดแบบ fixture มี [benchmark HTTP tracing](docs/benchmark-http.md) พร้อมผล latency/capture แยกกัน: การส่ง batch เคยเก็บ spans ครบในชุด Windows แต่การตรวจซ้ำพบ collector ปฏิเสธบาง batch จึงยังสอบสวนสาเหตุ และ overhead ยังเกินเป้า ไม่ใช่หลักฐานว่า production-ready
+- [ติดตั้งและเรียกใช้](docs/install.md)
+- [เชื่อมแอป Node.js](docs/node-adapter.md)
+- [ควบคุมการเข้าถึง session](docs/session-access.md)
+- [การจัดเก็บและกู้คืนข้อมูล](docs/storage.md)
+- [แผนพัฒนาและสถานะ](PLAN.md)
