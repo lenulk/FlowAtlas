@@ -28,7 +28,8 @@ export class LocalHttpSpanExporter {
       || !Number.isInteger(timeoutMs) || timeoutMs < 1 || timeoutMs > 1000) throw new Error('Invalid local trace exporter configuration');
     this.url = url.origin + '/flowatlas/ingest'; this.projectId = projectId; this.codeDigest = codeDigest;
     this.sessionToken = sessionToken; this.capacity = capacity; this.timeoutMs = timeoutMs; this.onDrop = onDrop;
-    this.queue = []; this.inFlight = 0; this.dropped = 0; this.closed = false; this.pending = null; this.abort = null;
+    this.queue = []; this.inFlight = 0; this.dropped = 0; this.closed = false;
+    this.active = new Set(); this.controllers = new Set();
     this.httpSpans = 0; this.invalidSpans = 0; this.delivered = 0;
     this.dropReasons = { overflow: 0, invalid: 0, rejected: 0, timeout: 0, transport: 0, shutdown: 0 };
     this.rejectedStatuses = { '400': 0, '401': 0, '403': 0, '409': 0, '413': 0, '503': 0, other: 0 };
@@ -58,40 +59,40 @@ export class LocalHttpSpanExporter {
     void this.pump(); // SDK/application never awaits collector delivery.
   }
   pump() {
-    if (this.pending) return this.pending;
-    this.pending = this.drain().finally(() => {
-      this.pending = null;
-      if (this.queue.length && !this.closed) void this.pump();
-    });
-    return this.pending;
-  }
-  async drain() {
-    while (this.queue.length) {
-      const batch = this.queue.splice(0, 32);
-      this.inFlight = batch.length;
-      const controller = new AbortController(); this.abort = controller;
-      const timer = setTimeout(() => controller.abort('timeout'), this.timeoutMs);
-      try {
-        const response = await context.with(suppressTracing(context.active()), () => fetch(this.url, {
-          method: 'POST', headers: { 'content-type': 'application/json', authorization: `Bearer ${this.sessionToken}` },
-          body: JSON.stringify({ kind: 'otel-span-batch', projectId: this.projectId, codeDigest: this.codeDigest, items: batch }),
-          signal: controller.signal, redirect: 'error' }));
-        await response.body?.cancel();
-        if (!response.ok) {
-          this.rejectedStatuses[Object.hasOwn(this.rejectedStatuses, response.status) ? response.status : 'other'] += batch.length;
-          this.drop(batch.length, 'rejected');
-        }
-        else this.delivered += batch.length;
-      } catch { this.drop(batch.length, ['timeout', 'shutdown'].includes(controller.signal.reason) ? controller.signal.reason : 'transport'); }
-      finally { clearTimeout(timer); this.inFlight = 0; this.abort = null; }
+    while (this.queue.length && this.active.size < 2) {
+      const work = this.sendBatch().finally(() => {
+        this.active.delete(work);
+        if (this.queue.length && !this.closed) void this.pump();
+      });
+      this.active.add(work);
     }
+    return Promise.all([...this.active]);
   }
-  async forceFlush() { do { await this.pump(); } while (this.queue.length || this.pending); }
+  async sendBatch() {
+    const batch = this.queue.splice(0, 32);
+    this.inFlight += batch.length;
+    const controller = new AbortController(); this.controllers.add(controller);
+    const timer = setTimeout(() => controller.abort('timeout'), this.timeoutMs);
+    try {
+      const response = await context.with(suppressTracing(context.active()), () => fetch(this.url, {
+        method: 'POST', headers: { 'content-type': 'application/json', authorization: `Bearer ${this.sessionToken}` },
+        body: JSON.stringify({ kind: 'otel-span-batch', projectId: this.projectId, codeDigest: this.codeDigest, items: batch }),
+        signal: controller.signal, redirect: 'error' }));
+      await response.body?.cancel();
+      if (!response.ok) {
+        this.rejectedStatuses[Object.hasOwn(this.rejectedStatuses, response.status) ? response.status : 'other'] += batch.length;
+        this.drop(batch.length, 'rejected');
+      }
+      else this.delivered += batch.length;
+    } catch { this.drop(batch.length, ['timeout', 'shutdown'].includes(controller.signal.reason) ? controller.signal.reason : 'transport'); }
+    finally { clearTimeout(timer); this.inFlight -= batch.length; this.controllers.delete(controller); }
+  }
+  async forceFlush() { do { await this.pump(); } while (this.queue.length || this.active.size); }
   async shutdown() {
     this.closed = true;
     const timer = setTimeout(() => {
       const queued = this.queue.length; this.queue = []; if (queued) this.drop(queued, 'shutdown');
-      this.abort?.abort('shutdown');
+      for (const controller of this.controllers) controller.abort('shutdown');
     }, 900);
     try { await this.forceFlush(); } finally { clearTimeout(timer); }
   }

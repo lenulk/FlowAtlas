@@ -220,7 +220,7 @@ function parseAppMetrics(value) {
   return Object.fromEntries([...fields, 'metricsRequests'].map((field) => [field, value[field]]));
 }
 
-async function runCondition(condition, runIndex, manifest) {
+async function runCondition(condition, runIndex, manifest, profileDirectory = null) {
   mkdirSync(storageRoot, { recursive: true });
   const canonicalStorage = realpathSync(storageRoot);
   if (!isInside(realpathSync(root), canonicalStorage)) throw new Error('unsafe_storage_parent');
@@ -248,8 +248,13 @@ async function runCondition(condition, runIndex, manifest) {
   delete childEnv.FLOWATLAS_TRACED_TOOL_ROOT;
   delete childEnv.NODE_OPTIONS;
   for (const key of Object.keys(childEnv)) if (key.startsWith('OTEL_')) delete childEnv[key];
-  const args = [join(root, 'scripts', 'cli.mjs'), '--workspace', workspace, 'inspect', '--project', 'benchmark-http', '--entry', 'server.mjs'];
+  const options = ['--project', 'benchmark-http', '--entry', 'server.mjs'];
+  const args = profileDirectory ? [join(root, 'scripts', 'inspect.mjs'), ...options]
+    : [join(root, 'scripts', 'cli.mjs'), '--workspace', workspace, 'inspect', ...options];
+  if (profileDirectory) childEnv.FLOWATLAS_WORKSPACE_ROOT = workspace;
   if (condition === 'traced') args.push('--trace', 'http');
+  if (profileDirectory) args.unshift('--cpu-prof', `--cpu-prof-dir=${profileDirectory}`,
+    `--cpu-prof-name=round-${runIndex}-${condition}.cpuprofile`);
   const child = spawn(process.execPath, args, { cwd: root, env: childEnv, stdio: ['pipe', 'pipe', 'pipe'] });
   const closePromise = new Promise((resolveClose) => child.once('close', (code, signal) => resolveClose({ code, signal })));
   const conditionController = new AbortController();
@@ -365,9 +370,13 @@ test('explicit local HTTP trace overhead benchmark (not in default suite)', { ti
   }
   const id = `${new Date().toISOString().replace(/[:.]/g, '-')}-${randomUUID()}`;
   const outputFile = join(outputRoot, `${id}.json`);
+  const profileDirectory = process.env.FLOWATLAS_BENCHMARK_PROFILE === 'collector' ? join(canonicalOutput, `profile-${id}`) : null;
+  if (profileDirectory) mkdirSync(profileDirectory);
   const manifest = workloadManifest();
   const report = { id, startedAt: new Date().toISOString(), finishedAt: null, sourceCommit: sourceCommit(),
     sourceDirty: sourceDirty(), sourceDigest: digestSources(), runtime: { node: process.version, platform: process.platform, arch: process.arch, osRelease: release() },
+    profiling: profileDirectory ? { scope: 'collector inspect process only; direct entry omits CLI wrapper', directory: relative(root, profileDirectory).replaceAll('\\', '/'),
+      comparableWithUnprofiledResults: false } : null,
     workload: { kind: 'deterministic plain native HTTP ESM fixture', warmupRequests: warmupCount, measuredRequests: measuredCount,
       concurrency, rounds: roundsCount, additionalUnmeasuredMetricsRequest: 1, ...manifest },
     thresholds: { tinyBaselineP95CutoffMs: 1, absoluteOverheadBudgetMs: 5, relativeP95TargetPercent: 10 }, rounds: [], acceptance: null,
@@ -378,7 +387,7 @@ test('explicit local HTTP trace overhead benchmark (not in default suite)', { ti
       const order = round % 2 === 0 ? ['baseline', 'traced'] : ['traced', 'baseline'];
       const outcomes = {};
       for (const condition of order) {
-        const outcome = await runCondition(condition, round + 1, manifest);
+        const outcome = await runCondition(condition, round + 1, manifest, profileDirectory);
         outcomes[condition] = outcome;
       }
       const baselineP95 = outcomes.baseline.measurement?.p95Ms ?? null;

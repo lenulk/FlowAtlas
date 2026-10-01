@@ -1572,3 +1572,62 @@ First matched3×1000 measurement: all6000 measured business responses pluswarmup
 - หลักฐาน: `reports/tests/2026-10-01T12-38-50-422Z.tap` และ `.json`
 
 - Final batch/diagnostic/inspect focused18/18 passed (2026-10-01T12-38-50-422Z); diagnostics encode fixedstatus counters only. Shipping this as developmentprogress with hosted/VMload gates next, not v1 or stablezero-loss/overheadacceptance. Localbench has bothpassesandintermittentrejection failures; retainall reports andfailedworkspaces. Application source/adapter files untouched.
+
+- Hostedrun36863352104 ae55301 initialsnapshot: Ubuntu22/24 completedwith failurein newloadcapture gate; precedingfunctional gates passed. Windowsrunning atsnapshot. This shows intermittent refusal is not provenOneDrive-specific. RetrieveactualCIbenchmarkartifact/drop-status/storage diagnostics beforefixingfilesystem or retry policy. Sourcebundle/VMfreshcheckout checksumverified; VMmain/load stillrunning.
+
+- Retrieved Ubuntu22 CI joblog andartifact11162582648 (ae55301) into reports/vm. Main96/source/browser/realSDK/package/reinstall passed; onlyloadcapture gatefailed. Benchmark businesscountsreconciled, performance90.36%aggregatep95increase. ArchivebenchmarkJSONpath/sizevalidated and sanitized counters inspected; nextdiagnosisbasedon HTTPstatus/storage fields, not genericpass/fail.
+
+- CI Ubuntu22 artifact11162582648 actualfailure: round1 overflow19, noHTTPrejections/storageerrors/timeout; next2roundszerodrop. This is a differentcause fromthelocal collectorrejections; do not conflate them orassumefilesystem. Queue256 stillsaturates duringfastbursts. VMae55301 main96/source1/SDKChromium2passed; benchmark1/1passed all3153acknowledged/zero drops, performanceFAILED baselinep95median5.341ms/traced14.083ms (+163.677%). RawVMarchive SHA25615b2490f1d216c12576b4e6bdc46f66498c10870d75a64c642c66290317301ca; retrieve next. Businessstatus/body remainedcorrect across allknownruns. Needprofile normalization/export/collectorvalidation andreadremainingCIevidence beforechanging queue/storagepolicy.
+
+- Hosted ae55301 completed: Windows24jobpassed, other3jobsfailedloadcapture only; allmain96/source/browser/SDK/package/reinstall gatespassed. Windows22artifact11162662816 showsround3overflow38, noHTTPrefusals/storageerrors; Ubuntu22round1overflow19. Actualcapacitysaturation is proven independently; localcollector-rejection cause stillunknown. Addedopt-in collector-only CPUprofile mode tobenchmark, preservingfixture/workload/budgets but markingprofiledresults incomparablewithunprofiledones. Rawprofiles staylocal/ignored andcancontain filesystemURLs; notanapp/production recorder. Nextdiagnosticprofile aims at actualnormalization/validation/storageCPUhotspots, no queuesizeorFSretry changes.
+
+## 2026-10-01T12-50-39-540Z
+
+- จุดประสงค์: Diagnostic collector-only CPUprofile atomic batch fullpath workload do not compare timing to baseline normal
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: ae553016f8001fa677ff47b295e636fc020cad2b; dirty: true
+- หลักฐาน: `reports/tests/2026-10-01T12-50-39-540Z.tap` และ `.json`
+
+- Diagnosticprofilerun2026-10-01T12-50-39-540Z passedmeasurement/capture1/1, but CPUprofiles mostlyidle/spawn: they captured CLIwrapper, not collectorprocess. CLI spawns inspect as a separateNodeprocess anddoesnotpropagateexecArgv; profilerselected wrongprocess. No CPUhotspot conclusion drawn and no validationoptimization yet. Correctdiagnosticmode toprofile scripts/inspect.mjs directlywith the same workspaceenvironment/arguments, recordmethoddifference explicitly; rawprofileslocalonly.
+
+## 2026-10-01T12-52-19-621Z
+
+- จุดประสงค์: Corrected actualcollector process CPUprofile directinspect diagnostic workload same counts budgets
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: ae553016f8001fa677ff47b295e636fc020cad2b; dirty: true
+- หลักฐาน: `reports/tests/2026-10-01T12-52-19-621Z.tap` และ `.json`
+
+- Continuation inspection: wildcard path search and assumed ci.yml filename failed before changes; no tests ran. Inspected actual test/workflow inventory next. These are tooling lookup failures, not application evidence.
+
+## 2026-10-01T13-03-31-601Z
+
+- จุดประสงค์: ตรวจคุณภาพปัจจุบัน
+- ผล: ไม่ผ่าน — 5/7; failed 2; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: ae553016f8001fa677ff47b295e636fc020cad2b; dirty: true
+- หลักฐาน: `reports/tests/2026-10-01T13-03-31-601Z.tap` และ `.json`
+- ไม่ผ่าน: collector uploads use at most two slots and preserve cross-trace batch accounting
+- ไม่ผ่าน: shutdown aborts both active upload slots and accounts for queued spans once
+
+## 2026-10-01T13-04-10-194Z
+
+- จุดประสงค์: ตรวจคุณภาพปัจจุบัน
+- ผล: ผ่าน — 20/20; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: ae553016f8001fa677ff47b295e636fc020cad2b; dirty: true
+- หลักฐาน: `reports/tests/2026-10-01T13-04-10-194Z.tap` และ `.json`
+
+## 2026-10-01T13-04-29-290Z
+
+- จุดประสงค์: Round48 two bounded upload slots unchanged HTTP load capture and performance budgets
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: ae553016f8001fa677ff47b295e636fc020cad2b; dirty: true
+- หลักฐาน: `reports/tests/2026-10-01T13-04-29-290Z.tap` และ `.json`
+
+- VM ae55301 evidence import: SHA256 matched 15b2490f1d216c12576b4e6bdc46f66498c10870d75a64c642c66290317301ca; tar entries passed path/type allowlist. Imported raw test/benchmark/browser artifacts without overwriting prior evidence; archived VM test log kept under ignored reports/vm/extracted-ae55301. Source provenance check next.
+
+- Imported VM ae55301 provenance: all four runner inventories matched exact Git ae55301 blobs (67 files each), no mismatches. Main96/96 (12-42-40-837Z), source1/1 (12-43-01-371Z), benchmark1/1 (12-43-01-675Z), SDK+Chromium2/2 (12-43-08-227Z); raw TAP/JSON retained. This verifies the prior serial batch revision, not the new two-slot implementation.
+- Round48 focused 2026-10-01T13-04-10-194Z20/20 passed including two-slot bounded delivery/abort, real CJS/ESM SDK, out-of-order atomic batch contracts and legacy inspector. Unprofiled matched benchmark2026-10-01T13-04-29-290Z1/1 capture/measurement passed: 3153 acknowledged spans, zero drops/invalid/pending, business results correct. Performance target FAILED: aggregate baselinep95 4.201ms, traced27.368ms (+551.464%); paired median380.559%. Passing capture does not establish overhead acceptance or repeatable stability. Hosted exact-revision gate next.

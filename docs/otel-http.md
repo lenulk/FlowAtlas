@@ -63,3 +63,9 @@ HTTP spans สร้าง request trace history และช่วยเห็�
 เมื่อหยุด SDK จะพิมพ์ summary ที่มีเฉพาะจำนวน httpSpans/invalidSpans/delivered/dropped/queued/inFlight ค่า delivered หมายถึง collector ตอบ HTTP 2xx; dropped รวมการปฏิเสธ/เต็ม/timeout ที่ไม่รับ acknowledgement บาง timeout อาจถูกบันทึกก่อนแล้ว จึงไม่ใช่จำนวนข้อมูลสูญหายที่พิสูจน์แน่นอน และจำนวน history ที่คงไว้สูงสุด100ไม่ใช่จำนวน span ทั้งหมด
 
 Shutdown diagnostics also report fixed drop reasons (overflow/invalid/rejected/timeout/transport/shutdown), fixed HTTP rejection buckets and collector storage diagnostic fields. Counters carry no URLs, messages or credentials. Intermittent collector refusal and performance targets remainopen; see benchmark/QUALITY for passes and failures.
+
+## Delivery limits and current evidence
+
+The exporter sends at most two collector batches concurrently, each with at most32 normalized spans. The total queued plus in-flight capacity remains256; default delivery timeout is300ms, shutdown drain budget900ms. There are no delivery retries. Acknowledged and dropped counts reconcile after normal shutdown, but unacknowledged delivery can be ambiguous if persistence happened before response loss. All HTTP graphs retain partial coverage; completeness is not yet persisted into each graph.
+
+Focused two-slot/lifecycle/SDK checks passed20/20 on Windows. One matched3x1000 load run acknowledged all3153 spans with zero drops, while measured p95 overhead exceeded the existing budget. Earlier hosted ae55301 load failed from queue overflow in three jobs; local collector rejection cause remains unresolved. This is development evidence, not stable-load or production acceptance.

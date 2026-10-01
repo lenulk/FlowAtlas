@@ -114,3 +114,9 @@ Archive reports/vm/flowatlas-4a68a3c-results.tgz SHA25646f36e56fd82fc91c03f6a8b9
 ## IPC flush/count revision1114257
 
 สำเนาVMใหม่ของ1114257bdd29f48f28b7ff4d24071d988a921a5d, Node22.23.3: main92/92 (2026-10-01T08-15-59-510Z), source1/1 (08-16-21-476Z), realSDK CJS/ESM+Chromium+shutdownsummary2/2 (08-16-21-828Z) ผ่าน failed/skipped0 ไม่พบwriterlockหรือCLIprocessหลังจบ ใช้cacheติดตั้งofflineและChromium1243ที่ตรวจแล้ว เก็บarchive reports/vm/flowatlas-1114257-results.tgz SHA256ba976062b452dc32b166a158ec471506b3868b02431b1c17f8d97b287e8a4ce1 ตรวจchecksum/type/path/no-overwriteแล้ว และsourcehashทุกไฟล์ตรงGitblobของ1114257 ไม่ใช่หลักฐานloadbenchmarkหรือpilot
+
+## Atomic batch revision ae55301
+
+Fresh Debian12 VM checkout, Node22.23.3: main96/96 (2026-10-01T12-42-40-837Z), isolated source1/1 (12-43-01-371Z), benchmark1/1 (12-43-01-675Z), realSDK CJS/ESM + Chromium2/2 (12-43-08-227Z), failed/skipped0. Matched fixture responses were correct and all3153 spans acknowledged without drops; performance acceptance FAILED (+163.677% aggregate p95, baseline5.341ms/traced14.083ms). No writer lock found after the run. This predates the two-slot exporter repair.
+
+Result archive SHA25615b2490f1d216c12576b4e6bdc46f66498c10870d75a64c642c66290317301ca checked before regular-file/path/no-overwrite import. Every runner inventory (67 files) matched exact ae55301 Git blobs; digest e103454e6a15eec65cff5c2331b06a831c5900b0cdc74d9108e5095811506617. Raw TAP/JSON and fixture images retained locally. No new UI behavior was claimed or visually certified from this transport-only revision.

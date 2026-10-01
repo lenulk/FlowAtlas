@@ -80,3 +80,39 @@ test('delivery health distinguishes a rejected batch from a timed out collector'
   assert.equal(Object.values(stalled.rejectionHealth()).reduce((sum, count) => sum + count, 0), 0);
   assert.equal(Object.values(stalled.deliveryHealth()).reduce((sum, count) => sum + count, 0), stalled.dropped);
 });
+
+test('collector uploads use at most two slots and preserve cross-trace batch accounting', async (t) => {
+  let active = 0, peak = 0; const received = [];
+  const url = await serve(t, async (req, res) => {
+    active++; peak = Math.max(peak, active);
+    let body = ''; for await (const part of req) body += part;
+    received.push(JSON.parse(body));
+    await new Promise((resolve) => setTimeout(resolve, 20));
+    active--; res.end('{}');
+  });
+  const exporter = new LocalHttpSpanExporter(config(url));
+  exporter.export(Array.from({ length: 128 }, (_v, index) => ({ ...sdkSpan(index + 1),
+    spanContext: () => ({ traceId: (index + 1).toString(16).padStart(32, '0'),
+      spanId: (index + 1).toString(16).padStart(16, '0') }) })), () => {});
+  assert.ok(exporter.queue.length + exporter.inFlight <= 256);
+  await exporter.forceFlush();
+  assert.equal(peak, 2); assert.equal(active, 0);
+  assert.equal(received.length, 4); assert.ok(received.every((batch) => batch.items.length === 32));
+  assert.equal(new Set(received.flatMap((batch) => batch.items.map((item) => item.traceId))).size, 128);
+  assert.deepEqual(exporter.summary(), { httpSpans: 128, invalidSpans: 0, delivered: 128,
+    dropped: 0, queued: 0, inFlight: 0 });
+  await exporter.shutdown();
+});
+
+test('shutdown aborts both active upload slots and accounts for queued spans once', async (t) => {
+  let received = 0;
+  const url = await serve(t, (req, _res) => { received++; req.resume(); });
+  const exporter = new LocalHttpSpanExporter(config(url, { timeoutMs: 1000 }));
+  exporter.export(Array.from({ length: 96 }, (_v, index) => sdkSpan(index + 1)), () => {});
+  const started = Date.now(); await exporter.shutdown();
+  assert.ok(Date.now() - started < 1500);
+  assert.equal(received, 2);
+  assert.deepEqual(exporter.summary(), { httpSpans: 96, invalidSpans: 0, delivered: 0,
+    dropped: 96, queued: 0, inFlight: 0 });
+  assert.equal(exporter.deliveryHealth().shutdown, 96);
+});
