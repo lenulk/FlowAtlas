@@ -1689,3 +1689,53 @@ First matched3×1000 measurement: all6000 measured business responses pluswarmup
 - VM e83f48f all three runner source inventories matched Git e83f48f blobs (67 files), no mismatch. This establishes source provenance of imported main98/load1/SDKChromium2 results, not of the current coalescing change.
 
 - Round49 load2026-10-01T13-22-33-249Z1/1 measurement/capture passed, all3153 acknowledged; batch density36/42/39 with fixed maximum2 uploads. Existing relative10% performance target FAILED; host-side evidence import/provenance work overlapped, so measured timings are not causal improvement evidence. Review actual diff and exact-revision CI next; all logs/rawresults retained.
+
+## 2026-10-01T13-26-01-528Z
+
+- จุดประสงค์: Exact2f40612 quiet-host confirmation capture stability unchanged paired workload and budgets
+- ผล: ไม่ผ่าน — 0/1; failed 1; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: 2f40612581614b1d69d68ae437eff1fda551577a; dirty: false
+- หลักฐาน: `reports/tests/2026-10-01T13-26-01-528Z.tap` และ `.json`
+- ไม่ผ่าน: explicit local HTTP trace overhead benchmark (not in default suite)
+
+- Quiet-host benchmark and Git push took longer than prior runs. Read-only process inventory via Get-CimInstance was denied by the local execution context; no process altered, no application cause inferred. Existing bounded benchmark still running; inspect its final report rather than treating delayed output as a test pass.
+
+- Quiet-host confirmation2026-10-01T13-26-01-528Z failed0/1: three conditions never became ready (traced round1/2 and baseline round2), so those workloads did not run and process cleanup is unconfirmed; retained three workspaces. Completed round3 acknowledged all1051 spans with zero drops. This is startup/lifecycle evidence, not a reproduced coalescing drop. Aggregate timings from incomplete pairs are unsuitable for acceptance. Get-Process fallback returned process inventory but native command status1 because no Git process matched; no process killed. Investigate inspector process trees and safe cleanup of owned QA only before new local benchmarks.
+
+- Read-only elevated process inventory showed no matching QA command lines, so it did not establish identity or permit cleanup; no process altered. Exact GitHub e83f48f/2f40612 run snapshots inspected next; job states in session output. Public CLI currently spawns an inspector child, so killing a wrapper cannot itself prove descendant cleanup. Record lifecycle investigation separately from batch density.
+
+- Exact2f40612 CI snapshot run36868875718: Ubuntu22 andWindows22 success, Ubuntu24 failed fixture load only, Windows24 stillrunning. Downloaded failed Ubuntu24 artifact for actual counters. Coalescing is not yet a complete hosted capture fix.
+
+- Failed2f40612 Ubuntu24 artifact11166236048 benchmark read with path/size guards and no-overwrite save; exact per-round capture/transport/failure counters inspected before choosing further change.
+
+## 2026-10-01T13-37-27-497Z
+
+- จุดประสงค์: Actual SDK target workload CPU diagnosis local fixture only incomparable timings
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: 2f40612581614b1d69d68ae437eff1fda551577a; dirty: true
+- หลักฐาน: `reports/tests/2026-10-01T13-37-27-497Z.tap` และ `.json`
+
+- Actual target workload profile2026-10-01T13-37-27-497Z1/1 passed measurement/capture; six local CPUprofiles created, all3153 spans acknowledged. Profile scope is generated fixture after preload, through warmup/measured load, stopped at metrics request; it does not include SDK startup or all shutdown work. Timings marked incomparable. Source/workload/diagnosticfixture hashes recorded. Sanitized sample-time analysis follows; rawprofiles remain ignored/local, no owner application changes.
+
+## 2026-10-01T13-41-26-268Z
+
+- จุดประสงค์: Reuse HTTP validator parsing with strict boundaries real SDK and legacy persistence
+- ผล: ไม่ผ่าน — 32/33; failed 1; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: 2f40612581614b1d69d68ae437eff1fda551577a; dirty: true
+- หลักฐาน: `reports/tests/2026-10-01T13-41-26-268Z.tap` และ `.json`
+- ไม่ผ่าน: completed and partial graphs survive a server restart without changing evidence
+
+## 2026-10-01T13-41-57-648Z
+
+- จุดประสงค์: Round50 HTTP validation reuse unprofiled matched load capture performance
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: 2f40612581614b1d69d68ae437eff1fda551577a; dirty: true
+- หลักฐาน: `reports/tests/2026-10-01T13-41-57-648Z.tap` และ `.json`
+
+- Round50 affected run2026-10-01T13-41-26-268Z32/33: validator boundaries/SDK/atomic contracts passed, but legacy restart test failed after a real storage save/rename EPERM (3graphs instead of4). This is actual Windows filesystem evidence with fixed diagnostics, not a validator rejection. Original-state preservation behavior remains; no cause process/OneDrive attribution confirmed. Follow-up unprofiled benchmark was already started before this final result arrived; retain its result, do not call the related storage gate passed. Handle transient rename recovery as separate Round51 after reviewing the completed report.
+
+- Round50 unprofiled2026-10-01T13-41-57-648Z1/1 measurement/capture passed, performance stillFAILED; related persistence run32/33 remains failed. Actual diffs and whitespace reviewed before the separate storage round. No package/production/user readiness claim.

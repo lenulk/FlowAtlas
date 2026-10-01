@@ -54,6 +54,24 @@ server.listen(Number(process.env.PORT), '127.0.0.1', () =>
   console.log('Registered app: http://127.0.0.1:' + server.address().port));
 `;
 
+function fixtureSource(profileScope) {
+  if (profileScope !== 'target') return appSource;
+  // Diagnostic fixture only; no profiler, inspector port or file writer is injected into owner apps.
+  const profiler = `import { Session } from 'node:inspector';
+import { promisify } from 'node:util';
+import { writeFileSync } from 'node:fs';
+const profileSession = new Session(); profileSession.connect();
+const profilePost = promisify(profileSession.post.bind(profileSession));
+await profilePost('Profiler.enable'); await profilePost('Profiler.start');
+async function stopProfile() {
+  const { profile } = await profilePost('Profiler.stop'); profileSession.disconnect();
+  writeFileSync(process.env.FLOWATLAS_BENCHMARK_TARGET_PROFILE, JSON.stringify(profile), { flag: 'wx' });
+}
+`;
+  return profiler + appSource.replace('const server = createServer((req, res) => {', 'const server = createServer(async (req, res) => {')
+    .replace('    metricsRequests++;', '    metricsRequests++;\n    await stopProfile();');
+}
+
 function isInside(parent, target) {
   const path = relative(parent, target);
   return Boolean(path) && path !== '..' && !path.startsWith(`..${process.platform === 'win32' ? '\\' : '/'}`)
@@ -229,7 +247,7 @@ function parseAppMetrics(value) {
   return Object.fromEntries([...fields, 'metricsRequests'].map((field) => [field, value[field]]));
 }
 
-async function runCondition(condition, runIndex, manifest, profileDirectory = null) {
+async function runCondition(condition, runIndex, manifest, profileDirectory = null, profileScope = null) {
   mkdirSync(storageRoot, { recursive: true });
   const canonicalStorage = realpathSync(storageRoot);
   if (!isInside(realpathSync(root), canonicalStorage)) throw new Error('unsafe_storage_parent');
@@ -240,7 +258,7 @@ async function runCondition(condition, runIndex, manifest, profileDirectory = nu
   }
   try {
     mkdirSync(join(workspace, 'app'));
-    writeFileSync(join(workspace, 'app', 'server.mjs'), appSource, { flag: 'wx' });
+    writeFileSync(join(workspace, 'app', 'server.mjs'), fixtureSource(profileScope), { flag: 'wx' });
     writeFileSync(join(workspace, 'flowatlas.config.json'), JSON.stringify({ projects: [
       { id: 'benchmark-http', root: 'app', files: ['server.mjs'] },
     ] }, null, 2) + '\n', { flag: 'wx' });
@@ -256,13 +274,15 @@ async function runCondition(condition, runIndex, manifest, profileDirectory = nu
     FLOWATLAS_COLLECTOR_PORT: '0', FLOWATLAS_INVENTORY_PORT: '0', FLOWATLAS_APP_PORT: '0', FLOWATLAS_EXTERNAL_PORT: '0' };
   delete childEnv.FLOWATLAS_TRACED_TOOL_ROOT;
   delete childEnv.NODE_OPTIONS;
+  delete childEnv.FLOWATLAS_BENCHMARK_TARGET_PROFILE;
+  if (profileScope === 'target') childEnv.FLOWATLAS_BENCHMARK_TARGET_PROFILE = join(profileDirectory, `round-${runIndex}-${condition}.cpuprofile`);
   for (const key of Object.keys(childEnv)) if (key.startsWith('OTEL_')) delete childEnv[key];
   const options = ['--project', 'benchmark-http', '--entry', 'server.mjs'];
-  const args = profileDirectory ? [join(root, 'scripts', 'inspect.mjs'), ...options]
+  const args = profileScope === 'collector' ? [join(root, 'scripts', 'inspect.mjs'), ...options]
     : [join(root, 'scripts', 'cli.mjs'), '--workspace', workspace, 'inspect', ...options];
-  if (profileDirectory) childEnv.FLOWATLAS_WORKSPACE_ROOT = workspace;
+  if (profileScope === 'collector') childEnv.FLOWATLAS_WORKSPACE_ROOT = workspace;
   if (condition === 'traced') args.push('--trace', 'http');
-  if (profileDirectory) args.unshift('--cpu-prof', `--cpu-prof-dir=${profileDirectory}`,
+  if (profileScope === 'collector') args.unshift('--cpu-prof', `--cpu-prof-dir=${profileDirectory}`,
     `--cpu-prof-name=round-${runIndex}-${condition}.cpuprofile`);
   const child = spawn(process.execPath, args, { cwd: root, env: childEnv, stdio: ['pipe', 'pipe', 'pipe'] });
   const closePromise = new Promise((resolveClose) => child.once('close', (code, signal) => resolveClose({ code, signal })));
@@ -382,12 +402,14 @@ test('explicit local HTTP trace overhead benchmark (not in default suite)', { ti
   }
   const id = `${new Date().toISOString().replace(/[:.]/g, '-')}-${randomUUID()}`;
   const outputFile = join(outputRoot, `${id}.json`);
-  const profileDirectory = process.env.FLOWATLAS_BENCHMARK_PROFILE === 'collector' ? join(canonicalOutput, `profile-${id}`) : null;
+  const profileScope = ['collector', 'target'].includes(process.env.FLOWATLAS_BENCHMARK_PROFILE) ? process.env.FLOWATLAS_BENCHMARK_PROFILE : null;
+  const profileDirectory = profileScope ? join(canonicalOutput, `profile-${id}`) : null;
   if (profileDirectory) mkdirSync(profileDirectory);
   const manifest = workloadManifest();
   const report = { id, startedAt: new Date().toISOString(), finishedAt: null, sourceCommit: sourceCommit(),
     sourceDirty: sourceDirty(), sourceDigest: digestSources(), runtime: { node: process.version, platform: process.platform, arch: process.arch, osRelease: release() },
-    profiling: profileDirectory ? { scope: 'collector inspect process only; direct entry omits CLI wrapper', directory: relative(root, profileDirectory).replaceAll('\\', '/'),
+    profiling: profileDirectory ? { scope: profileScope === 'collector' ? 'collector inspect process only; direct entry omits CLI wrapper'
+      : 'fixture target workload only; public CLI; diagnostic fixture includes local inspector Session', fixtureDigest: hash(fixtureSource(profileScope)), directory: relative(root, profileDirectory).replaceAll('\\', '/'),
       comparableWithUnprofiledResults: false } : null,
     workload: { kind: 'deterministic plain native HTTP ESM fixture', warmupRequests: warmupCount, measuredRequests: measuredCount,
       concurrency, rounds: roundsCount, additionalUnmeasuredMetricsRequest: 1, ...manifest },
@@ -399,7 +421,7 @@ test('explicit local HTTP trace overhead benchmark (not in default suite)', { ti
       const order = round % 2 === 0 ? ['baseline', 'traced'] : ['traced', 'baseline'];
       const outcomes = {};
       for (const condition of order) {
-        const outcome = await runCondition(condition, round + 1, manifest, profileDirectory);
+        const outcome = await runCondition(condition, round + 1, manifest, profileDirectory, profileScope);
         outcomes[condition] = outcome;
       }
       const baselineP95 = outcomes.baseline.measurement?.p95Ms ?? null;

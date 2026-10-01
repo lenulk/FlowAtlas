@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { createServer } from 'node:http';
 import { randomBytes } from 'node:crypto';
 import { LocalHttpSpanExporter, normalizeSdkHttpSpan } from '../src/otel-exporter.mjs';
+import { cleanHttpSpan, validSpanId } from '../src/http-span-contract.mjs';
 
 function sdkSpan(index = 1) {
   return { kind: 1, spanContext: () => ({ traceId: 'a'.repeat(32), spanId: index.toString(16).padStart(16, '0') }),
@@ -22,6 +23,26 @@ test('SDK metadata normalization strips sensitive fields and ignores non-HTTP sp
   assert.equal(normalizeSdkHttpSpan({ ...sdkSpan(), kind: 0 }), null);
   assert.equal(normalizeSdkHttpSpan({ ...sdkSpan(), attributes: {} }), null);
   assert.equal(normalizeSdkHttpSpan({ ...sdkSpan(), attributes: { 'http.method': 'canary-method' } }).span.method, 'OTHER');
+});
+
+test('normalized HTTP contract preserves identity time status and duration boundaries', () => {
+  const valid = normalizeSdkHttpSpan(sdkSpan()).span;
+  for (const size of [16, 32]) {
+    assert.equal(validSpanId('f'.repeat(size), size), true);
+    for (const id of ['0'.repeat(size), 'F'.repeat(size), 'f'.repeat(size - 1), 'f'.repeat(size + 1), null]) {
+      assert.equal(validSpanId(id, size), false);
+    }
+  }
+  for (const patch of [{ spanId: '0'.repeat(16) }, { parentSpanId: '0'.repeat(16) },
+    { startedAt: '2026-10-01T00:00:00Z' }, { endedAt: 'not-a-time' },
+    { endedAt: '2026-09-30T00:00:00.000Z' }, { durationMs: NaN }, { durationMs: Infinity },
+    { durationMs: -1 }, { durationMs: 86400001 }, { httpStatus: 99 }, { httpStatus: 600 }, { httpStatus: NaN }]) {
+    assert.throws(() => cleanHttpSpan({ ...valid, ...patch }), /Invalid normalized HTTP span/);
+  }
+  for (const durationMs of [0, 86400000]) for (const httpStatus of [null, 100, 599]) {
+    assert.equal(cleanHttpSpan({ ...valid, durationMs, httpStatus, secret: 'canary' }).durationMs, durationMs);
+  }
+  assert.deepEqual(cleanHttpSpan(valid), valid);
 });
 
 test('bounded exporter promptly acknowledges spans, reports drops and stops with a stalled collector', async (t) => {
