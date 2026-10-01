@@ -9,6 +9,7 @@ import { dirname, join, relative, isAbsolute } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { JsonActionStore } from '../src/action-store.mjs';
 import { createRequire } from 'node:module';
+import { validateGraph } from '../src/evidence-contract.mjs';
 
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
 const parent = join(root, 'reports/storage');
@@ -21,6 +22,44 @@ async function waitFor(work, timeoutMs = 5000) {
   const deadline = Date.now() + timeoutMs;
   while (Date.now() < deadline) { const value = await work(); if (value) return value; await new Promise((resolve) => setTimeout(resolve, 25)); }
   throw new Error('Asynchronous span delivery did not reach the expected state');
+}
+async function auditMap(page, graph, evidence, name) {
+  const geometry = await page.evaluate(() => {
+    const cards = [...document.querySelectorAll('#map .map-node')].map((group) => ({
+      id: group.dataset.nodeId, box: group.querySelector('rect').getBBox(),
+    }));
+    const routes = [...document.querySelectorAll('#map .map-edge')].map((path) => ({
+      id: path.dataset.edgeId, route: path.getAttribute('d'), status: path.getAttribute('class'),
+      marker: path.getAttribute('marker-end'), title: path.querySelector('title')?.textContent,
+      height: path.getBBox().height,
+    }));
+    const crossings = [...document.querySelectorAll('#map .map-edge')].flatMap((path) => {
+      const length = path.getTotalLength(), touched = new Set();
+      for (let distance = 0; distance <= length; distance += 1) {
+        const point = path.getPointAtLength(distance);
+        for (const { id, box } of cards) if (point.x > box.x + 2 && point.x < box.x + box.width - 2
+          && point.y > box.y + 2 && point.y < box.y + box.height - 2) touched.add(id);
+      }
+      return [...touched].map((nodeId) => ({ edgeId: path.dataset.edgeId, nodeId }));
+    });
+    const map = document.querySelector('#map'), wrap = map.parentElement;
+    return { nodeIds: cards.map((card) => card.id), routes, crossings,
+      width: map.getBoundingClientRect().width, viewWidth: map.viewBox.baseVal.width,
+      scrollWidth: wrap.scrollWidth, viewportWidth: wrap.clientWidth };
+  });
+  writeFileSync(join(evidence, `${name}-geometry.json`), JSON.stringify(geometry, null, 2));
+  assert.deepEqual(geometry.nodeIds, graph.nodes.map((node) => node.id));
+  assert.deepEqual(geometry.routes.map((route) => route.id), graph.edges.map((edge) => edge.id));
+  assert.equal(new Set(geometry.routes.map((route) => route.route)).size, graph.edges.length);
+  assert.deepEqual(geometry.crossings, [], 'Relationship paths must stay outside all card interiors');
+  for (const [index, route] of geometry.routes.entries()) {
+    assert.equal(route.status, `map-edge ${graph.edges[index].status}`);
+    assert.equal(route.marker, `url(#map-arrow-${graph.edges[index].status})`);
+    assert.ok(route.title.includes('→'));
+    if (graph.edges[index].from === graph.edges[index].to) assert.ok(route.height > 20, 'A self-relationship must form a visible loop');
+  }
+  assert.equal(geometry.width, geometry.viewWidth, 'Wide maps scroll without shrinking labels');
+  return geometry;
 }
 for (const extension of ['cjs', 'mjs']) test(`real OTel preload captures ${extension} HTTP/Undici fan-out and isolates concurrent requests`, { timeout: 25000 }, async (t) => {
   mkdirSync(parent, { recursive: true }); const workspace = mkdtempSync(join(parent, 'otel-runtime-'));
@@ -93,6 +132,31 @@ process.stdin.resume();
         mkdirSync(evidence, { recursive: true });
         await page.screenshot({ path: join(evidence, 'http-trace.png'), fullPage: true, timeout: 20000 });
         console.log(`HTTP trace browser evidence: ${relative(root, evidence)}`);
+        await auditMap(page, graphs[0], evidence, 'actual-http');
+        if (extension === 'mjs') {
+          // Viewer-only synthetic boundary: cycles, self-edge, disconnected cards,
+          // and the allowed 200-edge maximum. This is not captured business data.
+          const { trace, ...boundary } = graphs[0];
+          boundary.schemaVersion = '0.1';
+          boundary.nodes = ['a', 'b', 'c', 'd', 'isolated', 'unconnected'].map((id) => ({ id, type: 'unknown', label: `Geometry fixture ${id}` }));
+          const pairs = [['a', 'b'], ['b', 'c'], ['c', 'a'], ['a', 'd'], ['d', 'b'], ['b', 'b']];
+          boundary.edges = Array.from({ length: 200 }, (_, index) => ({ id: `fixture-${index}`,
+            from: pairs[index % pairs.length][0], to: pairs[index % pairs.length][1], status: 'unknown',
+            evidence: { type: 'coverage-gap', id: randomBytes(16).toString('hex'), recordedAt: boundary.startedAt,
+              reason: 'Synthetic viewer geometry fixture, not runtime evidence.' } }));
+          assert.deepEqual(validateGraph(boundary), []);
+          await page.route(`${ready.collector}/flowatlas/actions/${boundary.id}`, (route) => route.fulfill({
+            status: 200, contentType: 'application/json', body: JSON.stringify(boundary),
+          }));
+          await page.reload();
+          try { await page.locator('#session-code').fill(token); } catch { throw new Error('Cannot pair the boundary viewer'); }
+          await page.locator('#session-form button').click();
+          await page.locator('#map .map-edge').nth(199).waitFor({ state: 'attached' });
+          const geometry = await auditMap(page, boundary, evidence, 'synthetic-boundary');
+          assert.ok(geometry.scrollWidth > geometry.viewportWidth);
+          await page.locator('.map-wrap').evaluate((wrap) => { wrap.scrollLeft = wrap.scrollWidth; });
+          await page.screenshot({ path: join(evidence, 'synthetic-boundary.png'), fullPage: true, timeout: 20000 });
+        }
       } finally { await browser.close(); }
     }
     const done = once(child, 'close'); child.stdin.write('stop\n'); assert.equal((await done)[0], 0);

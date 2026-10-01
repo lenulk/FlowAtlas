@@ -62,30 +62,47 @@ function svgElement(name, attrs = {}) {
 function renderMap(graph) {
   const svg = $('#map');
   svg.replaceChildren();
-  const width = 680;
+  // Each relationship gets its own gutter lane, outside every card. Node rows
+  // are a reading order only: a long edge must not imply intermediate steps.
+  const cardX = 88 + Math.max(0, graph.edges.length - 4) * 12;
+  const width = cardX + 592;
   const rowHeight = 100;
   const height = graph.nodes.length * rowHeight + 20;
   svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
+  svg.style.width = `${width}px`;
   svg.style.height = `${height}px`;
-  const locations = new Map(graph.nodes.map((node, index) => [node.id, { x: 88, y: 20 + index * rowHeight }]));
+  const locations = new Map(graph.nodes.map((node, index) => [node.id, { x: cardX, y: 20 + index * rowHeight }]));
+  const defs = svgElement('defs');
+  for (const status of Object.keys(statusLabels)) {
+    const marker = svgElement('marker', { id: `map-arrow-${status}`, viewBox: '0 0 10 10',
+      refX: 10, refY: 5, markerWidth: 6, markerHeight: 6, orient: 'auto', markerUnits: 'userSpaceOnUse' });
+    marker.append(svgElement('path', { d: 'M 0 0 L 10 5 L 0 10 Z', class: `map-arrow ${status}` }));
+    defs.append(marker);
+  }
+  svg.append(defs);
 
-  for (const edge of graph.edges) {
+  for (const [index, edge] of graph.edges.entries()) {
     const from = locations.get(edge.from);
     const to = locations.get(edge.to);
     if (!from || !to) continue;
+    const lane = 20 + index * 12;
     const line = svgElement('path', {
-      d: `M ${from.x + 250} ${from.y + 62} L ${to.x + 250} ${to.y + 9}`,
-      class: `map-edge ${edge.status}`,
+      d: edge.from === edge.to
+        ? `M ${from.x} ${from.y + 36} H ${lane} V ${from.y + 82} H ${from.x - 12} V ${from.y + 36} H ${from.x}`
+        : `M ${from.x} ${from.y + 36} H ${lane} V ${to.y + 36} H ${to.x}`,
+      class: `map-edge ${edge.status}`, 'data-edge-id': edge.id,
+      'marker-end': `url(#map-arrow-${edge.status})`,
     });
+    const description = svgElement('title');
+    description.textContent = `${graph.nodes.find((node) => node.id === edge.from).label} → ${graph.nodes.find((node) => node.id === edge.to).label} · ${statusLabels[edge.status]}`;
+    line.append(description);
     svg.append(line);
-    const label = svgElement('text', { x: from.x + 272, y: (from.y + to.y) / 2 + 35, class: `edge-label ${edge.status}` });
-    label.textContent = statusLabels[edge.status];
-    svg.append(label);
   }
 
   for (const node of graph.nodes) {
     const { x, y } = locations.get(node.id);
-    const group = svgElement('g', { class: `map-node ${node.type}` });
+    const group = svgElement('g', { class: `map-node ${node.type}`, 'data-node-id': node.id });
+    const description = svgElement('title'); description.textContent = node.label; group.append(description);
     group.append(svgElement('rect', { x, y, width: 500, height: 72, rx: 12 }));
     const type = svgElement('text', { x: x + 18, y: y + 25, class: 'node-type' });
     type.textContent = typeLabels[node.type] ?? node.type;

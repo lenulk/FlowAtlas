@@ -2079,3 +2079,80 @@ First matched3×1000 measurement: all6000 measured business responses pluswarmup
 - Round57 startupstopboundary18-26-58-909Z9/9passed failed/skipped0, noapplaunch/lockretained whenstartupownerrequestsstop; existingowner-kill/signalevent/plain/actualSDKcasesalso passed. No productionedits afterdefault117. Remaining2e7b9f2 CIarchive inspected usingactualreports/ prefixes; counts/performanceinoutput, no skip/rerun.
 - FinalRound57actualdiff/whitespace reviewed, startupowner-stop9/9passed; priorRound56CIremainingUbuntu24artifact11183292311 confirmsmain113/allgatespass,capture3153ack0drops,performanceFAILED+113.666%. CI4/4successdoesnotmeanperformanceacceptance. PLANupdatedwithoutclosingunverifiedgates.
 - Luna finalread-onlyRound57review foundnoblockinggap instartupstop/readyIPCcleanup; noedits/tests byLuna. Leadreview acceptscontrolledhandler scope, retainswatchdog/directinspectorkill/grandchild limitations. Commitselectedrepair+evidencedocs; nootherdirtyfilespresent.
+- Round570e49f48729b35788d355f58c44ba2573b83874c8 committedandpushedsuccessfullywithoutremoteconflict. BundleSHA256f0e0f04a2121f925e2ce6ed8e0081e04a3b02ba7f689e225c1ea5e1f82ba9072 transferredtoVM; freshdetachedexactcheckoutQAlaunched usingexistingofflineNode22dependencycache. ExactLinux/hostedresults pending.
+- Read-onlynext-worklookup failed because assumed src/http-span-exporter.mjs doesnotexist; benchmarkscript read succeeded. Noappchange/testfailure; usecurrentfileinventory beforefurtherinspection.
+- Exact0e49f48LinuxVMmain118/118(18-31-59-640Z),source1/1(18-32-27-547Z),SDKChromium2/2(18-32-27-874Z),unchangedload1/1(18-32-33-544Z) passed failed/skipped0. All3153spansack0drops; performanceFAILED+199.569%aggregatep95(base5.101ms/traced15.281ms),paired204.431%. AllQAexitcodes0,no writerlockfound. ArchiveSHA1434cc0d4afe49be48724166f4effbe0c7a5e50deacb21dc57c3f79553c52c5a; import/provenancepending. ExactGitHubrun36907343569 all4inprogress atread-onlysnapshot.
+- 0e49f48VMarchivechecksum matched; everypathrelative/allowed,everyentryregular; freshignoredextraction andreportimportwithoutoverwrite completed. RawVMTEST-RUNSretainedinignoredextract, trackedhostlogpreserved. Sourceinventoryverificationnext.
+
+## 2026-10-01T18-34-23-056Z
+
+- จุดประสงค์: Round57 exact VM source inventory final Windows owner evidence and paired benchmark replay
+- ผล: ผ่าน — 2/2; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: 0e49f48729b35788d355f58c44ba2573b83874c8; dirty: true
+- หลักฐาน: `reports/tests/2026-10-01T18-34-23-056Z.tap` และ `.json`
+- Round57VMprovenance18-34-23-056Z2/2passed: allfour71-fileLinuxinventories exact0e49f48Gitbytes; Windowsfinalowner9 shares70exactprogramfiles+packageJSONnewlineequivalence. Pairedbenchmarkreplaymatchesreportedfailedbudget. ManualGitHubsnapshotchecked; actualstatesinoutput, no unfinishedgatecertification.
+
+## 2026-10-01T18-42-17-519Z
+
+- จุดประสงค์: Round58 reproduce relationship paths crossing unrelated cards in actual HTTP SDK viewer
+- ผล: ไม่ผ่าน — 0/1; failed 1; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: 0e49f48729b35788d355f58c44ba2573b83874c8; dirty: true
+- หลักฐาน: `reports/tests/2026-10-01T18-42-17-519Z.tap` และ `.json`
+- ไม่ผ่าน: test\\otel-runtime.test.mjs
+- Round58browserregression18-42-17-519Z0/1failed withnativeNodeprocess exit3221226505 aftersavingCJSscreenshot, beforegeometryassertionresult. Thisisnotyetdeterministicassertionproofofcrossing; preserveTAP/JSON/image, inspectevidence andtestdriver beforefurtherrepair. No productionUIedit yet.
+
+## 2026-10-01T18-43-25-964Z
+
+- จุดประสงค์: Round58 isolate CJS geometry regression phase after native driver exit
+- ผล: ไม่ผ่าน — 0/1; failed 1; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: 0e49f48729b35788d355f58c44ba2573b83874c8; dirty: true
+- หลักฐาน: `reports/tests/2026-10-01T18-43-25-964Z.tap` และ `.json`
+- ไม่ผ่าน: test\\otel-runtime.test.mjs
+- Round58CJSdiagnostic18-43-25-964Z0/1failednativeexit3221226505again, butphase/artifactconfirmsSVGsamplingcompletedwith4unrelated-cardcrossings. Savedreports/browser/otel-runtime-1790880210018-cjs/geometry.json; thisestablishesgeometryproblem independentlyofnativefailurecleanup. Nativefailureexitrootcauseunconfirmed, preservebothfailures.
+
+## 2026-10-01T18-44-38-440Z
+
+- จุดประสงค์: Round58 gutter routes avoid unrelated cards in actual CJS ESM SDK browser viewer
+- ผล: ผ่าน — 2/2; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: 0e49f48729b35788d355f58c44ba2573b83874c8; dirty: true
+- หลักฐาน: `reports/tests/2026-10-01T18-44-38-440Z.tap` และ `.json`
+
+## 2026-10-01T18-48-07-128Z
+
+- จุดประสงค์: Round58 actual SDK viewer geometry and synthetic cycle disconnected 200-edge boundaries
+- ผล: ผ่าน — 2/2; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: 0e49f48729b35788d355f58c44ba2573b83874c8; dirty: true
+- หลักฐาน: `reports/tests/2026-10-01T18-48-07-128Z.tap` และ `.json`
+- Exact0e49f48GitHubrun36907343569completedSUCCESS4/4 onWindows2025/Ubuntu24.04Node22.23.3/24.21.0; alljobs/gatespassed. ThisisRound57source,predatesRound58UI. No cancelled/rerun/skippedgate. Artifactcapture/performanceinspectionpending.
+
+## 2026-10-01T18-49-07-873Z
+
+- จุดประสงค์: Round58 isolated source serving and changed snapshot protection
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: 0e49f48729b35788d355f58c44ba2573b83874c8; dirty: true
+- หลักฐาน: `reports/tests/2026-10-01T18-49-07-873Z.tap` และ `.json`
+
+## 2026-10-01T18-49-08-902Z
+
+- จุดประสงค์: Round58 existing inspector and independent browser journeys after map routing change
+- ผล: ผ่าน — 2/2; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: 0e49f48729b35788d355f58c44ba2573b83874c8; dirty: true
+- หลักฐาน: `reports/tests/2026-10-01T18-49-08-902Z.tap` และ `.json`
+
+## 2026-10-01T18-52-46-410Z
+
+- จุดประสงค์: Round58 verify self-loop visibility card clearance and actual SDK browser fixtures
+- ผล: ผ่าน — 2/2; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: 0e49f48729b35788d355f58c44ba2573b83874c8; dirty: true
+- หลักฐาน: `reports/tests/2026-10-01T18-52-46-410Z.tap` และ `.json`
+- Round570e49f48all4CIartifacts downloaded, paths/JSONsizeschecked, rawZIPsretained andreportsextractedtoignoredunique filenames. Main118/118 failed/skipped0everychannel;capture3153ack0dropseveryload. PerformanceFAILED Win22+229.851%,Win24+224.212%,Ubuntu22+161.766%,Ubuntu24+144.292%. No workload/threshold change andno sustainedcaptureclaim.
+- Round58manualactualSDKbefore/afterPNGinspected: longedgesnowoutsidecards, SERVERlinksseparateCLIENTcards, evidencepartial/observed/unknownlabelsretained. Source1/oldbrowser2/finalSDKbrowser2passed. Bounds include200edges/cycle/selfloop/disconnectedinsyntheticvieweronly; allroutesmaystillcrossotheredgesingutter, no mutual-isolation/layeredlayoutclaim. PLANupdated andFA-15nativefailurepathdiagnosisrecordedseparately.
+- LunaRound58finalread-onlyreview acceptsactualself-loopfix andboundedcard-clearanceclaim; guttercrossings/sharedsegments explicitlyopenFA-10. Leadreviewedactualdiff/whitespaceandfinalbrowser evidence; commitcurrentroutingrepairandevidencedocs, no unrelateddirtywork.

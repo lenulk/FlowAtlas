@@ -350,6 +350,10 @@ h1 {
   stroke:#89959a;
   stroke-dasharray:2 6
 }
+.map-arrow.observed { fill:#148779 }
+.map-arrow.inferred { fill:#cf8e26 }
+.map-arrow.unknown { fill:#89959a }
+.map-note { font-size:12px; color:#64747b; line-height:1.6; margin:10px 0 0 }
 .edge-label {
   font-size:12px;
   font-weight:700

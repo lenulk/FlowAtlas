@@ -16,12 +16,12 @@ Node.js เป็น integration ที่กำลังพัฒนาแล�
 
 | ความสามารถ | หลักฐานปัจจุบัน | งานที่เหลือ |
 | --- | --- | --- |
-| เปิด/ปิดเครื่องมือ | CLI/workspace/doctor/offline package/reinstall ผ่านบน Windows/Linux; รุ่น 2e7b9f2 ตรวจ owner disconnect และ startup lease แล้ว; รอบ 57 ตรวจคำสั่งหยุดผ่านช่องควบคุมบน Windows | สัญญาณจาก console จริง, startup ที่เคยล่าช้า, inspector ถูกบังคับหยุด/โปรเซสหลาน, attach แอปที่เริ่มอยู่แล้ว |
+| เปิด/ปิดเครื่องมือ | รุ่น 0e49f48 ผ่าน owner disconnect, startup lease และ controlled SIGINT/SIGTERM handler บน Windows/Linux VM/CI; SDK flush, offline package/reinstall ผ่าน | สัญญาณจาก console จริง, startup ที่เคยล่าช้า, inspector ถูกบังคับหยุด/โปรเซสหลาน, attach แอปที่เริ่มอยู่แล้ว |
 | ตั้งค่าแอป | register/allowlist และ managed adapter update/rollback มี backup; opt-in SDK HTTP ไม่ต้องใส่ handler hook | browser→SDK bridge, route/source mapping, existing SDK, แอปธุรกิจจริง |
-| แผนที่และ source | observed/inferred/unknown, digest/hash mismatch; schema0.2 HTTP/Undici concurrent fan-out และ parent ordering ผ่าน | แผนที่แตกแขนง, async นอก HTTP, source รุ่นเก่า, ห้ามอ้าง user click จาก SDK-only spans |
+| แผนที่และ source | observed/inferred/unknown, digest/hash mismatch; รอบ58 routing ไม่พาดผ่านกล่องอื่น มีหัวลูกศร/คำอธิบายตำแหน่งไม่ใช่เวลา; actual SDK+Edge และ cycle/200edge viewer fixture ผ่าน | จัดชั้น/แยกเส้นที่ยังตัดกันใน gutter, filter/navigation, exact Linux/CI รอบ58, async นอก HTTP, source รุ่นเก่า; ห้ามอ้าง user click จาก SDK-only spans |
 | หน้าเว็บ | Chromium headless บน Linux และ Edge headless บน Windows ผ่านกับ fixtures | ผู้ใช้จริง, keyboard/accessibility, error/capture states |
 | ข้อมูล | storageVersion1 อ่าน graph0.1/0.2, single writer/history100; Windows rename recovery แบบจำกัด ผ่าน simulation/obstruction/restart | persisted completeness, safe metadata retry, export/migration, lock owner/rootcause, overhead |
-| คุณภาพ | รุ่น 2e7b9f2: Linux VM main113/source1/SDKChromium2/load1 ผ่าน; GitHub Windows/Linux Node22/24 ผ่าน 4/4 รวม package/reinstall; รอบ 57 Windows main117/117 และ owner9/9 ผ่าน | รอบ 57 ยังต้องตรวจ exact Linux/CI; performance ยังไม่ผ่านทุกช่อง; sustained-load และสาเหตุ acknowledgement pause ยังเปิด; เก็บผลล้มเหลวก่อนหน้าไว้ |
+| คุณภาพ | รุ่น0e49f48 Linux VM main118/source1/SDKChromium2/load1 ผ่าน; GitHub Windows/Linux Node22/24 ผ่าน4/4 main118ทุกช่อง รวมpackage/reinstall; รอบ58 Windows source1/oldbrowser2/SDKbrowser2ผ่าน | รอบ58ยังรอexactLinux/CI; performanceไม่ผ่านทุกช่อง; sustained-load, acknowledgement pause และ nativeQAexitในfailurepathยังเปิด; เก็บผลล้มเหลวก่อนหน้าไว้ |
 | ความเชื่อมั่น | session bearer/pairing/Host/Origin checks; HTTP spans ลดรูปไม่เก็บ URL/header/body/baggage | export privacy/real-app gates; authentication ไม่ได้พิสูจน์ว่า sender report เกิดจริง |
 | การใช้งานจริง | ไม่มีแอปธุรกิจของผู้ใช้หรือ user trial | pilot แอปที่ไม่ได้สร้างเพื่อให้ FlowAtlas ผ่านเทสต์ และวัดประโยชน์ |
 
@@ -70,6 +70,7 @@ Node.js เป็น integration ที่กำลังพัฒนาแล�
 | FA-12 | pilot แอปอิสระ | FA-03–FA-10 | inspect แอปก่อนติดตั้งและมี rollback; known-answer cases success/error/slow/upstream outage; บันทึกเวลาติดตั้งและ overhead; ใช้ fixtures เพื่อเตรียมได้แต่ไม่แทน real-app gate |
 | FA-13 | user trial | FA-10, FA-12 | ผู้ทดลอง 3–5 คน, 6 โจทย์เทียบเครื่องมือ/ไม่มีเครื่องมือแบบสลับลำดับและโจทย์ใกล้เคียง; เก็บคำตอบผิด/เวลา/ขอบเขตที่ช่วยไม่ได้; ไม่สรุปทั่วไปจากกลุ่มเล็ก |
 | FA-14 | release และคำแนะนำ support | FA-02, FA-06–FA-13 | license ที่เจ้าของเลือก, artifact checksum/dependency review, clean install/update/uninstall, release notes, known limits; ไฟล์ข้อมูล/credentials ไม่เข้าชุดเผยแพร่ |
+| FA-15 | วินิจฉัย native QA exit บน Windows เมื่อ browser assertion ล้มเหลว | FA-02 | รอบ58พบ Node subprocess exit3221226505 สองครั้งหลัง geometryพบ4crossings; ตรวจ failure cleanup กับโปรเซสที่ระบุตัวตนได้ เก็บ assertion/artifact ได้แม้ cleanupผิดพลาด ไม่ใช้การรันผ่านมาปิดสาเหตุ |
 
 FA-11 ทำการทดลองได้ระหว่าง R3 แต่ raw Playwright trace ไม่ใช่ข้อบังคับของ v1 ถ้า metadata capture และ reproduction ที่กำหนดผ่านแล้ว การบันทึก DOM/screenshots/network แบบเต็มต้องมี consent และตรวจข้อมูลก่อนใช้งานจริง แผนนี้ไม่รับประกันว่าจะบันทึกได้ครบทุกฟังก์ชันในแอป
 
