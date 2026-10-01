@@ -26,3 +26,7 @@ SDK ใช้ custom exporter เท่านั้น ไม่ auto resource d
 - [Exporter selection](https://opentelemetry.io/docs/specs/otel/configuration/sdk-environment-variables/#exporter-selection)
 
 ADR เป็นเกณฑ์ implementation/test ไม่ใช่หลักฐานว่าฟีเจอร์ผ่านแล้ว ผลจริงต้องบันทึก TEST-RUNS/QUALITY
+
+### Cross-trace batch transport
+
+Exporter ส่ง kind=otel-span-batch พร้อม projectId/codeDigest และ items1–32 แต่ละitemมี traceId และ span ที่ลดรูปตามสัญญาข้างต้น Collector แยกกลุ่ม trace/build/validate ทั้งชุดก่อนบันทึก durableครั้งเดียว หาก itemใดขัดแย้ง/ไม่ผ่าน หรือsaveล้ม จะไม่เปลี่ยนกราฟใดในmemory ทุกgraphยังschema0.2และcoveragepartial; legacy kind=otel-spans ยังอ่านได้ การรับackเป็นbatchไม่ได้ขยายqueue256/history100/16KiBbody หรือdeadlineเดิม

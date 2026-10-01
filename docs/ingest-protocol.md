@@ -42,3 +42,7 @@ CLI ตรวจ session bearer และ Origin/Host ก่อนรับเ�
 `kind: otel-spans` ต้องมี projectId/codeDigest/traceId และ spans 1–32 รายการต่อ batch; ไม่ต้องมี actionId ใช้ schema 0.2 แยก trace graph ตาม project/trace IDs จำกัด 48 spans ต่อ trace ไม่มี raw attributes/names/URLs/body/events/resource ในกราฟ รับ duplicate ที่เหมือนกันแบบ idempotent และปฏิเสธ conflicting IDs/cycles ก่อนเขียน Parent ที่ยังขาดมี unknown placeholder; กราฟ partial เสมอและไม่ถือว่าเป็น user click ที่ยืนยันแล้ว Source/schema/rollback implications อยู่ใน [ADR](adr-otel-http.md)
 
 ส่งเฉพาะ metadata ที่จำเป็น ห้ามใส่ request body, token, cookie หรือข้อมูลส่วนตัวใน event ตัวรับฟังเฉพาะ `127.0.0.1`; ส่ง bearer ใน header สำหรับ session ที่เปิดจาก CLI ห้ามส่ง credential ใน event/URL
+
+### Cross-trace batch transport
+
+Exporter ส่ง kind=otel-span-batch พร้อม projectId/codeDigest และ items1–32 แต่ละitemมี traceId และ span ที่ลดรูปตามสัญญาข้างต้น Collector แยกกลุ่ม trace/build/validate ทั้งชุดก่อนบันทึก durableครั้งเดียว หาก itemใดขัดแย้ง/ไม่ผ่าน หรือsaveล้ม จะไม่เปลี่ยนกราฟใดในmemory ทุกgraphยังschema0.2และcoveragepartial; legacy kind=otel-spans ยังอ่านได้ การรับackเป็นbatchไม่ได้ขยายqueue256/history100/16KiBbody หรือdeadlineเดิม

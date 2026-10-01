@@ -1473,3 +1473,102 @@
 - Environment: win32/x64; OS 10.0.26200; Node v24.18.0
 - commit: 18b9ddd6892bfd977e299f75eeef4b60d480c37a; dirty: true
 - หลักฐาน: `reports/tests/2026-10-01T08-10-28-953Z.tap` และ `.json`
+
+- Uploaded committed1114257 IPC/counter source bundle, SHA2561f6c694f2edd3cc1e2a4c20a8baccbe9b165c67aeb027b185bc05047ac5cd168, for fresh VM QA. Hostedrun36834857530 UbuntuNode22/24 alreadycompleted success, Windowsrunning withno failures in snapshot; fullpassnotyetclaimed.
+
+- VM1114257 newcheckout/offlineinstall/main92/92 (2026-10-01T08-15-59-510Z), source1/1 (08-16-21-476Z), realSDK+pairedChromium+IPCsummary2/2 (08-16-21-828Z) passed, failed/skipped0. No writerlock found underQAstorage and no matchingCLIprocess found afterstop. Sourcebundle checksum passed. VMresultarchive SHA256ba976062b452dc32b166a158ec471506b3868b02431b1c17f8d97b287e8a4ce1, retrieval pending. This newly verifies actualLinux shutdown counters, not a production/pilot result.
+
+- HostedIPC/counterrun36834857530 commit1114257 completed success in all4Windows/Ubuntu ×Node22/24jobs, main92 plus source/browser/installedSDK/reinstall gates. Capturecounter/shutdown support at this exact revision now has hosted and LinuxVM evidence. Benchmark remains separate and unverified.
+- AdditionalUX finding for FA-10: stacklayout draws siblingCLIENT ancestry along overlappingverticalsegments; evidence rows correctly saySERVER→eachCLIENT, but diagramcanlooksequential. Recordbranch-awareedge routing as a separate repair after measurement, avoid bundlingunverifiedUIchanges with counter fix.
+
+- VM1114257 resultarchive checksum/type/path/no-overwrite import passed, raw3runs plus2SDKscreenshots copiedinto project. Allrecordedsource file hashes match Git1114257 blobs; retainedrawreports contain actualIPCsummary assertions with CJS/ESM6spans acknowledged each. Prior91tests evidence is not reused as92test result.
+
+- Benchmark leadreview accepted Luna's boundedfixture/guide after correcting firstdraftthreshold and adding condition/request cancellation. Lead pinnedappports0, addedmeasuredsourceDirty provenance and madecleanupfailureinvalidate acceptance. Preselected tinybaselinecutoff1ms, delta≤5ms iftiny, otherwise relativep95≤10%; both metrics reported. Metrics extra request is identicalinbothconditions, excludedfromsamples butcounted1051tracedspans. Testsnotyetexecuted; firstmeasurementbeginsnow.
+
+## 2026-10-01T08-22-26-683Z
+
+- จุดประสงค์: First paired real SDK HTTP overhead benchmark 3x1000 baseline traced concurrency8 preselected budgets
+- ผล: ไม่ผ่าน — 0/1; failed 1; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: 1114257bdd29f48f28b7ff4d24071d988a921a5d; dirty: true
+- หลักฐาน: `reports/tests/2026-10-01T08-22-26-683Z.tap` และ `.json`
+- ไม่ผ่าน: explicit local HTTP trace overhead benchmark (not in default suite)
+
+- Firstbenchmarkrun2026-10-01T08-22-26-683Z failed0/1 captureacceptance; all3pairedrounds completed and sanitizedJSONsaved reports/benchmarks/2026-10-01T08-22-27-103Z-3806e131-175d-4f35-9f65-2e73f62b6bcf.json. Retaineddiagnosticworkspaces perreport. Readactualresponse/counter/latencydata before choosing throughputrepair; no benchmarkthreshold weakened.
+
+### Round47 — cross-trace batch throughput repair
+
+First matched3×1000 measurement: all6000 measured business responses pluswarmups/metrics correct, requestcounts1050 andSDKhttpSpans1051 eachtracedrun. Delivered118/116/118, dropped933/935/933; medianpairedp95overhead114.491% (target10%failed), target sampledRSS~120MBvsbaseline62–69MB. No invalidspans/pendingafterstop, allCLIshutdownsconfirmed, failedtracedworkspacesretained. Codeinspection: exporter groupsonlysametrace, soindependentrequests requireonecollectorHTTPPOST andfull100graphsyncJSONrewriteeach. Practicalrepair: flatbatch≤32 normalizedspans acrossdistincttraces, atomicvalidation/build +onesave, bounded256queue/16KiBbody/300msdelivery and900msflush unchanged; rejectbad/conflictingitemswholebatch. Regressionchecks: singletracelegacyprotocol, multi-traceisolation/idempotency/lateparent, wholebatchreject, savefailurepreservesmemory/disk, onesaveperbatch, bodylimit/canary/auth, realSDKshutdown. Re-run identicalbenchmark withoutchangingrequests/concurrency/thresholds. CPU/RSS covers targetonly, notcollector/fullmachine.
+- Tool failure at roundstart: after new usermessage the functions store root variable was unavailable, so command defaulted to parentdirectory and could not find docs/src; no write occurred. Re-established explicitprojectworkdir and recordedthe failedread/append here; sourcepatch used absoluteprojectpaths and appliedsuccessfully.
+
+## 2026-10-01T12-18-06-722Z
+
+- จุดประสงค์: Atomic32span cross-trace batch isolation storagefailure bodybounds legacySDK
+- ผล: ผ่าน — 29/29; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: 1114257bdd29f48f28b7ff4d24071d988a921a5d; dirty: true
+- หลักฐาน: `reports/tests/2026-10-01T12-18-06-722Z.tap` และ `.json`
+
+- Atomiccross-tracebatch affectedregressions29/29 passed (2026-10-01T12-18-06-722Z): realSDKCJS/ESM, oldsingletraceevents, one-savebatch/idempotency/retention/bodybounds, no partialmutation after invaliditems/controlledsavefailure, legacydisk/source/session behavior. Queuecapacity256, perrequestdeadline300ms, shutdown900ms unchanged. New rawbenchmarkdirectory addedto.gitignore (initialinventory showed ituntracked); artifacts staylocal andpackagefilesalreadyexcludereports. Nextidenticalbenchmarkmeasures repair; nooverheadpassclaimed from unitcases.
+
+## 2026-10-01T12-19-32-032Z
+
+- จุดประสงค์: Same3x1000 paired benchmark after atomic cross-trace32span batch unchanged budgets
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: 1114257bdd29f48f28b7ff4d24071d988a921a5d; dirty: true
+- หลักฐาน: `reports/tests/2026-10-01T12-19-32-032Z.tap` และ `.json`
+
+- Aftercross-tracebatch benchmark 2026-10-01T12-19-32-032Z measurement/capturetest1/1passed: all3pairs1000measuredresponses correct; all3153HTTPspans acknowledged (1051each), dropped/invalid/pending0; all6workspaces shutdownconfirmed/removed. Sanitizedartifact reports/benchmarks/2026-10-01T12-19-32-485Z-97b33b9c-c319-43aa-a1ec-eda6ce8b20db.json. Performancegate FAILED: baselinep95 4.680/4.091/4.878ms, traced13.314/24.881/19.107ms; medianpairedrelative+291.697%, mediandelta14.229ms, target10%notmet. Passingmeasurement/capture doesnotmean acceptableoverhead. Before/afterruns occurredatdifferenttimes andhostloadcanvary; thisisnotacontrolledcausalperformancecomparison. Completecapture doesmoreworkthanthepreviouslossycollector. NeedCPUprofile/isolate exporterwork andLinuxbenchmarkbeforestoragebackend/SDKdecisions; no thresholdchange.
+
+## 2026-10-01T12-26-08-847Z
+
+- จุดประสงค์: Final batch capture benchmark with explicit aggregate method and CI acceptance summary
+- ผล: ไม่ผ่าน — 0/1; failed 1; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: 1114257bdd29f48f28b7ff4d24071d988a921a5d; dirty: true
+- หลักฐาน: `reports/tests/2026-10-01T12-26-08-847Z.tap` และ `.json`
+- ไม่ผ่าน: explicit local HTTP trace overhead benchmark (not in default suite)
+
+- Finalbenchmarkrerun2026-10-01T12-26-08-847Z failed0/1: allresponses/countsreconciled but captureCompleteWithoutDrops=false. Report817d1e56..., retaineddiagnosticworkspace; baselinep95median8.271ms (vs4.680 prior), traced22.318ms, performance stillfails. Capture therefore not yet repeatably lossfree; don'tpublish zero-dropstableclaim from onepassingrun. Add fixed-vocabulary drop-reason counters before tuning deadlines/capacity/storage so causescanbe distinguished; no businessretry, no thresholdrelaxation.
+
+## 2026-10-01T12-28-49-833Z
+
+- จุดประสงค์: Fixed vocabulary span drop diagnostics distinguish overflow rejection timeout shutdown invalid
+- ผล: ผ่าน — 7/7; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: 1114257bdd29f48f28b7ff4d24071d988a921a5d; dirty: true
+- หลักฐาน: `reports/tests/2026-10-01T12-28-49-833Z.tap` และ `.json`
+
+- Added fixedvocabulary deliveryhealth counters after32-spanloss rerun: overflow/invalid/rejected/timeout/transport/shutdown; no messages/URLs/statuspayload/privatepaths. Focused7/7 (2026-10-01T12-28-49-833Z) passed including controlledtimeout vs503 vs900ms shutdown andrealSDK. This is diagnosis, not a fix for the lastloss. Benchmarknowrequiresdrop-reason countsreconcile withtotal dropped; firstdiagnosticmeasurementnext.
+
+## 2026-10-01T12-29-22-081Z
+
+- จุดประสงค์: Cross-trace batch benchmark diagnosis with fixed drop reasons unchanged workload limits
+- ผล: ไม่ผ่าน — 0/1; failed 1; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: 1114257bdd29f48f28b7ff4d24071d988a921a5d; dirty: true
+- หลักฐาน: `reports/tests/2026-10-01T12-29-22-081Z.tap` และ `.json`
+- ไม่ผ่าน: explicit local HTTP trace overhead benchmark (not in default suite)
+
+- Diagnosticbenchmark2026-10-01T12-29-22-081Z failed0/1: drops30/27/0 were collectorREJECTIONS, notqueue overflow, timeout, transport orshutdown. Allresponses/counts remainedcorrect. Parseexistingcollector fixedstorage diagnostic lines into sanitizedbenchmarkJSON beforeclassifying cause; do notimplement timeout/retry changes based on the previousguess. Luna's follow-up analysis is unavailable due agentusage-limit error; lead is analyzing actualresults directly (Luna's earlierfixtureauthorship remainscorrect).
+
+## 2026-10-01T12-34-46-663Z
+
+- จุดประสงค์: Rejected span batch diagnosis preserve fixed storage cause codes in benchmark artifacts
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: 1114257bdd29f48f28b7ff4d24071d988a921a5d; dirty: true
+- หลักฐาน: `reports/tests/2026-10-01T12-34-46-663Z.tap` และ `.json`
+
+- Storage-diagnosticbenchmark2026-10-01T12-34-46-663Z passedmeasurement/capture1/1 (all3153spans/zero drops), no storageerrorlines in thisrun. Earlierrejectionsremainunexplained; thispassingrerun is not a rootcausefix. AddedfixedHTTPstatus counters400/401/403/409/413/503/other todiagnosticoutput/report so subsequentCI/VM failures distinguish validation/auth/snapshot/body/storage refusal withoutreadingrawerrorpayloads. Coredeadlines/capacities/thresholds unchanged; no speculativefilesystemretry implemented.
+
+## 2026-10-01T12-38-50-422Z
+
+- จุดประสงค์: Final cross-trace batch diagnostics and affected lifecycle contracts
+- ผล: ผ่าน — 18/18; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: 1114257bdd29f48f28b7ff4d24071d988a921a5d; dirty: true
+- หลักฐาน: `reports/tests/2026-10-01T12-38-50-422Z.tap` และ `.json`
+
+- Final batch/diagnostic/inspect focused18/18 passed (2026-10-01T12-38-50-422Z); diagnostics encode fixedstatus counters only. Shipping this as developmentprogress with hosted/VMload gates next, not v1 or stablezero-loss/overheadacceptance. Localbench has bothpassesandintermittentrejection failures; retainall reports andfailedworkspaces. Application source/adapter files untouched.

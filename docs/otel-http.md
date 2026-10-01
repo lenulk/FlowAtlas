@@ -42,7 +42,7 @@ Entry ต้องอยู่ใน `files` ของ project และเป�
 
 ระยะนี้ใช้โหมด HTTP preload กับแอปที่ไม่มี explicit capture hooks; การใช้พร้อม Node adapter ที่สร้าง traceparent เองยังไม่ผ่าน correlation/compatibility gate ไม่รับรองว่าประวัติ action แบบ explicit และ HTTP trace จะรวมกันได้ โหมด HTTP เปิดกราฟจาก history ของ viewer ตาม FlowAtlas URL ไม่สร้างลิงก์จากปุ่มในแอปให้เอง
 
-โหมด trace ต้องใช้ Node 20.6 ขึ้นไปตาม runtime gate ของ CLI; matrix ที่ระบุในข้อความตรวจ CLI คือ Node 22/24 ตัวอย่าง CJS และ ESM ที่มีผลทดสอบจริงอยู่ใน [TEST-RUNS](TEST-RUNS.md) บน Windows/Node 24 และ Linux VM/Node 22; hosted Windows/Ubuntu × Node 22/24 ผ่านครบใน revision 18b9ddd ส่วน counter/IPC ที่เพิ่มหลังจากนั้นยังรอ hosted รอบใหม่ ESM ต้องใช้ loader hook ของ OpenTelemetry เพิ่มจาก preload; อย่าสรุปว่า OS หรือ Node version อื่นรองรับจนกว่าจะมีผลตรวจเพิ่ม
+โหมด trace ต้องใช้ Node 20.6 ขึ้นไปตาม runtime gate ของ CLI; matrix ที่ระบุในข้อความตรวจ CLI คือ Node 22/24 ตัวอย่าง CJS และ ESM ที่มีผลทดสอบจริงอยู่ใน [TEST-RUNS](TEST-RUNS.md) บน Windows/Node 24 และ Linux VM/Node 22; hosted Windows/Ubuntu × Node 22/24 ผ่านครบใน revision 18b9ddd counter/IPC ใน1114257ผ่านhostedทั้ง4ช่องและLinuxVMแล้ว ESM ต้องใช้ loader hook ของ OpenTelemetry เพิ่มจาก preload; อย่าสรุปว่า OS หรือ Node version อื่นรองรับจนกว่าจะมีผลตรวจเพิ่ม
 
 ## สิ่งที่ถูกเก็บ
 
@@ -58,6 +58,8 @@ HTTP spans สร้าง request trace history และช่วยเห็�
 
 ปิดโหมดโดยเอา `--trace http` ออกจากคำสั่ง แล้วกลับไปใช้การเชื่อมแบบ explicit ตาม [Node adapter](node-adapter.md) ได้ แต่ข้อมูล trace schema `0.2` ยังอยู่ใน workspace และ reader รุ่นเก่าอาจเปิดไม่ได้ ก่อนใช้เครื่องมือรุ่นเก่ากับ workspace เดิม ให้สำรอง workspace และแยกข้อมูล `0.2` ออกก่อน ยังไม่มีการรับรอง migration/rollback สำหรับ released version หรือการกู้คืนจากการ sync ข้ามเครื่อง
 
-ผลทดสอบปัจจุบันครอบคลุม real NodeSDK preload ทั้ง CJS และ ESM บน Windows/Node 24 โดยใช้ local fixture: HTTP/Undici fan-out, requests พร้อมกัน, canary filtering, response และ shutdown ตรวจแล้ว offline package CJS/ESM preload และ schema reload ผ่าน 2/2 ด้วย revision 18b9ddd ผ่าน hosted ทั้ง4ช่อง และ Linux VM revision 4a68a3c ผ่าน main/source/Chromium; การเปลี่ยน counter/IPC ถัดจากนั้นยังต้องตรวจเพิ่ม แอปงานจริงและ compatibility matrix อื่นยังรอการตรวจ ผลนี้ไม่รับรองความพร้อม production ดู [รายงานทดสอบ](TEST-RUNS.md) และ [แผน/ข้อจำกัด](../PLAN.md)
+ผลทดสอบปัจจุบันครอบคลุม real NodeSDK preload ทั้ง CJS และ ESM บน Windows/Node 24 โดยใช้ local fixture: HTTP/Undici fan-out, requests พร้อมกัน, canary filtering, response และ shutdown ตรวจแล้ว offline package CJS/ESM preload และ schema reload ผ่าน 2/2 ด้วย revision 18b9ddd ผ่าน hosted ทั้ง4ช่อง และ Linux VM revision 4a68a3c ผ่าน main/source/Chromium; counter/IPC revision1114257 ผ่าน hostedทั้ง4ช่องและLinuxVM main92/source1/SDKChromium2 แล้ว แอปงานจริงและ compatibility matrix อื่นยังรอการตรวจ ผลนี้ไม่รับรองความพร้อม production ดู [รายงานทดสอบ](TEST-RUNS.md) และ [แผน/ข้อจำกัด](../PLAN.md)
 
 เมื่อหยุด SDK จะพิมพ์ summary ที่มีเฉพาะจำนวน httpSpans/invalidSpans/delivered/dropped/queued/inFlight ค่า delivered หมายถึง collector ตอบ HTTP 2xx; dropped รวมการปฏิเสธ/เต็ม/timeout ที่ไม่รับ acknowledgement บาง timeout อาจถูกบันทึกก่อนแล้ว จึงไม่ใช่จำนวนข้อมูลสูญหายที่พิสูจน์แน่นอน และจำนวน history ที่คงไว้สูงสุด100ไม่ใช่จำนวน span ทั้งหมด
+
+Shutdown diagnostics also report fixed drop reasons (overflow/invalid/rejected/timeout/transport/shutdown), fixed HTTP rejection buckets and collector storage diagnostic fields. Counters carry no URLs, messages or credentials. Intermittent collector refusal and performance targets remainopen; see benchmark/QUALITY for passes and failures.

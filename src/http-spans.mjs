@@ -4,6 +4,28 @@ import { validateGraph } from './evidence-contract.mjs';
 import { cleanHttpSpan, validSpanId } from './http-span-contract.mjs';
 
 export function ingestHttpSpans(atlas, event) {
+  const { graph, result } = prepareHttpSpans(atlas, event);
+  if (graph) atlas.putTraceGraph(graph);
+  return result;
+}
+
+export function ingestHttpSpanBatch(atlas, event) {
+  if (!Array.isArray(event.items) || event.items.length < 1 || event.items.length > 32) throw new Error('Invalid HTTP span batch');
+  const groups = new Map();
+  for (const item of event.items) {
+    if (!item || typeof item !== 'object' || !validSpanId(item.traceId, 32)) throw new Error('Invalid HTTP span batch');
+    if (!groups.has(item.traceId)) groups.set(item.traceId, []);
+    groups.get(item.traceId).push(item.span);
+  }
+  // Build every graph before the single durable commit. A bad item cannot partly accept a batch.
+  const prepared = [...groups].map(([traceId, spans]) => prepareHttpSpans(atlas,
+    { projectId: event.projectId, codeDigest: event.codeDigest, traceId, spans }));
+  const graphs = prepared.map((item) => item.graph).filter(Boolean);
+  if (graphs.length) atlas.putTraceGraphs(graphs);
+  return { actions: prepared.map((item) => item.result) };
+}
+
+function prepareHttpSpans(atlas, event) {
   if (typeof event.projectId !== 'string' || !/^[a-z][a-z0-9_-]{0,63}$/.test(event.projectId)
     || !validSpanId(event.traceId, 32) || !Array.isArray(event.spans) || event.spans.length < 1 || event.spans.length > 32) {
     throw new Error('Invalid HTTP span batch');
@@ -34,7 +56,7 @@ export function ingestHttpSpans(atlas, event) {
       visited.add(parent); parent = spans.get(parent).parentSpanId;
     }
   }
-  if (!changed) return { actionId, duplicate: true };
+  if (!changed) return { graph: null, result: { actionId, duplicate: true } };
   const ordered = [...spans.values()].sort((a, b) => a.startedAt.localeCompare(b.startedAt) || a.spanId.localeCompare(b.spanId));
   const displayOrder = []; const seen = new Set();
   const visit = (span) => {
@@ -73,6 +95,5 @@ export function ingestHttpSpans(atlas, event) {
   edge('action', 'coverage', 'unknown', { type: 'coverage-gap', reason: 'HTTP spans do not prove internal functions or complete capture; events can be dropped.' });
   if (graph.nodes.length > 100 || graph.edges.length > 200) throw new Error('Graph capacity exceeded');
   if (validateGraph(graph).length) throw new Error('Invalid normalized HTTP trace graph');
-  atlas.putTraceGraph(graph);
-  return { actionId, duplicate: false };
+  return { graph, result: { actionId, duplicate: false } };
 }

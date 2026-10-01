@@ -115,4 +115,6 @@ node scripts/run-tests.mjs scripts/source-check.mjs
 
 มี [browser action module](docs/browser-client.md) สำหรับจุดที่เลือกเปิด capture โดยใช้ scope แยกต่อคำขอ ทดสอบ concurrency กับ demo ใน Edge แล้ว; demo ที่สร้างใหม่ใช้ module นี้
 
-มีต้นแบบที่รันได้พร้อมแอปทดลอง, fixture คนละ repository, Node adapter/source registration, แผนที่หลักฐาน, การเก็บผลถาวร, รายการย้อนหลัง/ตัวกรอง, JSON API และชุดทดสอบ เส้นทางเรียกใช้ → คลิก 3 action → กราฟ/source → ปิด → เปิดใหม่ดูประวัติ ผ่านบน Linux VM/Chromium headless และเว็บ fixture อีกตัวที่รันคนละโปรเซสผ่านการคลิกบน Windows/Edge ([ผลทดสอบ](docs/TEST-RUNS.md)) แต่ยังไม่สมบูรณ์เป็นเครื่องมือใช้ได้กับทุกแอป ขั้นต่อไปคือเพิ่ม trace จากเครื่องมือมาตรฐานและทดลองกับแอปงานจริงก่อนวัดคุณค่ากับผู้ใช้
+มีต้นแบบที่รันได้พร้อมแอปทดลอง, fixture คนละ repository, Node adapter/source registration, แผนที่หลักฐาน, การเก็บผลถาวร, รายการย้อนหลัง/ตัวกรอง, JSON API และชุดทดสอบ เส้นทางเรียกใช้ → คลิก 3 action → กราฟ/source → ปิด → เปิดใหม่ดูประวัติ ผ่านบน Linux VM/Chromium headless และเว็บ fixture อีกตัวที่รันคนละโปรเซสผ่านการคลิกบน Windows/Edge ([ผลทดสอบ](docs/TEST-RUNS.md)) แต่ยังไม่สมบูรณ์เป็นเครื่องมือใช้ได้กับทุกแอป มี opt-in HTTP tracing จาก OpenTelemetry แล้ว แต่ยังต้องเชื่อม client action/source mapping, ลด overhead และทดลองกับแอปงานจริงก่อนวัดคุณค่ากับผู้ใช้
+
+การวัดโหลดแบบ fixture มี [benchmark HTTP tracing](docs/benchmark-http.md) พร้อมผล latency/capture แยกกัน: การส่ง batch เคยเก็บ spans ครบในชุด Windows แต่การตรวจซ้ำพบ collector ปฏิเสธบาง batch จึงยังสอบสวนสาเหตุ และ overhead ยังเกินเป้า ไม่ใช่หลักฐานว่า production-ready

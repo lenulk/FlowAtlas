@@ -1,5 +1,5 @@
 import { sourceRef } from './flowatlas.mjs';
-import { ingestHttpSpans } from './http-spans.mjs';
+import { ingestHttpSpans, ingestHttpSpanBatch } from './http-spans.mjs';
 
 function requiredText(value, field) {
   if (typeof value !== 'string' || !value.trim() || value.length > 200) throw new Error(`Invalid ${field}`);
@@ -18,6 +18,7 @@ function traceparent(value) {
 export function ingestEvent(atlas, event) {
   if (!event || typeof event !== 'object' || Array.isArray(event)) throw new Error('Invalid event');
   if (event.kind === 'otel-spans') return ingestHttpSpans(atlas, event);
+  if (event.kind === 'otel-span-batch') return ingestHttpSpanBatch(atlas, event);
   const actionId = requiredText(event.actionId, 'actionId');
   if (!/^[A-Za-z0-9_-]{8,80}$/.test(actionId)) throw new Error('Invalid actionId');
 

@@ -35,6 +35,7 @@ test('bounded exporter promptly acknowledges spans, reports drops and stops with
   assert.ok(Date.now() - started < 1500, 'Shutdown must abort delivery within the documented budget');
   assert.equal(exporter.queue.length, 0); assert.equal(exporter.inFlight, 0); assert.equal(exporter.dropped, 20);
   assert.deepEqual(exporter.summary(), { httpSpans: 20, invalidSpans: 0, delivered: 0, dropped: 20, queued: 0, inFlight: 0 });
+  assert.deepEqual(exporter.deliveryHealth(), { overflow: 16, invalid: 0, rejected: 0, timeout: 0, transport: 0, shutdown: 4 });
   assert.equal(received, 1); assert.ok(health.length > 0); assert.equal(JSON.stringify(health).includes('canary-'), false);
 });
 
@@ -58,10 +59,24 @@ test('exporter summary counts acknowledged HTTP spans separately from invalid an
   exporter.export([sdkSpan(1), sdkSpan(2), { ...sdkSpan(), kind: 0 },
     { ...sdkSpan(), spanContext: () => ({ traceId: 'invalid' }) }], () => {});
   await exporter.shutdown();
-  assert.equal(received.flatMap((batch) => batch.spans).length, 2);
+  assert.equal(received.flatMap((batch) => batch.items).length, 2);
   assert.deepEqual(exporter.summary(), { httpSpans: 2, invalidSpans: 1, delivered: 2, dropped: 1, queued: 0, inFlight: 0 });
   assert.equal(Object.isFrozen(exporter.summary()), true);
   assert.equal(JSON.stringify(exporter.summary()).includes('canary-'), false);
   let code; exporter.export([sdkSpan(3)], (result) => { code = result.code; });
   assert.equal(code, 1); assert.equal(exporter.summary().httpSpans, 2);
+});
+
+test('delivery health distinguishes a rejected batch from a timed out collector', async (t) => {
+  const rejectedUrl = await serve(t, (req, res) => { req.resume(); res.writeHead(503); res.end(); });
+  const rejected = new LocalHttpSpanExporter(config(rejectedUrl));
+  rejected.export([sdkSpan()], () => {}); await rejected.shutdown();
+  assert.equal(rejected.deliveryHealth().rejected, 1); assert.equal(rejected.deliveryHealth().timeout, 0);
+  assert.equal(rejected.rejectionHealth()['503'], 1); assert.equal(rejected.rejectionHealth()['400'], 0);
+  const stalledUrl = await serve(t, (req, _res) => req.resume());
+  const stalled = new LocalHttpSpanExporter(config(stalledUrl, { timeoutMs: 30 }));
+  stalled.export([sdkSpan()], () => {}); await stalled.shutdown();
+  assert.equal(stalled.deliveryHealth().timeout, 1); assert.equal(stalled.deliveryHealth().shutdown, 0);
+  assert.equal(Object.values(stalled.rejectionHealth()).reduce((sum, count) => sum + count, 0), 0);
+  assert.equal(Object.values(stalled.deliveryHealth()).reduce((sum, count) => sum + count, 0), stalled.dropped);
 });

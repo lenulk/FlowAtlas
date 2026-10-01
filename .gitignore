@@ -6,6 +6,7 @@ reports/storage/
 reports/ssh/
 reports/vm/
 reports/browser/
+reports/benchmarks/
 reports/releases/
 data/
 apps/

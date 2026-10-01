@@ -67,6 +67,11 @@ jobs:
           FLOWATLAS_TEST_PURPOSE: CI real HTTP traces and paired Chromium viewer
           FLOWATLAS_OTEL_BROWSER_CHECK: '1'
         run: node scripts/run-tests.mjs test/otel-runtime.test.mjs
+      - name: Fixture load capture accounting (performance reported separately)
+        if: ${{ !cancelled() }}
+        env:
+          FLOWATLAS_TEST_PURPOSE: CI paired fixture load responses and capture accounting
+        run: node scripts/run-tests.mjs scripts/benchmark-http-trace.mjs
       - name: Pack and install in disposable workspace
         id: package_install
         if: ${{ !cancelled() }}
@@ -133,5 +138,6 @@ jobs:
             reports/vm/inspector-browser-*/
             reports/browser/independent-browser-*/
             reports/browser/otel-runtime-*/
+            reports/benchmarks/
             docs/TEST-RUNS.md
             reports/releases/pack-result.json

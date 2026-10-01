@@ -30,13 +30,18 @@ export class LocalHttpSpanExporter {
     this.sessionToken = sessionToken; this.capacity = capacity; this.timeoutMs = timeoutMs; this.onDrop = onDrop;
     this.queue = []; this.inFlight = 0; this.dropped = 0; this.closed = false; this.pending = null; this.abort = null;
     this.httpSpans = 0; this.invalidSpans = 0; this.delivered = 0;
+    this.dropReasons = { overflow: 0, invalid: 0, rejected: 0, timeout: 0, transport: 0, shutdown: 0 };
+    this.rejectedStatuses = { '400': 0, '401': 0, '403': 0, '409': 0, '413': 0, '503': 0, other: 0 };
   }
   summary() {
     return Object.freeze({ httpSpans: this.httpSpans, invalidSpans: this.invalidSpans, delivered: this.delivered,
       dropped: this.dropped, queued: this.queue.length, inFlight: this.inFlight });
   }
-  drop(count) {
+  deliveryHealth() { return Object.freeze({ ...this.dropReasons }); }
+  rejectionHealth() { return Object.freeze({ ...this.rejectedStatuses }); }
+  drop(count, reason = 'transport') {
     this.dropped += count;
+    this.dropReasons[Object.hasOwn(this.dropReasons, reason) ? reason : 'transport'] += count;
     try { this.onDrop(Object.freeze({ dropped: this.dropped, queued: this.queue.length, inFlight: this.inFlight })); } catch { /* Diagnostic cannot affect business code. */ }
   }
   export(spans, callback) {
@@ -46,8 +51,8 @@ export class LocalHttpSpanExporter {
         const item = normalizeSdkHttpSpan(span);
         if (!item) continue;
         this.httpSpans++;
-        if (this.queue.length + this.inFlight >= this.capacity) this.drop(1); else this.queue.push(item);
-      } catch { this.invalidSpans++; this.drop(1); }
+        if (this.queue.length + this.inFlight >= this.capacity) this.drop(1, 'overflow'); else this.queue.push(item);
+      } catch { this.invalidSpans++; this.drop(1, 'invalid'); }
     }
     callback({ code: 0 });
     void this.pump(); // SDK/application never awaits collector delivery.
@@ -62,22 +67,22 @@ export class LocalHttpSpanExporter {
   }
   async drain() {
     while (this.queue.length) {
-      const traceId = this.queue[0].traceId; const batch = [];
-      for (let index = 0; index < this.queue.length && batch.length < 32;) {
-        if (this.queue[index].traceId === traceId) batch.push(this.queue.splice(index, 1)[0].span); else index++;
-      }
+      const batch = this.queue.splice(0, 32);
       this.inFlight = batch.length;
       const controller = new AbortController(); this.abort = controller;
-      const timer = setTimeout(() => controller.abort(), this.timeoutMs);
+      const timer = setTimeout(() => controller.abort('timeout'), this.timeoutMs);
       try {
         const response = await context.with(suppressTracing(context.active()), () => fetch(this.url, {
           method: 'POST', headers: { 'content-type': 'application/json', authorization: `Bearer ${this.sessionToken}` },
-          body: JSON.stringify({ kind: 'otel-spans', projectId: this.projectId, codeDigest: this.codeDigest, traceId, spans: batch }),
+          body: JSON.stringify({ kind: 'otel-span-batch', projectId: this.projectId, codeDigest: this.codeDigest, items: batch }),
           signal: controller.signal, redirect: 'error' }));
         await response.body?.cancel();
-        if (!response.ok) this.drop(batch.length);
+        if (!response.ok) {
+          this.rejectedStatuses[Object.hasOwn(this.rejectedStatuses, response.status) ? response.status : 'other'] += batch.length;
+          this.drop(batch.length, 'rejected');
+        }
         else this.delivered += batch.length;
-      } catch { this.drop(batch.length); }
+      } catch { this.drop(batch.length, ['timeout', 'shutdown'].includes(controller.signal.reason) ? controller.signal.reason : 'transport'); }
       finally { clearTimeout(timer); this.inFlight = 0; this.abort = null; }
     }
   }
@@ -85,8 +90,8 @@ export class LocalHttpSpanExporter {
   async shutdown() {
     this.closed = true;
     const timer = setTimeout(() => {
-      const queued = this.queue.length; this.queue = []; if (queued) this.drop(queued);
-      this.abort?.abort();
+      const queued = this.queue.length; this.queue = []; if (queued) this.drop(queued, 'shutdown');
+      this.abort?.abort('shutdown');
     }, 900);
     try { await this.forceFlush(); } finally { clearTimeout(timer); }
   }

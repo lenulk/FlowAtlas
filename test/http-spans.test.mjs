@@ -13,6 +13,53 @@ const span = (spanId, parentSpanId = null, extra = {}) => ({ spanId, parentSpanI
   startedAt: '2026-10-01T00:00:00.000Z', endedAt: '2026-10-01T00:00:00.100Z', durationMs: 100, httpStatus: 200, error: false, ...extra });
 const make = () => new FlowAtlas(version, 100, null, { version: (project) => project === 'target' ? version : null });
 const send = (atlas, spans, extra = {}) => ingestEvent(atlas, { kind: 'otel-spans', projectId: 'target', codeDigest: version.digest, traceId, spans, ...extra });
+const sendBatch = (atlas, items) => ingestEvent(atlas, { kind: 'otel-span-batch', projectId: 'target', codeDigest: version.digest, items });
+
+test('cross-trace batches commit once and preserve isolation, ancestry and idempotency', () => {
+  let saves = 0;
+  const store = { load: () => [], save: () => { saves++; } };
+  const atlas = new FlowAtlas(version, 100, store, { version: () => version });
+  const other = 'd'.repeat(32);
+  const items = [{ traceId, span: span(childId, rootId, { kind: 'CLIENT' }) },
+    { traceId: other, span: span(rootId, null, { httpStatus: 503, error: true }) }, { traceId, span: span(rootId) }];
+  const result = sendBatch(atlas, items);
+  assert.equal(saves, 1); assert.equal(result.actions.length, 2); assert.equal(atlas.actions.size, 2);
+  const first = atlas.get(result.actions[0].actionId), second = atlas.get(result.actions[1].actionId);
+  assert.equal(first.trace.traceId, traceId); assert.equal(first.trace.spans.length, 2);
+  assert.equal(first.edges.filter((edge) => edge.status === 'observed').length, 1);
+  assert.equal(first.outcome, 'success'); assert.equal(second.outcome, 'error');
+  assert.equal(second.trace.spans.length, 1);
+  assert.ok(sendBatch(atlas, items).actions.every((action) => action.duplicate)); assert.equal(saves, 1);
+  sendBatch(atlas, [{ traceId, span: span('3'.repeat(16), rootId, { kind: 'CLIENT' }) }]);
+  assert.equal(saves, 2); assert.equal(atlas.get(first.id), first); assert.equal(first.trace.spans.length, 3);
+});
+
+test('a bad cross-trace item or failed storage commit cannot partly change any graph', () => {
+  let fail = false, saves = 0;
+  const store = { load: () => [], save: () => { saves++; if (fail) throw new Error('controlled storage failure'); } };
+  const atlas = new FlowAtlas(version, 100, store, { version: () => version });
+  const result = send(atlas, [span(rootId)]); const original = atlas.get(result.actionId);
+  const before = structuredClone([...atlas.actions.values()]);
+  const good = { traceId, span: span(childId, rootId, { kind: 'CLIENT' }) };
+  assert.throws(() => sendBatch(atlas, [good, { traceId: 'd'.repeat(32), span: span(rootId, null, { method: 'invalid' }) }]));
+  assert.equal(saves, 1); assert.deepEqual([...atlas.actions.values()], before);
+  assert.throws(() => sendBatch(atlas, [good, { traceId, span: span(rootId, null, { httpStatus: 503 }) }]));
+  assert.equal(saves, 1); assert.deepEqual([...atlas.actions.values()], before);
+  fail = true;
+  assert.throws(() => sendBatch(atlas, [good, { traceId: 'd'.repeat(32), span: span(rootId) }]), /storage failure/);
+  assert.deepEqual([...atlas.actions.values()], before); assert.equal(atlas.get(original.id), original);
+  assert.equal(saves, 2);
+});
+
+test('flat batches enforce 32 spans, retain ordered history and fit the ingestion body limit', () => {
+  const atlas = new FlowAtlas(version, 2, null, { version: () => version });
+  const items = Array.from({ length: 32 }, (_value, index) => ({ traceId: (index + 1).toString(16).padStart(32, '0'), span: span(rootId) }));
+  assert.throws(() => sendBatch(atlas, [])); assert.throws(() => sendBatch(atlas, [...items, items[0]]));
+  assert.equal(atlas.actions.size, 0);
+  const result = sendBatch(atlas, items); assert.equal(result.actions.length, 32); assert.equal(atlas.actions.size, 2);
+  assert.deepEqual([...atlas.actions.values()].map((graph) => graph.trace.traceId), items.slice(-2).map((item) => item.traceId));
+  assert.ok(Buffer.byteLength(JSON.stringify({ kind: 'otel-span-batch', projectId: 'p'.repeat(64), codeDigest: version.digest, items })) < 16 * 1024);
+});
 
 test('out-of-order HTTP spans resolve parent gaps without claiming a user action or function', () => {
   const atlas = make();

@@ -133,12 +133,25 @@ export class FlowAtlas {
   get(id) { return this.actions.get(id) ?? null; }
 
   putTraceGraph(graph) {
-    if (graph.schemaVersion !== '0.2' || validateGraph(graph).length) throw new Error('Invalid HTTP trace graph');
-    const original = this.get(graph.id);
-    if (original) { this.commit(original, graph); return; }
-    const next = new Map(this.actions); next.set(graph.id, graph);
-    if (next.size > this.limit) next.delete(next.keys().next().value);
-    this.store?.save([...next.values()]); this.actions = next;
+    this.putTraceGraphs([graph]);
+  }
+
+  putTraceGraphs(graphs) {
+    if (!Array.isArray(graphs) || !graphs.length || graphs.length > 32
+      || new Set(graphs.map((graph) => graph?.id)).size !== graphs.length
+      || graphs.some((graph) => graph?.schemaVersion !== '0.2' || validateGraph(graph).length)) throw new Error('Invalid HTTP trace graph');
+    const next = new Map(this.actions);
+    for (const graph of graphs) {
+      next.set(graph.id, graph);
+      if (next.size > this.limit) next.delete(next.keys().next().value);
+    }
+    this.store?.save([...next.values()]);
+    // Preserve existing graph references only after persistence succeeds.
+    for (const graph of graphs) {
+      const original = this.actions.get(graph.id);
+      if (original && next.has(graph.id)) { Object.assign(original, graph); next.set(graph.id, original); }
+    }
+    this.actions = next;
   }
 
   list({ query = '', outcome = null, limit = this.limit } = {}) {
