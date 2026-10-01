@@ -173,3 +173,21 @@ test('full batches dispatch immediately and forceFlush bypasses the partial-batc
   assert.equal(exporter.transportHealth().batches, 2, 'Flush starts the pending batch synchronously');
   await flushed; assert.equal(exporter.summary().delivered, 33); await exporter.shutdown();
 });
+
+test('default exporter buffers a measured burst within 2048 spans and still stops a stalled collector', async (t) => {
+  let received = 0;
+  const url = await serve(t, (req, _res) => { received++; req.resume(); });
+  const exporter = new LocalHttpSpanExporter(config(url));
+  let callback = false;
+  exporter.export(Array.from({ length: 3000 }, (_v, index) => sdkSpan(index + 1)), () => { callback = true; });
+  assert.equal(callback, true); assert.equal(exporter.capacity, 2048); assert.equal(exporter.timeoutMs, 1000);
+  assert.equal(exporter.queue.length + exporter.inFlight, 2048);
+  assert.equal(exporter.deliveryHealth().overflow, 952);
+  await exporter.shutdown();
+  assert.equal(received, 2);
+  assert.deepEqual(exporter.summary(), { httpSpans: 3000, invalidSpans: 0, delivered: 0,
+    dropped: 3000, queued: 0, inFlight: 0 });
+  assert.equal(exporter.deliveryHealth().shutdown, 2048);
+  assert.throws(() => new LocalHttpSpanExporter(config(url, { capacity: 2049 })), /Invalid local trace exporter/);
+  assert.throws(() => new LocalHttpSpanExporter(config(url, { timeoutMs: 1001 })), /Invalid local trace exporter/);
+});

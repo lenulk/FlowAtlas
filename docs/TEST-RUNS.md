@@ -1782,3 +1782,31 @@ First matched3×1000 measurement: all6000 measured business responses pluswarmup
 - Round52 default2026-10-01T13-56-58-375Z101/103 failed, bounded2worker103/103 previously passed. Fixed SDK diagnostics and exact failed assertions inspected next. Defaults, deadlines and acceptance unchanged; source kept for diagnosis, no claim of stable default testing.
 
 - Round52 full default101/103 failure retained: fixed counters prove SDK timeout1 despite persisted6, plus explicit external-repository incomplete capture. Two-worker103/103 is comparison only; no default gate certification. Diagnostics disclose fixed numbers only. Next resource-policy repair must account for measured burst635overflow/64timeout, without changing benchmark acceptance/workload or claiming pause rootcause solved.
+
+## 2026-10-01T14-04-02-178Z
+
+- จุดประสงค์: Measured2048span bounded burst policy keeps callbacks shutdown and actual SDK contract
+- ผล: ผ่าน — 20/20; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: 8d1c2245c962c159b4ed596471e535d34fa8602d; dirty: true
+- หลักฐาน: `reports/tests/2026-10-01T14-04-02-178Z.tap` และ `.json`
+
+## 2026-10-01T14-04-43-130Z
+
+- จุดประสงค์: Round53 bounded2048buffer1000ms acknowledgement unchanged paired fixture acceptance
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: 8d1c2245c962c159b4ed596471e535d34fa8602d; dirty: true
+- หลักฐาน: `reports/tests/2026-10-01T14-04-43-130Z.tap` และ `.json`
+
+## 2026-10-01T14-06-03-543Z
+
+- จุดประสงค์: Round53 default104case regression measured buffer timeout policy and storage recovery
+- ผล: ผ่าน — 104/104; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: 8d1c2245c962c159b4ed596471e535d34fa8602d; dirty: true
+- หลักฐาน: `reports/tests/2026-10-01T14-06-03-543Z.tap` และ `.json`
+
+- Documentation patch used a shortened paragraph anchor and was rejected atomically; no partial edit. Read exact current policy paragraphs and reapply whole-line updates; tests continue on unchanged source.
+
+- Round53 main104/104 (14-06-03-543Z), focused20/20 (14-04-02-178Z), unchanged unprofiledload1/1 (14-04-43-130Z) passed functional/capture checks. Performancebudget FAILED (+16.336% aggregatep95). Current policy explicit in docs/adr-capture-policy.md; no test retries/skips or changed business workload. Docs partial patch rejection was atomic, exact paragraphs reapplied; final diff/links checked before commit.

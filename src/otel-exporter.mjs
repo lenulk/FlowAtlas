@@ -19,12 +19,12 @@ export function normalizeSdkHttpSpan(span) {
 }
 
 export class LocalHttpSpanExporter {
-  constructor({ collectorUrl, projectId, codeDigest, sessionToken, capacity = 256, timeoutMs = 300, onDrop = () => {} }) {
+  constructor({ collectorUrl, projectId, codeDigest, sessionToken, capacity = 2048, timeoutMs = 1000, onDrop = () => {} }) {
     const url = new URL(collectorUrl);
     if (url.protocol !== 'http:' || !['127.0.0.1', 'localhost', '[::1]'].includes(url.hostname)
       || url.href !== url.origin + '/' || !/^[a-z][a-z0-9_-]{0,63}$/.test(projectId ?? '')
       || !/^[a-f0-9]{64}$/.test(codeDigest ?? '') || !/^[A-Za-z0-9_-]{43}$/.test(sessionToken ?? '')
-      || !Number.isInteger(capacity) || capacity < 1 || capacity > 256
+      || !Number.isInteger(capacity) || capacity < 1 || capacity > 2048
       || !Number.isInteger(timeoutMs) || timeoutMs < 1 || timeoutMs > 1000) throw new Error('Invalid local trace exporter configuration');
     this.url = url.origin + '/flowatlas/ingest'; this.projectId = projectId; this.codeDigest = codeDigest;
     this.sessionToken = sessionToken; this.capacity = capacity; this.timeoutMs = timeoutMs; this.onDrop = onDrop;
