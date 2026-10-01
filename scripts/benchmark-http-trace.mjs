@@ -8,6 +8,7 @@ import { fileURLToPath } from 'node:url';
 import { Agent, request } from 'node:http';
 import { performance } from 'node:perf_hooks';
 import { release } from 'node:os';
+import { percentile, comparePairPerformance, aggregatePerformance } from './benchmark-statistics.mjs';
 
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
 const storageRoot = join(root, 'reports', 'storage');
@@ -96,28 +97,11 @@ function digestSources() {
   return hash(JSON.stringify(inventory));
 }
 
-function percentile(samples, fraction) {
-  if (!samples.length) return null;
-  const ordered = [...samples].sort((a, b) => a - b);
-  return Number(ordered[Math.max(0, Math.ceil(fraction * ordered.length) - 1)].toFixed(3));
-}
-
 function metrics(samples, durationMs) {
   return { count: samples.length, p50Ms: percentile(samples, 0.50), p95Ms: percentile(samples, 0.95),
     p99Ms: percentile(samples, 0.99), durationMs: Number(durationMs.toFixed(3)),
     throughputRequestsPerSecond: durationMs > 0 ? Number((samples.length * 1000 / durationMs).toFixed(3)) : null,
     latencySamplesMs: samples };
-}
-
-function comparePerformance(baselineP95Ms, tracedP95Ms) {
-  const deltaMs = baselineP95Ms === null || tracedP95Ms === null ? null : Number((tracedP95Ms - baselineP95Ms).toFixed(3));
-  const relativePercent = baselineP95Ms > 0 && tracedP95Ms !== null
-    ? Number(((tracedP95Ms / baselineP95Ms - 1) * 100).toFixed(3)) : null;
-  const criterion = baselineP95Ms !== null && baselineP95Ms < 1 ? 'absolute_overhead_ms' : 'relative_increase_percent';
-  const met = criterion === 'absolute_overhead_ms' ? deltaMs !== null && deltaMs <= 5
-    : relativePercent !== null && relativePercent <= 10;
-  return { deltaMs, relativePercent, acceptance: { criterion, met,
-    threshold: criterion === 'absolute_overhead_ms' ? { deltaMs: 5 } : { relativePercent: 10 } } };
 }
 
 function workloadManifest() {
@@ -424,9 +408,7 @@ test('explicit local HTTP trace overhead benchmark (not in default suite)', { ti
         const outcome = await runCondition(condition, round + 1, manifest, profileDirectory, profileScope);
         outcomes[condition] = outcome;
       }
-      const baselineP95 = outcomes.baseline.measurement?.p95Ms ?? null;
-      const tracedP95 = outcomes.traced.measurement?.p95Ms ?? null;
-      const comparison = comparePerformance(baselineP95, tracedP95);
+      const comparison = comparePairPerformance(outcomes, { measuredRequests: measuredCount, profiled: Boolean(profileScope) });
       report.rounds.push({ round: round + 1, order, baseline: outcomes.baseline, traced: outcomes.traced,
         deltaP95Ms: comparison.deltaMs, relativeP95OverheadPercent: comparison.relativePercent,
         performanceAcceptance: comparison.acceptance });
@@ -435,27 +417,15 @@ test('explicit local HTTP trace overhead benchmark (not in default suite)', { ti
     report.failure = 'benchmark_execution_error';
     testFailure = new Error('Benchmark execution failed; sanitized report saved.');
   } finally {
-    const baselineP95s = report.rounds.map((round) => round.baseline.measurement?.p95Ms).filter(Number.isFinite);
-    const tracedP95s = report.rounds.map((round) => round.traced.measurement?.p95Ms).filter(Number.isFinite);
-    const deltaP95s = report.rounds.map((round) => round.deltaP95Ms).filter(Number.isFinite);
-    const pairedOverheads = report.rounds.map((round) => round.relativeP95OverheadPercent).filter(Number.isFinite);
     const captureComplete = report.rounds.length === roundsCount && report.rounds.every(({ traced }) => traced.valid
       && traced.trace?.httpSpans === expectedTraceSpans && traced.trace.delivered + traced.trace.dropped === expectedTraceSpans
       && traced.trace.dropped === 0 && traced.trace.queued === 0 && traced.trace.inFlight === 0);
     const workloadCorrect = report.rounds.length === roundsCount && report.rounds.every(({ baseline, traced }) => baseline.valid && traced.valid
       && baseline.workloadDigest === traced.workloadDigest && baseline.requestIdDigest === traced.requestIdDigest);
-    const baselineP95Median = percentile(baselineP95s, 0.5);
-    const tracedP95Median = percentile(tracedP95s, 0.5);
-    const deltaP95Median = percentile(deltaP95s, 0.5);
-    const relativeP95Median = percentile(pairedOverheads, 0.5);
-    const aggregatePerformance = comparePerformance(baselineP95Median, tracedP95Median);
     report.acceptance = { allResponsesCorrectAndCountsReconciled: workloadCorrect,
       captureCompleteWithoutDrops: captureComplete,
-      performanceAcceptance: { ...aggregatePerformance.acceptance, aggregateMethod: 'ratio_or_difference_of_condition_medians',
-        aggregateDeltaP95Ms: aggregatePerformance.deltaMs, aggregateRelativeP95OverheadPercent: aggregatePerformance.relativePercent,
-        medianBaselineP95Ms: baselineP95Median,
-        medianTracedP95Ms: tracedP95Median, medianDeltaP95Ms: deltaP95Median,
-        medianPairedRelativeP95OverheadPercent: relativeP95Median },
+      performanceAcceptance: aggregatePerformance(report.rounds,
+        { expectedRounds: roundsCount, measuredRequests: measuredCount, profiled: Boolean(profileScope) }),
       performanceTargetMissDoesNotFailMeasurement: true,
       note: 'Fixture-local measurements only; performance thresholds are reported, not enforced as a test failure.' };
     if (!workloadCorrect || !captureComplete) testFailure ??= new Error('Benchmark workload/capture acceptance failed; all completed rounds are in the report.');

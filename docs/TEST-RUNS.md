@@ -1810,3 +1810,71 @@ First matched3×1000 measurement: all6000 measured business responses pluswarmup
 - Documentation patch used a shortened paragraph anchor and was rejected atomically; no partial edit. Read exact current policy paragraphs and reapply whole-line updates; tests continue on unchanged source.
 
 - Round53 main104/104 (14-06-03-543Z), focused20/20 (14-04-02-178Z), unchanged unprofiledload1/1 (14-04-43-130Z) passed functional/capture checks. Performancebudget FAILED (+16.336% aggregatep95). Current policy explicit in docs/adr-capture-policy.md; no test retries/skips or changed business workload. Docs partial patch rejection was atomic, exact paragraphs reapplied; final diff/links checked before commit.
+
+- da9a0b6 pushed successfully, exact hosted run snapshot inspected; job states shown in session output. Linux VM fresh bundle checksum a6167c994536004d080a5afbf75c2dffeff34f9976b5d2ba81c7252a85ce998d passed before clone. Main/source/load/SDKChromium sequence running on Node22.23.3, no owner app edits or root access.
+
+- Linux VM da9a0b6 exact main2026-10-01T14-12-15-495Z failed102/104; set-e sequence stopped before source/load/Chromium, so those gates have not run. Retrieve exact failed TAP before changing implementation or rerunning. Read-only UI inventory also referenced nonexistent public/styles.css; actual file is public/style.css. No UI files changed, no app cause inferred from lookup failure.
+- VM diagnosis SSH session expired before password submission; connection closed, no remote evidence read or archive confirmed. Reconnect for read-only failure diagnosis.
+- Exact da9a0b6 hosted run36874216698 jobs inspected via authenticated read-only API; actual conclusions and failed gate names shown in session output, failure details still require evidence.
+- VM failure TAP inspected: ESM timeout6/2batches although6persisted; registration outcome running ratherthansuccess; runtimeavailableParallelism2. Failed-main archive SHA25666ccd761045913d8bec6fa7143b64c670ffa85d09abc2ac317e8a4b9c0c18de1. Hostedda9a0b6 completed3/4, WindowsNode22 mainfailure; no rootcause/performance acceptance claimed.
+- Hosted WindowsNode22 job110409375469 failed-main log and exact da9a0b6 artifact inventory saved/read; failure assertion inspected, no rerun or skipped gate.
+- Read-only source search used absent adapters directory and Windows wildcard operands; lookup failed only. Repeat using existing src/examples directories. No source modified.
+- Exact da9a0b6 VM remaining gates source1/1 (17-24-34-472Z), load1/1 (17-24-36-970Z) and actualSDK+Chromium2/2 (17-24-48-363Z) passed. Capture all3153ack/zero drops; performanceFAILED +185.79% aggregatep95 (base10.148ms/traced29.002ms). Prior main102/104 staysfailed. Results archive SHA2560f63a8a9961d66dd3ea33b53a5883487a314e74e4010073c954c372e3274e978, import/provenance pending. HostedWindows22 main failure is browser-client happy fixture200vs503; fixture status derives from telemetry-start Map, so metadata timeout can alter its simulated businessrouting. Read-only Luna review confirms no actual loss established from acktimeouts and register finish failure needs actual diagnostics; no edits/tests by Luna.
+- VM da9a0b6 results archive checksum matched; all entries validated relative allowed regular files, extracted fresh ignored directory and imported reports without overwrite. Failedmain retained with source/load/SDK successes; source provenance comparison next.
+
+## 2026-10-01T17-28-27-705Z
+
+- จุดประสงค์: Round54 regression incomplete benchmark pairs must not produce performance verdict
+- ผล: ไม่ผ่าน — 0/4; failed 4; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: da9a0b6b06d97aed6b9089b81160a387d2974832; dirty: true
+- หลักฐาน: `reports/tests/2026-10-01T17-28-27-705Z.tap` และ `.json`
+- ไม่ผ่าน: missing opposite conditions cannot combine independent medians into a performance pass
+- ไม่ผ่าน: short, incorrect or mismatched workloads cannot certify overhead
+- ไม่ผ่าน: complete paired workloads retain original relative and tiny baseline thresholds
+- ไม่ผ่าน: profiled timings retain samples but cannot certify ordinary performance acceptance
+
+## 2026-10-01T17-30-16-946Z
+
+- จุดประสงค์: Round54 complete paired measurements only performance verdict regressions
+- ผล: ผ่าน — 4/4; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: da9a0b6b06d97aed6b9089b81160a387d2974832; dirty: true
+- หลักฐาน: `reports/tests/2026-10-01T17-30-16-946Z.tap` และ `.json`
+
+## 2026-10-01T17-30-43-900Z
+
+- จุดประสงค์: Round54 unchanged unprofiled paired load with complete-pair performance reporting
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: da9a0b6b06d97aed6b9089b81160a387d2974832; dirty: true
+- หลักฐาน: `reports/tests/2026-10-01T17-30-43-900Z.tap` และ `.json`
+
+## 2026-10-01T17-31-27-662Z
+
+- จุดประสงค์: da9a0b6 VM source provenance and original incomplete benchmark replay
+- ผล: ผ่าน — 2/2; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: da9a0b6b06d97aed6b9089b81160a387d2974832; dirty: true
+- หลักฐาน: `reports/tests/2026-10-01T17-31-27-662Z.tap` และ `.json`
+- All four exact da9a0b6 CI artifacts downloaded; relative entry paths/benchmark sizes validated, normalized benchmark JSON retained ignored; fixed acceptance/counts inspected without raw request samples. All four load captures passed3153ack/zero drops each, performance verdicts recorded separately.
+- Combined cleanup/docs patch rejected atomically because documentation paragraph anchor was shortened; no partial change. Keep verified statistics logic and append the report-format note directly.
+
+## 2026-10-01T17-34-51-844Z
+
+- จุดประสงค์: Round54 review regression all paired rounds must share same workload
+- ผล: ไม่ผ่าน — 3/4; failed 1; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: da9a0b6b06d97aed6b9089b81160a387d2974832; dirty: true
+- หลักฐาน: `reports/tests/2026-10-01T17-34-51-844Z.tap` และ `.json`
+- ไม่ผ่าน: short, incorrect or mismatched workloads cannot certify overhead
+- Actual diff reviewed; unrelated concurrent README rewrite detected and preserved, excluded from report repair commit. Full diff whitespace failure is README EOF only; check selected repair files separately.
+
+## 2026-10-01T17-35-17-042Z
+
+- จุดประสงค์: Round54 final paired benchmark statistics and archived evidence replay after review
+- ผล: ผ่าน — 6/6; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: da9a0b6b06d97aed6b9089b81160a387d2974832; dirty: true
+- หลักฐาน: `reports/tests/2026-10-01T17-35-17-042Z.tap` และ `.json`
+- Selected report repair diff reviewed, doc links resolve existing benchmark/statistics/quality/VM/CI files; final6/6 and realfixture1/1 capture sufficient for changed calculation. Unrelated README excluded; no broadmain rerun for report-only change.

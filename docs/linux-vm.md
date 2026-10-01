@@ -124,3 +124,9 @@ Result archive SHA25615b2490f1d216c12576b4e6bdc46f66498c10870d75a64c642c66290317
 ## Two-slot revision e83f48f
 
 Fresh exact checkout: main98/98 (2026-10-01T13-13-00-385Z), matched load1/1 (13-13-30-236Z), actualSDK+Chromium2/2 (13-13-42-102Z), failed/skipped0, no writerlock printed. Capture all3153 spans, performanceFAILED (+86.069% aggregatep95; baseline14.55ms/traced27.073ms). Archive SHA256dda5a81816d6a69402e5a6ec481ee794885084c5d502e861dd0e8324a31d6c1b passed checksum/type/path/no-overwrite import. All67-file inventories matched exact Git e83f48f blobs (digest705786c109afec3971f57ac6f5c73b3f4e5fc81e12e33dee21c302196c3da71b). These results predate20ms batching, and do not prove stable hosted capture: Ubuntu22 e83f48f load still failed.
+
+## Bounded-policy revision da9a0b6
+
+Exact fresh checkout/Node22.23.3: main102/104 failed (14-12-15-495Z), ESM acknowledged0/dropped6 with TIMEOUT6 although all6spans persisted, and registration graph remainedrunning. Remaining isolatedsource1/1 (17-24-34-472Z), unchangedload1/1 (17-24-36-970Z), actualSDK+Chromium2/2 (17-24-48-363Z) passed. Load acknowledged3153spans/zero drops, overhead FAILED+185.79% aggregatep95 (baseline10.148ms/traced29.002ms). This VM is not certified by the passing focused gates.
+
+Archive reports/vm/flowatlas-da9a0b6-results.tgz SHA2560f63a8a9961d66dd3ea33b53a5883487a314e74e4010073c954c372e3274e978 checked before regular-file/path/no-overwrite import. All four68-file inventories matched exactGit blobs, digestaa249cfd5982c036aaea9aac4553d643ea88e605a7be1df3844370efd38c4d9f (provenance17-31-27-662Z2/2 with archivedbenchmark replay). No root access or ownerapp changes. Saved browser screenshots are retained, but this transport/report revision adds no UI visual certification.
