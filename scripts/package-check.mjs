@@ -1,9 +1,9 @@
 // Optional gate after an offline npm package installation and `flowatlas demo`.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { spawn } from 'node:child_process';
+import { spawn, spawnSync } from 'node:child_process';
 import { randomUUID, randomBytes } from 'node:crypto';
-import { existsSync, realpathSync, readFileSync } from 'node:fs';
+import { existsSync, realpathSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join, relative, isAbsolute } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
@@ -17,6 +17,22 @@ test('installed package CLI records three actions, preserves history and closes 
   assert.ok(workspacePath && !workspacePath.startsWith('..') && !isAbsolute(workspacePath));
   const { getCodeVersion } = await import(pathToFileURL(join(installed, 'src', 'flowatlas.mjs')));
   assert.equal(getCodeVersion(installed).commit, null, 'Package must not inherit parent Git identity');
+  // Exercise the packaged update command against a known historical adapter in this disposable demo.
+  const adapterPath = join(workspace, 'apps/message-app/node-adapter.mjs');
+  const expectedAdapter = readFileSync(join(installed, 'src/node-adapter.mjs'));
+  assert.deepEqual(readFileSync(adapterPath), expectedAdapter, 'Package QA must use an unmodified demo adapter');
+  const statePath = join(workspace, 'data/actions/state.json');
+  assert.equal(existsSync(join(workspace, 'data/actions/.writer.lock')), false, 'Stop the demo inspector before package QA');
+  const previousState = existsSync(statePath) ? readFileSync(statePath) : null;
+  const previousConfig = readFileSync(join(workspace, 'flowatlas.config.json'));
+  writeFileSync(adapterPath, readFileSync(join(root, 'test/fixtures/adapter-fc273a9/node-adapter.mjs.txt')));
+  const upgraded = spawnSync(process.execPath, [join(installed, 'scripts/cli.mjs'), '--workspace', workspace,
+    'adapters', 'update', '--project', 'message-app'], { cwd: installed, encoding: 'utf8', timeout: 10000 });
+  assert.equal(upgraded.status, 0, upgraded.stderr);
+  assert.equal(JSON.parse(upgraded.stdout).changed, true);
+  assert.deepEqual(readFileSync(adapterPath), expectedAdapter);
+  assert.deepEqual(readFileSync(join(workspace, 'flowatlas.config.json')), previousConfig);
+  if (previousState) assert.deepEqual(readFileSync(statePath), previousState);
   let child;
   let credential;
   const read = (url) => fetch(url, { headers: { authorization: `Bearer ${credential}` } });

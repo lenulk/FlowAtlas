@@ -30,3 +30,5 @@ npm pack --pack-destination reports/releases --cache reports/releases/npm-cache
 หากไม่กำหนด --workspace ค่า default คือโฟลเดอร์เครื่องมือ เพื่อรองรับ source checkout เดิม เมื่อใช้ package ควรกำหนด workspace ทุกครั้ง หรือใช้ environment `FLOWATLAS_WORKSPACE_ROOT` ที่ชี้ไป workspace เดิม ไม่เก็บข้อมูลถาวรใน node_modules
 
 `doctor` ตรวจ runtime, config/source allowlist, syntax ของ entry, adapter versions, storage parent/lock และพอร์ต loopback มี `--json` และ exit 1 เมื่อพบปัญหา ไม่เริ่มแอปหรือสร้างข้อมูล การตรวจผ่านไม่ได้ยืนยัน business instrumentation/imports/dependencies/startup และพอร์ตอาจเปลี่ยนหลังตรวจ ต้องใช้ running integration check ด้วย
+
+เมื่อ doctor แจ้ง adapter รุ่นเก่า ใช้ [adapter update/rollback](adapter-update.md) หลังหยุดแอป คำสั่งอัปเดตเฉพาะไฟล์ที่ hash ตรงกับ revision ของเครื่องมือและสร้าง backup ก่อน ไม่เขียนทับไฟล์ที่แก้เอง; ยังไม่ใช่ schema migration หรือหลักฐาน upgrade ข้ามรุ่น release

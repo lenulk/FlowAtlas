@@ -51,7 +51,7 @@ node examples/independent-app/server.mjs
 
 รายละเอียด payload และขอบเขตความเชื่อมั่นอยู่ใน [โปรโตคอลรับเหตุการณ์รุ่นทดลอง](docs/ingest-protocol.md)
 
-เพิ่มตัวเชื่อม Node.js ที่คัดลอกไปใช้ในอีก repository ได้ พร้อม local registration ของไฟล์ต้นทางแล้ว ตัวอย่าง `apps/message-app` จัดเตรียมไว้ในเครื่องนี้ เปิด collector ด้วยคำสั่งเดิม แล้วเปิดอีกเทอร์มินัลรัน `node apps/message-app/server.mjs` และเข้าพอร์ต 4190 ตัวอย่างมี mock ที่พอร์ต 4191; ใช้ Git repository แยกจาก collector รายละเอียดการสร้างใหม่/ติดตั้ง/ข้อจำกัดอยู่ใน [node-adapter.md](docs/node-adapter.md)
+เพิ่มตัวเชื่อม Node.js ที่คัดลอกไปใช้ในอีก repository ได้ พร้อม local registration ของไฟล์ต้นทางแล้ว ตัวอย่าง `apps/message-app` จัดเตรียมไว้ในเครื่องนี้ เปิด collector ด้วยคำสั่งเดิม แล้วเปิดอีกเทอร์มินัลรัน `node apps/message-app/server.mjs` และเข้าพอร์ต 4190 ตัวอย่างมี mock ที่พอร์ต 4191; ใช้ Git repository แยกจาก collector รายละเอียดการสร้างใหม่/ติดตั้ง/ข้อจำกัดอยู่ใน [node-adapter.md](docs/node-adapter.md) ถ้า `doctor` แจ้ง adapter เก่า ให้หยุดแอปแล้วทำตาม [วิธีอัปเดตและย้อนกลับ](docs/adapter-update.md)
 
 ทดสอบด้วย:
 

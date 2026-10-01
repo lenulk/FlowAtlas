@@ -19,7 +19,7 @@ node scripts/cli.mjs inspect --project message-app
 # Write-Host $env:FLOWATLAS_SESSION_TOKEN
 ```
 
-เมื่อรัน collector และแอปแยกกัน ต้องกำหนดค่า environment เดียวกันทั้งสองเทอร์มินัล และใช้ adapter รุ่นปัจจุบัน หากแอปใช้ adapter เก่าให้ `doctor` ตรวจ mismatch ก่อน ยังไม่มีคำสั่ง migrate adapter อัตโนมัติ อย่าบันทึกรหัสใน config, reports, Git หรือ screenshots ที่มีช่อง password กำลังกรอก
+เมื่อรัน collector และแอปแยกกัน ต้องกำหนดค่า environment เดียวกันทั้งสองเทอร์มินัล และใช้ adapter รุ่นปัจจุบัน หากแอปใช้ adapter เก่าให้ `doctor` ตรวจ mismatch แล้วหยุดแอปก่อนใช้ [adapters update](adapter-update.md) ซึ่งสำรองและอัปเดตเฉพาะ revision ที่รู้จัก ไฟล์ที่แก้เองต้องตรวจ/merge เอง อย่าบันทึกรหัสใน config, reports, Git หรือ screenshots ที่มีช่อง password กำลังกรอก
 
 เลิกใช้ environment override หลังจบรอบด้วย `Remove-Item Env:FLOWATLAS_SESSION_TOKEN`; หากปล่อย override เดิมไว้ รหัสจะถูกใช้ซ้ำเมื่อเริ่มใหม่ Default ที่ไม่กำหนด override สร้างรหัสใหม่ทุก process และรหัสเดิมไม่ใช้กับ session ใหม่
 

@@ -405,3 +405,16 @@
 - จาก failed log รอบ 39 package journey ถูกเรียกเมื่อ pack/install skipped จึงเพิ่ม ENOENT ที่ไม่ใช่ package regression
 - ให้ pack/install รันได้หลัง failure ของ gate อิสระเมื่อยังไม่ canceled เพื่อเก็บหลักฐานเพิ่ม; journey ขึ้นกับ install success, reinstall ขึ้นกับ journey success, replay ขึ้นกับ reinstall success โดยใช้ step outcome จริง ไม่ continue-on-error
 - ตรวจ workflow diff ด้วยมือ: step IDs มีหนึ่งแห่งและ dependencies เรียงตาม execution, upload artifacts ยัง always; ไม่มี runtime app change ไม่สร้าง unit test ที่ mirror YAML ต้องใช้ hosted workflow ตรวจจริงก่อนรับรอง
+## รอบ 41 — existing workspace adapter update และ rollback
+
+- Doctor ของ message-app ที่มีอยู่จริงแจ้ง adapter mismatch; fresh fixture/package tests ไม่ครอบคลุม workspace รุ่นเดิม Regression ก่อนสร้างคำสั่ง 0/3 (2026-09-30T21-53-14-419Z): CLI ไม่รู้จัก adapters command
+- เพิ่ม update/rollback ที่ยอมรับเฉพาะ bytes hash ของ adapter revision ที่รู้จัก; history SHA256 สร้างจาก Git fc273a9/678a247 และเก็บใน package ไม่มี network download ขณะ update; old fixture เก็บเป็น .txt เพื่อไม่ให้ Node test discovery เรียกเป็น test/module
+- สำรองสองไฟล์และ manifest ก่อนเปลี่ยน, checked lock, symlink/path/owner edits, idempotent current version, failure recovery จาก bytes before/after ไม่เขียนทับ concurrent owner edits; config/app code/action data ไม่เปลี่ยน Backup metadata ignored จาก Git/package
+- Initial focused 3/3 (2026-09-30T21-55-37-997Z), affected doctor/register/workspace 16/16 (2026-09-30T21-57-26-492Z), final update integration 5/5 (2026-09-30T21-59-05-727Z) ผ่าน failed/skipped 0; includes simulation ของ failure หลัง replacement แล้วคืน originals/temp cleanup และ backup ใช้ rollback ได้
+- Integration seed graph รุ่นเดิมเป็น storage simulation; หลัง update เปิด inspect และ business HTTP จริง capture success พร้อม session ใหม่ และ graph เดิม byte-equivalent; old adapter source ตอบ 409 ไม่แสดงรุ่นใหม่แทน source รุ่นเก่า
+- ใช้คำสั่งกับ existing local message-app ที่ hash ตรง historical adapter; backup reports/adapter-backups/27ae7112-a3e3-43c0-a54d-f7aff3f3e954, doctor ทุกข้อผ่าน และ owner server/browser/config/state hashes ไม่เปลี่ยน ผล manual ใน TEST-RUNS
+- ขอบเขต: เป็นการอัปเดตข้าม code revision ที่มีอยู่ ไม่ใช่ released-version schema migration; ไม่ทดสอบ power loss/process kill ระหว่าง replace, ต้องหยุด inspector/target และระบุ data-dir ให้ตรง การ rollback adapter เก่าไม่ทำให้มันรองรับ session bearer ของ collector ใหม่
+- Final Windows main ผ่าน 76/76 (2026-09-30T22-01-49-568Z), failed/skipped 0 หลังเพิ่ม adapter lifecycle;ไม่มี snapshot tests ทำงานพร้อม source mutations
+- Line-ending regression 5/6 (2026-09-30T22-07-58-961Z): known historical adapter ที่แปลง LF→CRLF ถูกปฏิเสธว่า owner edit เพิ่ม exact SHA256 ของ CRLF variant จาก Git source เดิม ไม่ normalize owner bytes; rollback ต้องคืน original bytes พร้อม CRLF
+- CRLF repair verification: adapter/doctor focused 10/10 (2026-09-30T22-08-59-249Z); final packaged CLI journey 1/1 (2026-10-01T06-48-11-666Z), failed/skipped 0. Known Windows adapter bytes update safely and rollback restores original line endings. No owner-byte normalization introduced.
+- Hosted a9b1a8d run 36780927859 independently confirmed success in all four jobs. Its main 71/source/browser/package/reinstall gates precede this adapter feature; latest feature needs its own hosted result.

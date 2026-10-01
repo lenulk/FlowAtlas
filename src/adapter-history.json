@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "versions": [
+    {
+      "commit": "fc273a9d9a9eaee7651341c9e4162061c3de97e9",
+      "files": {
+        "node-adapter.mjs": "33b4793e212c39c710634704c4ee590cacfe6eb699aec8ce80d8feac93db8201",
+        "project-sources.mjs": "27cfcedef8977810b76ccc51d2aa60140e03ad00e3e466de045efd3731871d49"
+      },
+      "windowsFiles": {
+        "node-adapter.mjs": "ad6ea28f5bca933e3a919ed8dd4ecf656bcf9309f62bb13ba594e7a278bd8d6d",
+        "project-sources.mjs": "c8e68aa340d25be31ad07d8486c7e114a5ef0c52469d52163639e727f4cbc0df"
+      }
+    },
+    {
+      "commit": "678a2478bc999c1a09f3642f1979e5492d852670",
+      "files": {
+        "node-adapter.mjs": "d7dee0c2316cee25c9bf376c70d92f10b40e62d75a445d69cd14a1731e6fd007",
+        "project-sources.mjs": "27cfcedef8977810b76ccc51d2aa60140e03ad00e3e466de045efd3731871d49"
+      },
+      "windowsFiles": {
+        "node-adapter.mjs": "215801d943b9efed1b49e646245fd0aae0c98a4935f719a50ddd004020ad59f6",
+        "project-sources.mjs": "c8e68aa340d25be31ad07d8486c7e114a5ef0c52469d52163639e727f4cbc0df"
+      }
+    }
+  ]
+}

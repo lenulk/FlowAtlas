@@ -99,3 +99,8 @@ node scripts/run-tests.mjs test/register-app.test.mjs
 นำ raw TAP/JSON และภาพกลับเข้าโครงการด้วย archive `reports/vm/flowatlas-5908428-results.tgz` ตรวจ SHA-256 `45d2842e565a772bd2fdda3fb7bb0aea3425a2862419bd07a0eca64918e004f6` ตรง VM ก่อน extract และตรวจภาพด้วยตาแล้ว ผลนี้เพิ่มหลักฐาน fixtures บน commit เดียวกัน ยังไม่ได้ปิดสาเหตุ intermittent บน Windows/OneDrive หรือยืนยัน external business app
 
 ยังไม่ยืนยัน Linux GUI desktop, browser engine อื่น, มือถือจริง/touch, Linux distro/architecture อื่น, Node 20/22, filesystem ที่แชร์กับ Windows/OneDrive, power loss, production load หรือ OpenTelemetry/Playwright capture การใช้ Playwright ทดสอบ UI ไม่ใช่การเพิ่ม browser trace recorder ให้ผลิตภัณฑ์
+## Session/HTTP/workspace revision a9b1a8d
+
+ตรวจ clean bundle clone ใหม่บน VM เดิม /home/test/FlowAtlas-qa-a9b1a8d ด้วย portable Node 22.23.3: main 71/71 (2026-09-30T21-42-31-937Z), isolated source 1/1 (2026-09-30T21-42-48-575Z), secure Chromium inspector 1/1 (2026-09-30T21-42-48-983Z), failed/skipped 0; no writer lock after stop. ครอบคลุม pairing/graph/source/logout/reload/restart; source hashes ทุกไฟล์ตรง host ณ revision นี้
+
+Archive reports/vm/flowatlas-a9b1a8d-results.tgz SHA256 320efcdcbac65b2df4cf24b6cb6aad079173ddfe435777dea3b54a04abc25c28 ตรวจ checksum/paths/no-overwrite ก่อนนำเข้า; ตรวจภาพ restart ด้วยตาแล้ว ผลนี้ไม่รวม adapter-update feature ที่เพิ่มหลัง revision นี้ และไม่ใช่ external-business-app/user trial

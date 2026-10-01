@@ -15,11 +15,11 @@ try {
   } else workspace = resolveWorkspace(root);
 } catch (error) { console.error(error.message); process.exitCode = 1; }
 const [command, ...args] = input;
-const commands = { doctor: 'doctor.mjs', register: 'register-app.mjs', inspect: 'inspect.mjs', demo: 'create-target-app.mjs' };
+const commands = { doctor: 'doctor.mjs', register: 'register-app.mjs', inspect: 'inspect.mjs', demo: 'create-target-app.mjs', adapters: 'update-adapters.mjs' };
 if (!workspace) {
   // Invalid workspace fails before any command can write files or open services.
 } else if (!command || ['help', '--help', '-h'].includes(command)) {
-  console.log('FlowAtlas: see how a web action reaches APIs, handlers and services.\n\nUsage: flowatlas [--workspace DIR] <command> [options]\nCommands: demo, register, doctor, inspect\n\nStart: flowatlas demo → flowatlas doctor → flowatlas inspect\nUse docs/node-adapter.md to instrument your own app.');
+  console.log('FlowAtlas: see how a web action reaches APIs, handlers and services.\n\nUsage: flowatlas [--workspace DIR] <command> [options]\nCommands: demo, register, doctor, inspect, adapters update|rollback\n\nStart: flowatlas demo → flowatlas doctor → flowatlas inspect\nUse docs/node-adapter.md to instrument your own app.');
 } else if (command === '--version') {
   console.log(JSON.parse(readFileSync(join(root, 'package.json'), 'utf8')).version);
 } else if (!Object.hasOwn(commands, command)) {

@@ -71,7 +71,7 @@ export async function doctor(args = []) {
         const adapter = join(directory, file);
         if (!existsSync(adapter) || lstatSync(adapter).isSymbolicLink() || !lstatSync(adapter).isFile()
           || !readFileSync(adapter).equals(readFileSync(join(toolRoot, 'src', file)))) {
-          throw new Error(`Adapter missing or differs from this tool version: ${file}`);
+          throw new Error(`Adapter missing or differs from this tool version: ${file}; use adapters update for recognized versions, owner edits require manual review`);
         }
       }
       return 'Adapter files match this tool version';

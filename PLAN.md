@@ -10,7 +10,7 @@ FlowAtlas v1 เป็นเครื่องมือในเครื่อ�
 
 ขอบเขต v1 คือการวินิจฉัยใน development/test ของแอปที่เชื่อถือได้ รองรับ Node runtime และ framework ตามตาราง compatibility ที่ผ่านจริง เฟรมเวิร์กแรกเลือกจากแอป pilot; เริ่มจาก Node HTTP ที่มีอยู่แล้ว การรองรับ TypeScript/source maps, CJS และ startup ผ่าน package script ต้องตรวจเป็นกรณีแยกก่อนประกาศรองรับ
 
-การใช้งานทีมบนเซิร์ฟเวอร์กลาง, SaaS, การติดตาม production traffic, ส่วนเสริม IDE/browser, ภาษาอื่น และการวิเคราะห์สาเหตุด้วย AI เป็นงานหลัง v1 ต้องประเมินความต้องการและเกณฑ์ความปลอดภัยเพิ่ม
+Node.js เป็น integration ที่กำลังพัฒนาและมีหลักฐานทดสอบอยู่ ระยะและรุ่นในแผนใช้ตรวจความพร้อมระหว่างทาง เป้าหมายของโครงการยังเป็นเครื่องมือที่เรียกใช้เพื่อเห็นการทำงานของแอปตามที่ผู้ใช้ต้องการ และเดินงานต่อจนใช้ได้จริง ความสามารถเพิ่มเติม เช่น ส่วนเสริม IDE/browser หรือภาษาอื่น ให้เลือกจากปัญหาการใช้งานที่พบ พร้อมเกณฑ์ตรวจของแต่ละ integration
 
 ## สถานะเริ่มต้น
 
@@ -104,7 +104,7 @@ Release levels: Alpha = ติดตั้งและ trace เส้นทา�
 
 เริ่ม FA-01: เพิ่ม diagnostics ของ storage error อย่างจำกัด, เก็บ repro ของกรณี 503, ตรวจว่าผลก่อนหน้าอยู่ครบและเขียนต่อหลัง recovery ได้ แล้วทำ FA-02 ให้การทดสอบ release ใช้โค้ด revision เดียวกันบน Windows/Linux เมื่อฐานนี้ผ่านจึงทำ package/doctor ใน FA-03
 
-ความคืบหน้าวันที่ 1 ตุลาคม: ส่งมอบ local diagnostics ของ FA-01 แล้วใน `5908428`; Windows/Linux main 56/56 และ source/browser gates ผ่านบน source digest เดียวกัน แต่ intermittent หลังคืนไฟล์เดิมยังไม่ทำซ้ำ จึงยังเปิด investigation ไว้ FA-02 ผ่าน hosted [CI matrix](docs/ci.md) ครบ Windows/Linux × Node 22/24 ใน 6fcee44 รวม main 64 tests, source, browser และ offline reinstall; FA-03 มี CLI/doctor/แพ็กเกจและแยก workspace แล้ว แต่ cross-version upgrade/rollback และ real-app integration ยังไม่ผ่าน ไม่ถือว่าโครงการใช้งานจริงสมบูรณ์ ผู้ใช้ให้เดินทุกงานที่จำเป็นต่อจนถึงเป้าหมาย ระยะในแผนเป็น milestone ไม่ใช่จุดหยุดงาน
+ความคืบหน้าวันที่ 1 ตุลาคม: ส่งมอบ local diagnostics ของ FA-01 แล้วใน `5908428`; Windows/Linux main 56/56 และ source/browser gates ผ่านบน source digest เดียวกัน แต่ intermittent หลังคืนไฟล์เดิมยังไม่ทำซ้ำ จึงยังเปิด investigation ไว้ FA-02 ผ่าน hosted [CI matrix](docs/ci.md) ครบ Windows/Linux × Node 22/24 ใน a9b1a8d รวม main 71 tests, source, browser และ offline reinstall; VM a9b1a8d main/source/Chromium ผ่านด้วย FA-03 มี CLI/doctor/แพ็กเกจ แยก workspace และ managed adapter update/rollback พร้อม backup แล้ว Windows main 76/76 ก่อน CRLF regression, focused หลังแก้ 10/10 และ final package journey 1/1; ยังไม่ใช่ released-version/schema migration FA-06 มี session bearer/pairing/origin/Host checks แล้ว แต่ privacy ของ trace/export และ real-app integration ยังไม่ผ่าน ไม่ถือว่าโครงการใช้งานจริงสมบูรณ์ ผู้ใช้ให้เดินทุกงานที่จำเป็นต่อจนถึงเป้าหมาย ระยะในแผนเป็น milestone ไม่ใช่จุดหยุดงาน
 
 ## แหล่งอ้างอิงและข้อจำกัดทางเทคนิค
 

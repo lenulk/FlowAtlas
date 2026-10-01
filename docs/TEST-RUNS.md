@@ -1062,3 +1062,112 @@
 ## Manual workflow dependency review — 2026-10-01
 
 - Read failed step conclusions: install skipped → journey ENOENT; reviewed updated step IDs and prerequisites install→journey→reinstall→replay, independent gates retain failure status and artifact upload always; git diff whitespace check used before commit
+
+## Manual Linux QA preparation — 2026-10-01
+
+- Created clean Git bundle a9b1a8d (HEAD) for a new disposable VM checkout; original apps/workspaces preserved; bundle checksum retained in tool output and will compare before cloning
+## Linux VM actual QA — a9b1a8d (2026-10-01)
+
+- SSH test@10.35.70.59, new disposable checkout /home/test/FlowAtlas-qa-a9b1a8d; source bundle SHA256 018a0f67ebc84375cb7bbe48e791afd7cc8321f9e4aacc843cba599e0cb53f1f verified before clone; no credentials stored
+- Linux/x64 Node 22.23.3: main 71/71 (2026-09-30T21-42-31-937Z), isolated source 1/1 (2026-09-30T21-42-48-575Z), Chromium secure inspector 1/1 (2026-09-30T21-42-48-983Z); failed/skipped 0; no writer lock found after close
+- Raw TAP/JSON and screenshot result returned to reports/tests and reports/vm after archive checksum/path/no-overwrite checks; SHA256 320efcdcbac65b2df4cf24b6cb6aad079173ddfe435777dea3b54a04abc25c28. Every runner source hash matches host revision; main started clean, later dirty includes TEST-RUNS changes
+- Fixtures on an actual Linux VM; not a real-business-app or human user trial. Package reinstall tested on Windows/hosted CI, not in this VM round
+## Manual doctor and CI milestone — 2026-10-01
+
+- Current local message-app doctor: runtime/registration/entry/storage/ports pass, adapter mismatch fail; existing app has a copied adapter from an earlier revision. Fresh fixture/package passes do not prove existing workspace upgrade. Next repair: a managed adapter update with backup/rollback that refuses owner edits
+- CI a9b1a8d run 36780927859: Ubuntu Node 22/24 complete success, Windows still running at snapshot; inspection of Windows 22 step times shows Chromium installation took ~4 minutes and main just began. Runs 678a247/f22f11a were canceled by later source pushes; no claim of completed four-way gates for those revisions
+- Linux VM restart screenshot inspected after import: 3 retained actions and expected 5-node graph, no pairing code displayed
+
+## 2026-09-30T21-53-14-419Z
+
+- จุดประสงค์: Regression: existing workspaces need safe adapter update/rollback with preservation and edit refusal
+- ผล: ไม่ผ่าน — 0/3; failed 3; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: a9b1a8d3e091fc24ebdca665e73ebf68b2a8bb27; dirty: true
+- หลักฐาน: `reports/tests/2026-09-30T21-53-14-419Z.tap` และ `.json`
+- ไม่ผ่าน: managed adapter update and rollback preserve owner files, config and persisted state
+- ไม่ผ่าน: update refuses edited adapters and active storage without touching owner files
+- ไม่ผ่าน: rollback refuses modified files and escaped or tampered backups
+
+## 2026-09-30T21-55-37-997Z
+
+- จุดประสงค์: Managed update/rollback: recognized versions, local edit refusal, lock and backup validation
+- ผล: ผ่าน — 3/3; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: a9b1a8d3e091fc24ebdca665e73ebf68b2a8bb27; dirty: true
+- หลักฐาน: `reports/tests/2026-09-30T21-55-37-997Z.tap` และ `.json`
+
+## 2026-09-30T21-57-26-492Z
+
+- จุดประสงค์: Adapter update rollback failure simulation and related doctor/register/workspace behavior
+- ผล: ผ่าน — 16/16; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: a9b1a8d3e091fc24ebdca665e73ebf68b2a8bb27; dirty: true
+- หลักฐาน: `reports/tests/2026-09-30T21-57-26-492Z.tap` และ `.json`
+
+## 2026-09-30T21-59-05-727Z
+
+- จุดประสงค์: Adapter lifecycle: actual authenticated action after update, old graph preservation and safe source mismatch
+- ผล: ผ่าน — 5/5; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: a9b1a8d3e091fc24ebdca665e73ebf68b2a8bb27; dirty: true
+- หลักฐาน: `reports/tests/2026-09-30T21-59-05-727Z.tap` และ `.json`
+
+## Manual existing workspace adapter repair — 2026-10-01
+
+- Before: doctor flagged old node-adapter; storage lock absent and loopback ports available. adapters update accepted its known historical hash, created local backup and replaced managed adapter only; results in reports/releases/local-adapter-update.json
+- After: doctor exit 0, all checks pass. SHA256 unchanged for 3 existing server/browser/config/action-state files; no owner app code or persisted history modified. Real business app/user trial remains unverified
+
+## 2026-09-30T22-01-49-568Z
+
+- จุดประสงค์: Full regression after managed adapter update and rollback integration
+- ผล: ผ่าน — 76/76; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: a9b1a8d3e091fc24ebdca665e73ebf68b2a8bb27; dirty: true
+- หลักฐาน: `reports/tests/2026-09-30T22-01-49-568Z.tap` และ `.json`
+
+## 2026-09-30T22-06-09-107Z
+
+- จุดประสงค์: Offline installed CLI: legacy adapter update, protected session, actions/source/restart and unchanged workspace state
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: a9b1a8d3e091fc24ebdca665e73ebf68b2a8bb27; dirty: true
+- หลักฐาน: `reports/tests/2026-09-30T22-06-09-107Z.tap` และ `.json`
+
+## Manual packaged adapter check — 2026-10-01
+
+- Built current artifact in reports/releases/adapters-0442e7d170734c0b81a45305a7a76c8c; private path inventory clean, offline npm install without scripts in reports/storage/adapters-install-8ea2571f451e4f6fb7edf8c75f09db69 succeeded. Package check seeds historical adapter in disposable demo only, updates via installed CLI, compares config/state bytes and exercises real HTTP/session/source/restart. This is not a released-version tool/schema migration test
+
+## 2026-09-30T22-07-58-961Z
+
+- จุดประสงค์: Regression: byte ownership catalog must recognize exact Windows CRLF variant of historical adapters
+- ผล: ไม่ผ่าน — 5/6; failed 1; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: a9b1a8d3e091fc24ebdca665e73ebf68b2a8bb27; dirty: true
+- หลักฐาน: `reports/tests/2026-09-30T22-07-58-961Z.tap` และ `.json`
+- ไม่ผ่าน: recognized Windows line endings update safely and rollback restores exact original bytes
+
+## 2026-09-30T22-08-59-249Z
+
+- จุดประสงค์: Verify exact LF/CRLF ownership variants and rollback without normalizing owner data
+- ผล: ผ่าน — 10/10; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: a9b1a8d3e091fc24ebdca665e73ebf68b2a8bb27; dirty: true
+- หลักฐาน: `reports/tests/2026-09-30T22-08-59-249Z.tap` และ `.json`
+
+
+## Manual final adapter package build — 2026-10-01
+
+- Pack inventory excludes private paths; offline installation with scripts disabled and disposable demo succeeded. Artifact: reports/releases/adapters-final-79d283c551e9401181607f9a80636dab; installation: reports/storage/adapters-final-79d283c551e9401181607f9a80636dab. This artifact includes exact LF/CRLF fingerprints. Automated journey follows in separate runner evidence.
+
+## 2026-10-01T06-48-11-666Z
+
+- จุดประสงค์: Final packaged adapter update, authorized HTTP capture and restart after LF/CRLF catalog fix
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: a9b1a8d3e091fc24ebdca665e73ebf68b2a8bb27; dirty: true
+- หลักฐาน: `reports/tests/2026-10-01T06-48-11-666Z.tap` และ `.json`
+## Manual hosted CI verification — 2026-10-01
+
+- GitHub API confirms run 36780927859 completed success at a9b1a8d3e091fc24ebdca665e73ebf68b2a8bb27. All four jobs Ubuntu 24.04/Windows 2025 × Node 22.23.3/24.21.0 completed success. Gates include main 71 tests, isolated source, both Chromium journeys, offline package and reinstall/replay. This verifies the committed revision; pending managed adapter update was not in that run.
+- Review of final managed adapter diff and documentation: update/rollback is limited to known byte fingerprints; no schema migration or power-loss guarantee added. Final offline package journey 2026-10-01T06-48-11-666Z passed 1/1 after CRLF catalog fix; installed files/config/history and session rotation checked by the journey.
