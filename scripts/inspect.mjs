@@ -1,16 +1,18 @@
 import { spawn } from 'node:child_process';
 import { once } from 'node:events';
 import { createInterface } from 'node:readline';
+import { createRequire } from 'node:module';
 import { dirname, join, resolve, relative, isAbsolute } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { realpathSync, lstatSync } from 'node:fs';
 import { startServers } from '../src/server.mjs';
 import { readProjectConfig } from '../src/project-sources.mjs';
 import { resolveWorkspace } from '../src/workspace.mjs';
 import { sessionToken, showPairing } from '../src/session-access.mjs';
 
-const root = resolveWorkspace(dirname(dirname(fileURLToPath(import.meta.url))));
-const usage = 'Usage: node scripts/inspect.mjs [--project ID] [--entry registered-file] [--config local-path] [--data-dir local-path] [--app-url local-origin]';
+const toolRoot = dirname(dirname(fileURLToPath(import.meta.url)));
+const root = resolveWorkspace(toolRoot);
+const usage = 'Usage: node scripts/inspect.mjs [--project ID] [--entry registered-file] [--config local-path] [--data-dir local-path] [--app-url local-origin] [--trace http]';
 function inside(parent, path) {
   const rel = relative(parent, path);
   return rel && rel !== '..' && !rel.startsWith('../') && !rel.startsWith('..\\') && !isAbsolute(rel);
@@ -27,7 +29,7 @@ function parse(args) {
   const options = {};
   for (let index = 0; index < args.length; index += 2) {
     const key = args[index];
-    if (!['--project', '--entry', '--config', '--data-dir', '--app-url'].includes(key)
+    if (!['--project', '--entry', '--config', '--data-dir', '--app-url', '--trace'].includes(key)
       || !args[index + 1] || Object.hasOwn(options, key)) throw new Error(usage);
     options[key] = args[index + 1];
   }
@@ -75,6 +77,9 @@ function waitForTarget(child, expectedOrigin) {
 
 async function runInspector(args = process.argv.slice(2)) {
   const flags = parse(args);
+  if (flags['--trace'] !== undefined && flags['--trace'] !== 'http') throw new Error('Trace mode must be http');
+  const [nodeMajor, nodeMinor] = process.versions.node.split('.').map(Number);
+  if (flags['--trace'] && (nodeMajor < 20 || (nodeMajor === 20 && nodeMinor < 6))) throw new Error('HTTP trace mode requires Node 20.6 or newer; certified matrix is Node 22/24');
   const appUrl = flags['--app-url'] ? localOrigin(flags['--app-url']) : null;
   const config = readProjectConfig(root, flags['--config'] ?? 'flowatlas.config.json');
   const project = flags['--project'] ? config.find((item) => item.id === flags['--project'])
@@ -103,8 +108,17 @@ async function runInspector(args = process.argv.slice(2)) {
   process.once('SIGINT', onSignal);
   process.once('SIGTERM', onSignal);
   try {
-    target = spawn(process.execPath, [entryPath], { cwd: projectRoot,
-      env: { ...process.env, FLOWATLAS_URL: collectorUrl, FLOWATLAS_PROJECT_ID: project.id, FLOWATLAS_SESSION_TOKEN: credential,
+    const trace = flags['--trace'] === 'http';
+    const targetEnv = { ...process.env };
+    if (trace) {
+      for (const key of Object.keys(targetEnv)) if (key.startsWith('OTEL_')) delete targetEnv[key];
+      Object.assign(targetEnv, { OTEL_TRACES_EXPORTER: 'none', OTEL_METRICS_EXPORTER: 'none', OTEL_LOGS_EXPORTER: 'none',
+        OTEL_LOG_LEVEL: 'none', FLOWATLAS_TRACE_DIGEST: servers.atlas.projectSources.version(project.id).digest });
+    }
+    const preload = trace ? ['--experimental-loader', pathToFileURL(createRequire(import.meta.url).resolve('@opentelemetry/instrumentation/hook.mjs')).href,
+      '--import', pathToFileURL(join(toolRoot, 'src/otel-preload.mjs')).href] : [];
+    target = spawn(process.execPath, [...preload, entryPath], { cwd: projectRoot,
+      env: { ...targetEnv, FLOWATLAS_URL: collectorUrl, FLOWATLAS_PROJECT_ID: project.id, FLOWATLAS_SESSION_TOKEN: credential,
         PORT: process.env.FLOWATLAS_APP_PORT ?? '0', EXTERNAL_PORT: process.env.FLOWATLAS_EXTERNAL_PORT ?? '0' },
       stdio: ['pipe', 'pipe', 'pipe'] });
     const targetExited = once(target, 'exit');

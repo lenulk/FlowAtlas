@@ -38,6 +38,8 @@ jobs:
           package-manager-cache: false
       - name: Install pinned QA tools
         run: npm ci --prefix tools/qa --ignore-scripts --no-audit --no-fund
+      - name: Install pinned tracing runtime and warm offline package cache
+        run: npm ci --ignore-scripts --no-audit --no-fund --cache reports/releases/npm-cache
       - name: Install Chromium
         run: node tools/qa/node_modules/playwright/cli.js install --with-deps chromium
       - name: Main regression
@@ -59,6 +61,12 @@ jobs:
         env:
           FLOWATLAS_TEST_PURPOSE: CI Chromium independent browser journey
         run: node scripts/run-tests.mjs scripts/independent-browser-check.mjs
+      - name: OpenTelemetry runtime and viewer
+        if: ${{ !cancelled() }}
+        env:
+          FLOWATLAS_TEST_PURPOSE: CI real HTTP traces and paired Chromium viewer
+          FLOWATLAS_OTEL_BROWSER_CHECK: '1'
+        run: node scripts/run-tests.mjs test/otel-runtime.test.mjs
       - name: Pack and install in disposable workspace
         id: package_install
         if: ${{ !cancelled() }}
@@ -68,6 +76,7 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw 'Package build failed' }
           $taskPack = Get-Content -Raw reports/releases/pack-result.json | ConvertFrom-Json
           if ($taskPack.files | Where-Object { $_.path -match '^(reports|data|apps|tools|node_modules|\.git)/' -or $_.path -eq 'flowatlas.config.json' }) { throw 'Private paths entered package' }
+          if (-not ($taskPack.files | Where-Object { $_.path -eq 'npm-shrinkwrap.json' })) { throw 'Published dependency lock is missing' }
           $taskInstall = 'reports/storage/package-install'
           $taskArtifact = (Resolve-Path -LiteralPath ('reports/releases/' + $taskPack.filename)).Path
           npm install --prefix $taskInstall --cache reports/releases/npm-cache --offline --ignore-scripts --no-audit --no-fund $taskArtifact
@@ -85,6 +94,12 @@ jobs:
         env:
           FLOWATLAS_TEST_PURPOSE: CI offline installed package journey and replay
         run: node scripts/run-tests.mjs scripts/package-check.mjs
+      - name: Installed HTTP trace preload and schema replay
+        if: ${{ !cancelled() && steps.package_install.outcome == 'success' }}
+        env:
+          FLOWATLAS_TEST_PURPOSE: CI installed package HTTP tracing and schema reload
+          FLOWATLAS_TRACED_TOOL_ROOT: ${{ env.FLOWATLAS_INSTALLED_ROOT }}
+        run: node scripts/run-tests.mjs test/otel-runtime.test.mjs
       - name: Uninstall and reinstall without changing workspace data
         id: package_reinstall
         if: ${{ !cancelled() && steps.package_journey.outcome == 'success' }}
@@ -115,5 +130,6 @@ jobs:
             reports/tests/
             reports/vm/inspector-browser-*/
             reports/browser/independent-browser-*/
+            reports/browser/otel-runtime-*/
             docs/TEST-RUNS.md
             reports/releases/pack-result.json

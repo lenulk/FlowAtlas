@@ -2,7 +2,7 @@ import { createHash, randomUUID } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import { readFileSync, readdirSync, realpathSync } from 'node:fs';
 import { join } from 'node:path';
-import { validateEdge } from './evidence-contract.mjs';
+import { validateEdge, validateGraph } from './evidence-contract.mjs';
 
 const allowedStatuses = new Set(['observed', 'inferred', 'unknown']);
 
@@ -131,6 +131,15 @@ export class FlowAtlas {
   }
 
   get(id) { return this.actions.get(id) ?? null; }
+
+  putTraceGraph(graph) {
+    if (graph.schemaVersion !== '0.2' || validateGraph(graph).length) throw new Error('Invalid HTTP trace graph');
+    const original = this.get(graph.id);
+    if (original) { this.commit(original, graph); return; }
+    const next = new Map(this.actions); next.set(graph.id, graph);
+    if (next.size > this.limit) next.delete(next.keys().next().value);
+    this.store?.save([...next.values()]); this.actions = next;
+  }
 
   list({ query = '', outcome = null, limit = this.limit } = {}) {
     const term = query.trim().toLowerCase();

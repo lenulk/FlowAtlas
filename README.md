@@ -101,15 +101,15 @@ node scripts/run-tests.mjs scripts/source-check.mjs
 
 ## ข้อจำกัดปัจจุบัน
 
-- ตัวอย่างนี้ใช้ Node.js และจุด instrumentation ที่ใส่ไว้เอง มี adapter และ explicit source registration สำหรับอีก repository ภายในโฟลเดอร์โครงการแล้ว แต่ยังไม่ติดตั้ง instrumentation อัตโนมัติ
+- ตัวอย่าง explicit adapter ใช้จุด instrumentation ที่ใส่ไว้เอง อีกโหมดคือ [OpenTelemetry HTTP tracing](docs/otel-http.md) ผ่าน inspect --trace http เพื่อเก็บ HTTP/Undici spans โดยไม่ต้องใส่ handler hooks; ไม่ยืนยัน business functions ทุกตัว
 - examples/independent-app เป็น fixture ภายใน repository ของ collector ส่วน apps/message-app เป็น fixture ใน repository แยก ทั้งคู่ส่งเหตุการณ์ด้วยโปรโตคอลทดลองของ FlowAtlas มีการส่งต่อ `traceparent` แบบ W3C แต่ยังไม่ได้ใช้ OpenTelemetry SDK หรือบันทึก Playwright trace
 - fixture ส่ง telemetry แบบ best effort และยังทำงานธุรกิจได้เมื่อ collector หยุดทำงาน พร้อมแสดง capture ไม่ครบ รอ collector สูงสุด 500 ms ต่อเหตุการณ์และหยุดส่ง action นั้นเมื่อส่งไม่สำเร็จ ยังไม่มี retry queue; กราฟบางส่วนอาจค้าง `running` หาก finish ส่งไม่ถึง
 - บริการสต็อกเป็น mock ภายในโครงการ ไม่ใช่บริการภายนอกจริง และไม่มี trace ภายในบริการ
 - CLI เก็บ actions ล่าสุด 100 รายการลงดิสก์ แต่ละกราฟไม่เกิน 100 nodes / 200 edges (เกินแล้วตอบ 413) และ state ไม่เกิน 64 MiB ยังไม่มี archive ระยะยาว; รายการเกินขอบเขตจะถูกแทนด้วยรายการใหม่
 - การเขียนไฟล์เป็น synchronous และมี writer lock เหมาะกับการทดลองในเครื่องเดียว ยังไม่พิสูจน์ความทนไฟดับหรือ OneDrive sync ระหว่างหลายเครื่อง; หาก process ถูกบังคับปิด lock อาจค้าง ต้องตรวจและกู้คืนตาม storage.md
 - ยังไม่มีการทดสอบกับนักพัฒนาใหม่หรือผู้แก้ incident จริง เกณฑ์วัดผลด้านบนเป็นแผนทดลอง
-- ทดสอบอีก repository ด้วย fixture ที่สร้างในโครงการแล้ว ยังไม่ได้ติดตั้งกับแอปงานจริงของผู้ใช้; ยังไม่มี OpenTelemetry SDK/Playwright capture
-- เปิดเฉพาะ `127.0.0.1` และ endpoint รับเหตุการณ์ยังไม่มีการตรวจสิทธิ์ จึงเหมาะกับการทดลองในเครื่องที่เชื่อถือได้เท่านั้น
+- ทดสอบอีก repository และ SDK ด้วย fixtures ที่สร้างในโครงการแล้ว ยังไม่ได้ติดตั้งกับแอปงานจริงของผู้ใช้หรือทำ human trial; ยังไม่มี Playwright recorder เป็นฟีเจอร์ของผลิตภัณฑ์
+- CLI เปิดเฉพาะ loopback และป้องกัน endpoint ข้อมูลด้วย session bearer/pairing พร้อม Origin/Host checks ตาม [session access](docs/session-access.md); ยังไม่มี multiuser roles
 
 ## สถานะ
 

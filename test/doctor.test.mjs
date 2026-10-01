@@ -84,3 +84,15 @@ test('CLI help and version work from another directory and unknown commands fail
   assert.equal(run('--version').stdout.trim(), JSON.parse(readFileSync(join(root, 'package.json'))).version);
   assert.equal(run('unknown').status, 1);
 });
+test('HTTP trace doctor accepts registered source without requiring copied adapters or starting the app', (t) => {
+  const work = workspace(t);
+  const config = JSON.parse(readFileSync(work.config, 'utf8'));
+  config.projects[0].files = ['server.mjs'];
+  writeFileSync(work.config, JSON.stringify(config));
+  writeFileSync(join(work.app, 'server.mjs'), 'throw new Error("must not execute during doctor");\n');
+  const result = runDoctor(work, ['--trace', 'http']);
+  assert.equal(result.status, 0, result.stderr);
+  assert.equal(JSON.parse(result.stdout).checks.find((item) => item.id === 'adapters').status, 'pass');
+  assert.equal(existsSync(work.data), false);
+  assert.equal(runDoctor(work, ['--trace', 'unknown']).status, 1);
+});

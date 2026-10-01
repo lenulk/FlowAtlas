@@ -37,6 +37,8 @@ fixture เก็บ action IDs ในเครื่องเพื่อทำ
 
 CLI ตรวจ session bearer และ Origin/Host ก่อนรับเหตุการณ์ตาม [session access](session-access.md); ยังเชื่อเนื้อหาที่ผู้ถือรหัสรายงาน ไม่ตรวจว่า client เป็นมนุษย์คลิกจริง `traceparent` ที่ส่งต่อได้รับการ echo กลับจากบริการจำลอง เพื่อแสดงว่าค่าถึงปลายทาง แต่บริการนั้นยังไม่มี span ภายใน ข้อมูลที่ไม่เห็นจึงคงเป็น `unknown`
 
-ตัวรับรู้จัก file hash ของ collector และไฟล์ที่ลงทะเบียนแบบ explicit สำหรับ project อื่นภายในโฟลเดอร์โครงการ ไม่รับ root/path registration จาก HTTP โปรโตคอลยังไม่ใช่ OTLP/OpenTelemetry ingestion และยังไม่มี role separation สำหรับระบบหลายผู้ใช้
+ตัวรับรู้จัก file hash ของ collector และไฟล์ที่ลงทะเบียนแบบ explicit สำหรับ project อื่นภายในโฟลเดอร์โครงการ ไม่รับ root/path registration จาก HTTP มี normalized HTTP span ingestion จาก [OpenTelemetry preload](otel-http.md) เพิ่มจาก explicit protocol ข้างต้น; ไม่ใช่ OTLP endpoint และยังไม่มี role separation สำหรับระบบหลายผู้ใช้
+
+`kind: otel-spans` ต้องมี projectId/codeDigest/traceId และ spans 1–32 รายการต่อ batch; ไม่ต้องมี actionId ใช้ schema 0.2 แยก trace graph ตาม project/trace IDs จำกัด 48 spans ต่อ trace ไม่มี raw attributes/names/URLs/body/events/resource ในกราฟ รับ duplicate ที่เหมือนกันแบบ idempotent และปฏิเสธ conflicting IDs/cycles ก่อนเขียน Parent ที่ยังขาดมี unknown placeholder; กราฟ partial เสมอและไม่ถือว่าเป็น user click ที่ยืนยันแล้ว Source/schema/rollback implications อยู่ใน [ADR](adr-otel-http.md)
 
 ส่งเฉพาะ metadata ที่จำเป็น ห้ามใส่ request body, token, cookie หรือข้อมูลส่วนตัวใน event ตัวรับฟังเฉพาะ `127.0.0.1`; ส่ง bearer ใน header สำหรับ session ที่เปิดจาก CLI ห้ามส่ง credential ใน event/URL

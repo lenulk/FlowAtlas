@@ -1,6 +1,7 @@
 import { accessSync, constants, existsSync, lstatSync, readFileSync, realpathSync } from 'node:fs';
 import { createServer } from 'node:net';
 import { spawnSync } from 'node:child_process';
+import { createRequire } from 'node:module';
 import { dirname, isAbsolute, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { ProjectSources, readProjectConfig } from '../src/project-sources.mjs';
@@ -8,7 +9,7 @@ import { resolveWorkspace, resolveDataDirectory } from '../src/workspace.mjs';
 
 const toolRoot = dirname(dirname(fileURLToPath(import.meta.url)));
 const root = resolveWorkspace(toolRoot);
-const usage = 'Usage: flowatlas doctor [--project ID] [--entry server.mjs] [--config local-file] [--data-dir local-dir] [--json]';
+const usage = 'Usage: flowatlas doctor [--project ID] [--entry server.mjs] [--config local-file] [--data-dir local-dir] [--trace http] [--json]';
 function inside(parent, target) {
   const path = relative(parent, target);
   return path && path !== '..' && !path.startsWith('../') && !path.startsWith('..\\') && !isAbsolute(path);
@@ -19,7 +20,7 @@ function parse(args) {
     const key = args[index];
     if (Object.hasOwn(flags, key)) throw new Error(usage);
     if (key === '--json') flags[key] = true;
-    else if (['--project', '--entry', '--config', '--data-dir'].includes(key) && args[index + 1]
+    else if (['--project', '--entry', '--config', '--data-dir', '--trace'].includes(key) && args[index + 1]
       && !args[index + 1].startsWith('--')) flags[key] = args[++index];
     else throw new Error(usage);
   }
@@ -37,6 +38,7 @@ async function portAvailable(port) {
 
 export async function doctor(args = []) {
   const flags = parse(args);
+  if (flags['--trace'] !== undefined && flags['--trace'] !== 'http') throw new Error('Trace mode must be http');
   const checks = [];
   const check = async (id, work) => {
     try { checks.push({ id, status: 'pass', message: await work() }); }
@@ -44,7 +46,8 @@ export async function doctor(args = []) {
       ? 'Port is already in use; choose another port or stop its owner' : error.message }); }
   };
   await check('runtime', () => {
-    if (Number(process.versions.node.split('.')[0]) < 20) throw new Error('Node 20 or later is required');
+    const [major, minor] = process.versions.node.split('.').map(Number);
+    if (major < 20 || (major === 20 && minor < 6)) throw new Error('Node 20.6 or later is required');
     return `Node ${process.versions.node}; check docs/ci.md for tested versions`;
   });
   let project;
@@ -67,6 +70,11 @@ export async function doctor(args = []) {
       return 'Entry syntax is valid; app startup and instrumentation still need a running check';
     });
     await check('adapters', () => {
+    if (flags['--trace'] === 'http') {
+      const require = createRequire(import.meta.url);
+      for (const name of Object.keys(JSON.parse(readFileSync(join(toolRoot, 'package.json'), 'utf8')).dependencies ?? {})) require.resolve(name);
+      return 'HTTP preload dependencies resolve; no copied adapters required (startup still needs a runtime check)';
+    }
       for (const file of ['node-adapter.mjs', 'project-sources.mjs']) {
         const adapter = join(directory, file);
         if (!existsSync(adapter) || lstatSync(adapter).isSymbolicLink() || !lstatSync(adapter).isFile()

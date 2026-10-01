@@ -1225,3 +1225,176 @@
 - GitHub API: adapter revision 3f054c5b08b4b0964f1e84a6813f3850f3c5af5e run 36826886673 completed success; Ubuntu 24.04/Windows 2025 × Node 22.23.3/24.21.0 all success, including managed adapter main regressions and offline package probe/reinstall.
 - Luna performed read-only review of browser docs/source and new local links; no mismatch found. Lead reviewed source, affected diffs, real Edge evidence and package gate before accepting the review. No Luna code changes, tests or network operations.
 - Final browser module package journey 2026-10-01T07-00-07-562Z passed 1/1: generated app carries browser module in source snapshot and offline installation; real HTTP/auth/history restart checked. This test does not drive the installed package in a browser (Edge journey separately drives checkout-generated demo).
+## Manual OpenTelemetry dependency metadata — 2026-10-01
+
+- Read npm registry metadata using project-local cache: sdk-node/instrumentation-http 0.222.0, sdk-trace-base 2.11.0, api 1.9.1, instrumentation-undici 0.32.0; SDK/instrumentation Node floor ^18.19.0 || >=20.6.0. These are candidate exact versions, not yet installed or certified. No application change from metadata inspection.
+## Manual pinned OpenTelemetry install — 2026-10-01
+
+- Installed sdk-node 0.222.0, sdk-trace-base/resources 2.11.0, api 1.9.1, instrumentation-http 0.222.0 and instrumentation-undici 0.32.0 with --save-exact, project-local cache and --ignore-scripts (74 packages). package.json/lock now describe experimental tracing dependencies; no SDK initialized in a target yet. Check compatibility/export behavior before claiming support.
+## Tool inspection path correction — 2026-10-01
+
+- ReadableSpan type inspection used the former sdk-trace-base export path; installed SDK 2.11 places tracing types in sdk-trace. Get-Content failed with missing path before any application run. Use rg --files against installed packages to resolve current implementation paths; no code fix inferred from this read failure.
+- Follow-up SDK index read repeated the obsolete build path for sdk-trace-base; package is now a compatibility facade. Resolve exports from package.json and rg inventory before reading paths again. No source mutation occurred.
+
+## 2026-10-01T07-13-09-367Z
+
+- จุดประสงค์: HTTP span graph contract: out-of-order parent gaps, duplicate atomicity, privacy, snapshots and bounds
+- ผล: ไม่ผ่าน — 10/11; failed 1; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: b5c7fd0a9605f1d1a13913b78ae72e4b7900b489; dirty: true
+- หลักฐาน: `reports/tests/2026-10-01T07-13-09-367Z.tap` และ `.json`
+- ไม่ผ่าน: HTTP span normalization drops arbitrary names, URLs, exceptions, bodies and resource data
+
+## 2026-10-01T07-14-00-198Z
+
+- จุดประสงค์: Repair schema downgrade bypass and validate normalized HTTP span nodes with legacy graph compatibility
+- ผล: ไม่ผ่าน — 18/22; failed 4; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: b5c7fd0a9605f1d1a13913b78ae72e4b7900b489; dirty: true
+- หลักฐาน: `reports/tests/2026-10-01T07-14-00-198Z.tap` และ `.json`
+- ไม่ผ่าน: out-of-order HTTP spans resolve parent gaps without claiming a user action or function
+- ไม่ผ่าน: identical HTTP span replay is idempotent; conflicting IDs and invalid batches are atomic
+- ไม่ผ่าน: HTTP span normalization drops arbitrary names, URLs, exceptions, bodies and resource data
+- ไม่ผ่าน: span batches enforce project snapshot, bounds and concurrency identities before inserting graphs
+
+## 2026-10-01T07-14-32-499Z
+
+- จุดประสงค์: Verify shared span validation extraction and schema downgrade rejection after missing import repair
+- ผล: ผ่าน — 7/7; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: b5c7fd0a9605f1d1a13913b78ae72e4b7900b489; dirty: true
+- หลักฐาน: `reports/tests/2026-10-01T07-14-32-499Z.tap` และ `.json`
+
+## 2026-10-01T07-18-51-342Z
+
+- จุดประสงค์: Real NodeSDK CJS/ESM preload: native HTTP plus Undici fan-out, concurrent traces, canaries and graceful stop
+- ผล: ไม่ผ่าน — 1/2; failed 1; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: b5c7fd0a9605f1d1a13913b78ae72e4b7900b489; dirty: true
+- หลักฐาน: `reports/tests/2026-10-01T07-18-51-342Z.tap` และ `.json`
+- ไม่ผ่าน: real OTel preload captures cjs HTTP/Undici fan-out and isolates concurrent requests
+
+## 2026-10-01T07-19-51-498Z
+
+- จุดประสงค์: Diagnose traced target readiness using sanitized child output after initial 0/2 failure
+- ผล: ผ่าน — 2/2; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: b5c7fd0a9605f1d1a13913b78ae72e4b7900b489; dirty: true
+- หลักฐาน: `reports/tests/2026-10-01T07-19-51-498Z.tap` และ `.json`
+
+## 2026-10-01T07-21-12-754Z
+
+- จุดประสงค์: Bounded OTel export: SDK canary allowlist, queue overflow, stalled shutdown and no redirect/retry
+- ผล: ผ่าน — 9/9; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: b5c7fd0a9605f1d1a13913b78ae72e4b7900b489; dirty: true
+- หลักฐาน: `reports/tests/2026-10-01T07-21-12-754Z.tap` และ `.json`
+## Manual tracing dependency and SDK inspection — 2026-10-01
+
+- Added exact core 2.11.0 and instrumentation 0.222.0 direct dependencies for suppression/W3C propagation and preload hook; npm install with scripts disabled succeeded. Installed SDK types confirm parentSpanContext, plural spanProcessors/logRecordProcessors/metricReaders and no default detector when disabled. ADR records limits and rollback/schema implications.
+
+## 2026-10-01T07-23-16-162Z
+
+- จุดประสงค์: Final HTTP trace contracts/export queue review plus real SDK and legacy inspector/session/persistence integration
+- ผล: ผ่าน — 29/29; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: b5c7fd0a9605f1d1a13913b78ae72e4b7900b489; dirty: true
+- หลักฐาน: `reports/tests/2026-10-01T07-23-16-162Z.tap` และ `.json`
+
+## 2026-10-01T07-27-26-363Z
+
+- จุดประสงค์: Validate remote parent cannot imply trace outcome, final span contracts and normalized exporter
+- ผล: ผ่าน — 7/7; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: b5c7fd0a9605f1d1a13913b78ae72e4b7900b489; dirty: true
+- หลักฐาน: `reports/tests/2026-10-01T07-27-26-363Z.tap` และ `.json`
+## Manual packaged dependency lock — 2026-10-01
+
+- npm shrinkwrap succeeded using project cache, converting the newly generated root package-lock to npm-shrinkwrap.json. CLI package needs a publishable transitive lock; ordinary package-lock is excluded from packed distributions. Selection follows official npm shrinkwrap documentation. QA lock under tools/qa is unchanged. Offline install still requires the dependency cache, not bundled node_modules.
+## Documentation patch anchor failure — 2026-10-01
+
+- Patch attempted a partial Thai paragraph as a full-line anchor in otel-http.md; verification rejected it without applying the patch. Reapply only exact inspected context. This repeated edit-anchor error is recorded; it does not represent an application failure.
+- Corrected documentation patch still contained an unrelated incomplete test anchor, and was rejected atomically again. Removed the extraneous hunk; future patches in this round use one exact-context change per file.
+
+## 2026-10-01T07-31-28-955Z
+
+- จุดประสงค์: Trace doctor without copied adapters and real SDK traces reloaded exactly from schema 0.2 storage
+- ผล: ผ่าน — 7/7; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: b5c7fd0a9605f1d1a13913b78ae72e4b7900b489; dirty: true
+- หลักฐาน: `reports/tests/2026-10-01T07-31-28-955Z.tap` และ `.json`
+
+## 2026-10-01T07-32-39-463Z
+
+- จุดประสงค์: Actual OTel CJS/ESM trace graphs in paired Edge viewer with partial coverage and secret filtering
+- ผล: ผ่าน — 2/2; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: b5c7fd0a9605f1d1a13913b78ae72e4b7900b489; dirty: true
+- หลักฐาน: `reports/tests/2026-10-01T07-32-39-463Z.tap` และ `.json`
+## Manual OTel viewer visual check — 2026-10-01
+
+- Viewed reports/browser/otel-runtime-1790839967081-mjs/http-trace.png from actual NodeSDK/ESM + Edge fixture. Paired viewer shows HTTP trace, 3 span nodes, two observed ancestry edges and explicit unknown client/coverage; subtitle says partial HTTP evidence and unverified action/functions. No canary URL/header/body or pairing credential visible. This confirms fixture rendering, not real-app usefulness.
+
+## 2026-10-01T07-34-41-662Z
+
+- จุดประสงค์: Parent-before-child display order with identical rounded timestamps and unique span labels
+- ผล: ผ่าน — 4/4; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: b5c7fd0a9605f1d1a13913b78ae72e4b7900b489; dirty: true
+- หลักฐาน: `reports/tests/2026-10-01T07-34-41-662Z.tap` และ `.json`
+
+
+## Manual OTel package inventory failure — 2026-10-01
+
+- npm pack succeeded but inventory guard found npm-shrinkwrap.json absent from files allowlist artifact: C:\Users\lenul\OneDrive\เดสก์ท็อป\opensode\FlowAtlas MVP\reports\releases\otel-b99c2c0de4694f05b2eb9fdef191ba5f. No installation or journey ran. Add publishable lock explicitly to package files and rebuild; do not claim dependency pinning in artifacts before checking inventory.
+
+
+## Manual OTel package rebuild — 2026-10-01
+
+- Pack now includes npm-shrinkwrap.json explicitly; private path inventory clean. Offline install with scripts disabled and generated demo succeeded. Artifact: reports/releases/otel-d89e6f7053664f779fbb379c33653886; installation: reports/storage/otel-install-d89e6f7053664f779fbb379c33653886. Automated explicit/SDK journeys follow.
+
+## 2026-10-01T07-36-54-807Z
+
+- จุดประสงค์: Offline package with packaged dependency lock preserves explicit adapter and history
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: b5c7fd0a9605f1d1a13913b78ae72e4b7900b489; dirty: true
+- หลักฐาน: `reports/tests/2026-10-01T07-36-54-807Z.tap` และ `.json`
+
+## 2026-10-01T07-36-57-518Z
+
+- จุดประสงค์: Offline installed pinned OTel CJS/ESM preload and exact schema 0.2 reload
+- ผล: ผ่าน — 2/2; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: b5c7fd0a9605f1d1a13913b78ae72e4b7900b489; dirty: true
+- หลักฐาน: `reports/tests/2026-10-01T07-36-57-518Z.tap` และ `.json`
+## Manual browser revision hosted result — 2026-10-01
+
+- GitHub API confirms b5c7fd0a9605f1d1a13913b78ae72e4b7900b489 run 36827991849 completed success. All four Ubuntu/Windows × Node 22.23.3/24.21.0 jobs passed, including browser scope/main and Chromium/package gates. This predates OTel/schema implementation and does not certify the pending SDK feature.
+
+## 2026-10-01T07-39-41-381Z
+
+- จุดประสงค์: Isolated source regression after schema and OTel viewer changes
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: b5c7fd0a9605f1d1a13913b78ae72e4b7900b489; dirty: true
+- หลักฐาน: `reports/tests/2026-10-01T07-39-41-381Z.tap` และ `.json`
+
+## 2026-10-01T07-40-26-394Z
+
+- จุดประสงค์: Final actual SDK/Edge graph ordering and legacy browser action scope regression
+- ผล: ผ่าน — 3/3; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: b5c7fd0a9605f1d1a13913b78ae72e4b7900b489; dirty: true
+- หลักฐาน: `reports/tests/2026-10-01T07-40-26-394Z.tap` และ `.json`
+## Manual corrected trace display — 2026-10-01
+
+- Reviewed reports/browser/otel-runtime-1790840435821-mjs/http-trace.png after parent ordering fix: SERVER precedes its two CLIENT children, labels have span suffixes, coverage and client-action uncertainty remain visible; no pairing code/canary metadata. Combined actual SDK/Edge + legacy UI browser runner 2026-10-01T07-40-26-394Z passed 3/3.
+
+## 2026-10-01T07-41-41-463Z
+
+- จุดประสงค์: Release integration regression for new schema validator, SDK dependencies and unchanged explicit flows
+- ผล: ผ่าน — 91/91; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: b5c7fd0a9605f1d1a13913b78ae72e4b7900b489; dirty: true
+- หลักฐาน: `reports/tests/2026-10-01T07-41-41-463Z.tap` และ `.json`

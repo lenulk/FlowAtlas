@@ -5,6 +5,7 @@
 ใช้ Node ที่ตรวจผ่านตาม [CI](ci.md) ในโฟลเดอร์ FlowAtlas:
 
 ```powershell
+npm ci --ignore-scripts --no-audit --no-fund --cache reports/releases/npm-cache
 node scripts/cli.mjs --help
 node scripts/cli.mjs demo
 node scripts/cli.mjs doctor
@@ -12,6 +13,10 @@ node scripts/cli.mjs inspect
 ```
 
 `demo` สร้าง apps/message-app และ config เมื่อยังไม่มีตัวอย่างนี้เท่านั้น ไม่เขียนทับแอปเดิม หากมีแอปที่ลงทะเบียนอยู่แล้ว ใช้ `doctor --project ID` และ `inspect --project ID` แทน demo ใช้ `--entry` หาก entry ไม่ใช่ server.mjs และ `--config` หากไม่ได้ใช้ flowatlas.config.json
+
+มี dependencies ที่ตรึงรุ่นสำหรับ [HTTP tracing ผ่าน OpenTelemetry](otel-http.md) โหมดนี้ใช้ Node 20.6 ขึ้นไป; compatibility จะประกาศจากผล Node 22/24 ที่ผ่านจริง การติดตั้งจาก tgz ต้องติดตั้ง dependencies ด้วย Offline install ต้องเตรียม npm cache ที่มี dependencies ครบไว้ก่อนตามขั้น npm ci; tgz ไม่ได้ bundle node_modules
+
+ใช้ npm-shrinkwrap.json ใน CLI artifact เพื่อตรึง transitive dependencies ด้วย ตาม [npm documentation](https://docs.npmjs.com/cli/v11/configuring-npm/npm-shrinkwrap-json/) ซึ่งแยกจาก package-lock ของ QA tools
 
 เปิด App URL ที่คำสั่ง inspect แสดง คลิก action แล้วเปิดลิงก์ FlowAtlas ใส่ pairing code จาก interactive terminal เพื่อดูกราฟ/source; reload/new tab ต้อง pair ใหม่ ดู [session access](session-access.md) สำหรับ scripted output และการแยกรัน พิมพ์ `stop` ใน terminal เพื่อปิด target และ collector เมื่อเรียก inspect ใหม่ประวัติจะโหลดจาก data/actions การลงทะเบียนแอปของตนใช้ `register` กับตัวเลือกตาม [Node adapter](node-adapter.md); ยังต้องเพิ่ม instrumentation ตามคู่มือ
 

@@ -50,6 +50,7 @@ const outcomeLabels = { success: 'สำเร็จ', error: 'ผิดพล�
 const typeLabels = {
   'user-action': 'USER ACTION', api: 'API', code: 'CODE',
   'external-request': 'EXTERNAL REQUEST', unknown: 'COVERAGE GAP',
+  'http-trace': 'HTTP TRACE', 'http-span': 'HTTP SPAN',
 };
 
 function svgElement(name, attrs = {}) {
@@ -135,7 +136,7 @@ function renderGraph(graph) {
   if (!authorized) return;
   $('#empty').hidden = true;
   $('#trace-content').hidden = false;
-  $('#trace-subtitle').textContent = `${graph.name} · ${outcomeLabels[graph.outcome]} · ${graph.nodes.length} nodes`;
+  $('#trace-subtitle').textContent = `${graph.name} · ${outcomeLabels[graph.outcome]} · ${graph.nodes.length} nodes${graph.schemaVersion === '0.2' ? ' · หลักฐาน HTTP บางส่วน; ยังไม่ยืนยัน action/ฟังก์ชันภายใน' : ''}`;
   $('#action-id').textContent = graph.id;
   $('#json-link').href = `/flowatlas/actions/${encodeURIComponent(graph.id)}`;
   renderMap(graph);

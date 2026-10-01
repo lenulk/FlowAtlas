@@ -6,14 +6,33 @@
   "bin": {
     "flowatlas": "scripts/cli.mjs"
   },
-  "files": ["src/", "public/", "examples/", "scripts/", "docs/", "PLAN.md", "AGENTS.md"],
+  "files": [
+    "src/",
+    "public/",
+    "examples/",
+    "scripts/",
+    "docs/",
+    "PLAN.md",
+    "AGENTS.md",
+    "npm-shrinkwrap.json"
+  ],
   "engines": {
-    "node": ">=20"
+    "node": ">=20.6"
   },
   "scripts": {
     "start": "node src/server.mjs",
     "start:fixture": "node examples/independent-app/server.mjs",
     "test": "node scripts/run-tests.mjs",
     "test:source": "node scripts/run-tests.mjs scripts/source-check.mjs"
+  },
+  "dependencies": {
+    "@opentelemetry/api": "1.9.1",
+    "@opentelemetry/core": "2.11.0",
+    "@opentelemetry/instrumentation": "0.222.0",
+    "@opentelemetry/instrumentation-http": "0.222.0",
+    "@opentelemetry/instrumentation-undici": "0.32.0",
+    "@opentelemetry/resources": "2.11.0",
+    "@opentelemetry/sdk-node": "0.222.0",
+    "@opentelemetry/sdk-trace-base": "2.11.0"
   }
 }

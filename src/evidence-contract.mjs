@@ -1,9 +1,12 @@
+import { cleanHttpSpan } from './http-span-contract.mjs';
+
 const statusForType = Object.freeze({
   'client-report-and-http-inbound': 'observed',
   'instrumented-handler-entry': 'observed',
   'http-outbound': 'observed',
   'source-route-match': 'inferred',
   'coverage-gap': 'unknown',
+  'otel-span-parent': 'observed',
 });
 
 function isText(value) {
@@ -93,6 +96,12 @@ export function validateEdge(action, edge) {
     if (target?.source?.file !== evidence.source?.file || target.source?.sha256 !== evidence.source?.sha256) {
       issues.push(`${label}: inferred source does not match the target node`);
     }
+  } else if (evidence.type === 'otel-span-parent') {
+    const from = nodes.find((node) => node.id === edge.from), to = nodes.find((node) => node.id === edge.to);
+    if (action.schemaVersion !== '0.2' || from?.type !== 'http-span' || to?.type !== 'http-span'
+      || !/^[a-f0-9]{32}$/.test(evidence.traceId ?? '') || evidence.traceId !== action.trace?.traceId
+      || from.span?.spanId !== evidence.parentSpanId || to.span?.spanId !== evidence.spanId
+      || to.span?.parentSpanId !== evidence.parentSpanId) issues.push(`${label}: span ancestry does not match captured spans`);
   } else if (evidence.type === 'coverage-gap' && !isText(evidence.reason)) {
     issues.push(`${label}: coverage gap reason is missing`);
   }
@@ -101,7 +110,10 @@ export function validateEdge(action, edge) {
 
 export function validateGraph(graph) {
   const issues = [];
-  if (graph?.schemaVersion !== '0.1') issues.push('unsupported schema version');
+  if (!['0.1', '0.2'].includes(graph?.schemaVersion)) issues.push('unsupported schema version');
+  if (graph?.schemaVersion === '0.2' && (!/^[a-f0-9]{32}$/.test(graph.trace?.traceId ?? '')
+    || graph.trace.coverage !== 'partial' || !Array.isArray(graph.trace.spans)
+    || graph.trace.spans.length < 1 || graph.trace.spans.length > 48)) issues.push('invalid HTTP trace metadata');
   if (!isText(graph?.id) || !isText(graph?.name) || !isTime(graph?.startedAt)) {
     issues.push('action identity or start time is missing');
   }
@@ -116,13 +128,29 @@ export function validateGraph(graph) {
     return issues;
   }
   const nodeIds = new Set();
+  const traceSpans = new Map();
+  if (graph.schemaVersion === '0.2') {
+    for (const span of Array.isArray(graph.trace?.spans) ? graph.trace.spans : []) {
+      try {
+        const clean = cleanHttpSpan(span);
+        if (JSON.stringify(span) !== JSON.stringify(clean) || traceSpans.has(span.spanId)) issues.push('invalid or duplicate trace span');
+        traceSpans.set(span.spanId, clean);
+      } catch { issues.push('invalid trace span'); }
+    }
+  } else if (graph.trace !== undefined || graph.nodes.some((node) => ['http-span', 'http-trace'].includes(node?.type))) {
+    issues.push('HTTP trace nodes require schema 0.2');
+  }
   for (const node of graph.nodes) {
     if (!node || typeof node !== 'object' || Array.isArray(node)) { issues.push('invalid node'); continue; }
     if (!isText(node.id) || !isText(node.type) || !isText(node.label)) issues.push('invalid node');
     if (nodeIds.has(node.id)) issues.push(`duplicate node ${node.id}`);
     nodeIds.add(node.id);
+    if (node.type === 'http-span' && (node.id !== `span:${node.span?.spanId}`
+      || JSON.stringify(node.span) !== JSON.stringify(traceSpans.get(node.span?.spanId)))) issues.push('span node does not match trace metadata');
     if (node.source) issues.push(...validateSource(node.source, graph.codeVersion, `node ${node.id}`));
   }
+  if (graph.schemaVersion === '0.2' && (graph.nodes.filter((node) => node?.type === 'http-span').length !== traceSpans.size
+    || graph.nodes[0]?.type !== 'http-trace')) issues.push('HTTP trace graph has missing span nodes');
   const edgeIds = new Set();
   for (const edge of graph.edges) {
     if (!edge || typeof edge !== 'object' || Array.isArray(edge)) { issues.push('invalid edge'); continue; }
