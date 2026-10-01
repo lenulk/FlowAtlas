@@ -26,21 +26,29 @@ if (!workspace) {
   console.error('Unknown command. Run flowatlas --help'); process.exitCode = 1;
 } else {
   const managedInspector = command === 'inspect';
+  let stopRequested = false, stopTimer;
   const child = spawn(process.execPath, [join(root, 'scripts', commands[command]), ...args],
     { cwd: workspace, stdio: managedInspector ? ['inherit', 'inherit', 'inherit', 'ipc'] : 'inherit',
       detached: managedInspector && process.platform === 'win32', windowsHide: true,
       env: { ...process.env, FLOWATLAS_WORKSPACE_ROOT: workspace, ...(managedInspector ? { FLOWATLAS_CLI_OWNER: '1' } : {}) } });
   if (managedInspector) child.on('message', (message) => {
     if (message === 'flowatlas:owner-check' && child.connected) {
-      child.send('flowatlas:owner-alive', () => {}); // A disappearing inspector needs no reply.
+      child.send(stopRequested ? 'flowatlas:owner-stop' : 'flowatlas:owner-alive', () => {});
     }
   });
-  const forward = (signal) => child.kill(signal);
+  const forward = (signal) => {
+    if (!managedInspector) { child.kill(signal); return; }
+    stopRequested = true;
+    stopTimer ??= setTimeout(() => child.kill('SIGKILL'), 6000);
+    if (child.connected) child.send('flowatlas:owner-stop', (error) => { if (error) child.kill(signal); });
+    else child.kill(signal);
+  };
   const interrupt = () => forward('SIGINT');
   const terminate = () => forward('SIGTERM');
   process.on('SIGINT', interrupt); process.on('SIGTERM', terminate);
-  child.once('error', (error) => { console.error(error.message); process.exitCode = 1; });
+  child.once('error', (error) => { clearTimeout(stopTimer); console.error(error.message); process.exitCode = 1; });
   child.once('exit', (code, signal) => {
+    clearTimeout(stopTimer);
     process.off('SIGINT', interrupt); process.off('SIGTERM', terminate);
     process.exitCode = code ?? (signal ? 1 : 0);
   });

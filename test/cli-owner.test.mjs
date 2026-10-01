@@ -7,7 +7,7 @@ import { hostname } from 'node:os';
 import { randomBytes } from 'node:crypto';
 import { mkdirSync, mkdtempSync, writeFileSync, readFileSync, existsSync, rmSync, realpathSync } from 'node:fs';
 import { dirname, join, relative, isAbsolute } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
 async function waitFor(predicate, milliseconds = 8000) {
@@ -28,7 +28,7 @@ function portClosed(origin) {
   });
 }
 
-for (const traced of [false, true]) test(`force stopping the CLI wrapper closes owned services and lock (${traced ? 'HTTP SDK flush' : 'plain HTTP'})`, { timeout: 25000 }, async (t) => {
+for (const stopMode of ['owner-kill', 'SIGINT', 'SIGTERM']) for (const traced of [false, true]) test(`CLI ${stopMode} closes owned services and lock (${traced ? 'HTTP SDK flush' : 'plain HTTP'})`, { timeout: 25000 }, async (t) => {
   const parent = join(root, 'reports/storage'); mkdirSync(parent, { recursive: true });
   const workspace = mkdtempSync(join(parent, 'cli-owner-')); const canonical = realpathSync(workspace);
   mkdirSync(join(workspace, 'app'));
@@ -40,10 +40,16 @@ server.listen(Number(process.env.PORT),'127.0.0.1',()=>console.log('Registered a
 process.stdin.resume();
 `);
   writeFileSync(join(workspace, 'flowatlas.config.json'), JSON.stringify({ projects: [{ id: 'owner-qa', root: 'app', files: ['server.mjs'] }] }));
+  // Test-only driver of the CLI's JS signal handler. This is not a real OS console signal.
+  const signalDriver = join(workspace, 'signal-driver.mjs');
+  if (stopMode !== 'owner-kill') writeFileSync(signalDriver, `process.on('message',message=>{
+if(message==='test:SIGINT'||message==='test:SIGTERM')process.emit(message.slice(5));});process.channel?.unref();`);
   const lock = join(workspace, 'data/actions/.writer.lock');
-  const child = spawn(process.execPath, [join(root, 'scripts/cli.mjs'), '--workspace', workspace, 'inspect', ...(traced ? ['--trace', 'http'] : [])],
+  const child = spawn(process.execPath, [...(stopMode === 'owner-kill' ? [] : ['--import', pathToFileURL(signalDriver).href]),
+    join(root, 'scripts/cli.mjs'), '--workspace', workspace, 'inspect', ...(traced ? ['--trace', 'http'] : [])],
     { cwd: root, env: { ...process.env, FLOWATLAS_SESSION_TOKEN: randomBytes(32).toString('base64url'),
-      FLOWATLAS_COLLECTOR_PORT: '0', FLOWATLAS_INVENTORY_PORT: '0' }, stdio: ['pipe', 'pipe', 'pipe'] });
+      FLOWATLAS_COLLECTOR_PORT: '0', FLOWATLAS_INVENTORY_PORT: '0' },
+      stdio: stopMode === 'owner-kill' ? ['pipe', 'pipe', 'pipe'] : ['pipe', 'pipe', 'pipe', 'ipc'] });
   let output = ''; child.stdout.on('data', (part) => { output += part; }); child.stderr.on('data', (part) => { output += part; });
   let inspectorPid, targetPid, app;
   try {
@@ -59,7 +65,8 @@ process.stdin.resume();
     for (const pid of [inspectorPid, targetPid]) assert.ok(Number.isSafeInteger(pid) && pid > 0 && pid !== process.pid && pid !== child.pid);
     assert.notEqual(inspectorPid, targetPid);
     assert.equal(target.ownerEnvironment, null, 'CLI ownership channel flag does not enter the app');
-    const closed = once(child, 'close'); child.kill('SIGKILL');
+    const closed = once(child, 'close');
+    if (stopMode === 'owner-kill') child.kill('SIGKILL'); else child.send('test:' + stopMode);
     // The descendants inherit stdio; close occurs only when their inherited handles close too.
     await waitFor(async () => !existsSync(lock) && !alive(inspectorPid) && !alive(targetPid)
       && await portClosed(ready.collector) && await portClosed(app)).catch(async (error) => {
@@ -70,7 +77,8 @@ process.stdin.resume();
           'ERR_STREAM_DESTROYED', 'Storage lock ownership changed', 'ENOENT'].filter((code) => output.includes(code))));
         throw error;
       });
-    await closed;
+    const [exitCode] = await closed;
+    if (stopMode !== 'owner-kill') assert.equal(exitCode, 0, 'The controlled signal handler completes ordinary shutdown');
     if (traced) {
       const summaries = [...output.matchAll(/FlowAtlas trace summary: (\{[^\n]+\})/g)];
       assert.equal(summaries.length, 1);
@@ -93,7 +101,7 @@ process.stdin.resume();
   }
 });
 
-for (const ownerState of ['disconnected', 'silent']) test(`startup owner ${ownerState} prevents target launch and releases storage`, { timeout: 15000 }, async () => {
+for (const ownerState of ['disconnected', 'silent', 'stop-requested']) test(`startup owner ${ownerState} prevents target launch and releases storage`, { timeout: 15000 }, async () => {
   const parent = join(root, 'reports/storage'); mkdirSync(parent, { recursive: true });
   const workspace = mkdtempSync(join(parent, 'cli-owner-startup-')); const canonical = realpathSync(workspace);
   mkdirSync(join(workspace, 'app'));
@@ -110,6 +118,9 @@ writeFileSync('started','target started');process.stdin.resume();`);
   const exited = once(child, 'exit'); const watchdog = setTimeout(() => child.kill('SIGKILL'), 12000);
   try {
     if (ownerState === 'disconnected') child.disconnect();
+    if (ownerState === 'stop-requested') child.on('message', (message) => {
+      if (message === 'flowatlas:owner-check' && child.connected) child.send('flowatlas:owner-stop', () => {});
+    });
     assert.equal((await exited)[0], 1, 'An unconfirmed owner is a failed startup, with no services left running');
     assert.equal(existsSync(marker), false, 'No app is launched after its owner disappeared');
     assert.equal(existsSync(lock), false);

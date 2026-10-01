@@ -41,7 +41,10 @@ function confirmOwner() {
     const finish = (alive) => {
       clearTimeout(timer); process.off('message', message); process.off('disconnect', disconnected); resolveOwner(alive);
     };
-    const message = (value) => { if (value === 'flowatlas:owner-alive') finish(true); };
+    const message = (value) => {
+      if (value === 'flowatlas:owner-alive') finish(true);
+      else if (value === 'flowatlas:owner-stop') finish(false);
+    };
     const disconnected = () => finish(false);
     const timer = setTimeout(() => finish(false), 1000);
     process.on('message', message); process.once('disconnect', disconnected);
@@ -124,10 +127,12 @@ async function runInspector(args = process.argv.slice(2)) {
     try { await stopTarget(target); } finally { await servers.close(); }
   })();
   const onSignal = () => stop().catch((error) => { console.error(error); process.exitCode = 1; });
+  const onOwnerMessage = (message) => { if (message === 'flowatlas:owner-stop') onSignal(); };
   const managedOwner = process.env.FLOWATLAS_CLI_OWNER === '1';
   if (managedOwner) {
     // The private parent channel carries only fixed lifecycle messages, without app data.
     process.once('disconnect', onSignal);
+    process.on('message', onOwnerMessage);
     process.channel?.unref();
   }
   process.once('SIGINT', onSignal);
@@ -176,7 +181,7 @@ async function runInspector(args = process.argv.slice(2)) {
     await stop();
     throw error;
   } finally {
-    if (managedOwner) process.off('disconnect', onSignal);
+    if (managedOwner) { process.off('disconnect', onSignal); process.off('message', onOwnerMessage); }
     process.off('SIGINT', onSignal);
     process.off('SIGTERM', onSignal);
   }

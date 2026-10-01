@@ -16,12 +16,12 @@ Node.js เป็น integration ที่กำลังพัฒนาแล�
 
 | ความสามารถ | หลักฐานปัจจุบัน | งานที่เหลือ |
 | --- | --- | --- |
-| เปิด/ปิดเครื่องมือ | CLI/workspace/doctor/offline package/reinstall ผ่านบน Windows/Linux; SDK มี IPC flush | startup เป็นบางครั้ง, ปิดโปรเซสลูกเมื่อ wrapper ถูกบังคับหยุด, attach แอปที่เริ่มอยู่แล้ว |
+| เปิด/ปิดเครื่องมือ | CLI/workspace/doctor/offline package/reinstall ผ่านบน Windows/Linux; รุ่น 2e7b9f2 ตรวจ owner disconnect และ startup lease แล้ว; รอบ 57 ตรวจคำสั่งหยุดผ่านช่องควบคุมบน Windows | สัญญาณจาก console จริง, startup ที่เคยล่าช้า, inspector ถูกบังคับหยุด/โปรเซสหลาน, attach แอปที่เริ่มอยู่แล้ว |
 | ตั้งค่าแอป | register/allowlist และ managed adapter update/rollback มี backup; opt-in SDK HTTP ไม่ต้องใส่ handler hook | browser→SDK bridge, route/source mapping, existing SDK, แอปธุรกิจจริง |
 | แผนที่และ source | observed/inferred/unknown, digest/hash mismatch; schema0.2 HTTP/Undici concurrent fan-out และ parent ordering ผ่าน | แผนที่แตกแขนง, async นอก HTTP, source รุ่นเก่า, ห้ามอ้าง user click จาก SDK-only spans |
 | หน้าเว็บ | Chromium headless บน Linux และ Edge headless บน Windows ผ่านกับ fixtures | ผู้ใช้จริง, keyboard/accessibility, error/capture states |
 | ข้อมูล | storageVersion1 อ่าน graph0.1/0.2, single writer/history100; Windows rename recovery แบบจำกัด ผ่าน simulation/obstruction/restart | persisted completeness, safe metadata retry, export/migration, lock owner/rootcause, overhead |
-| คุณภาพ | Windows default104/104; da9a0b6 VM main102/104ไม่ผ่าน แต่ source/load/SDKChromiumpassed; CI da9a0b6 ผ่าน3/4 (Windows22mainไม่ผ่าน), loadcaptureผ่าน4/4; benchmark reporting focused/replay6/6 | acknowledgement/fixture/lifecycle diagnosis; performance budgetsยังไม่ผ่านทั้งCIและVM; sustained-load |
+| คุณภาพ | รุ่น 2e7b9f2: Linux VM main113/source1/SDKChromium2/load1 ผ่าน; GitHub Windows/Linux Node22/24 ผ่าน 4/4 รวม package/reinstall; รอบ 57 Windows main117/117 และ owner9/9 ผ่าน | รอบ 57 ยังต้องตรวจ exact Linux/CI; performance ยังไม่ผ่านทุกช่อง; sustained-load และสาเหตุ acknowledgement pause ยังเปิด; เก็บผลล้มเหลวก่อนหน้าไว้ |
 | ความเชื่อมั่น | session bearer/pairing/Host/Origin checks; HTTP spans ลดรูปไม่เก็บ URL/header/body/baggage | export privacy/real-app gates; authentication ไม่ได้พิสูจน์ว่า sender report เกิดจริง |
 | การใช้งานจริง | ไม่มีแอปธุรกิจของผู้ใช้หรือ user trial | pilot แอปที่ไม่ได้สร้างเพื่อให้ FlowAtlas ผ่านเทสต์ และวัดประโยชน์ |
 

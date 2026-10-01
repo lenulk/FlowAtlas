@@ -2002,3 +2002,80 @@ First matched3×1000 measurement: all6000 measured business responses pluswarmup
 - commit: 40f3a15afaf08b55db563aadf85924d73d8bad95; dirty: true
 - หลักฐาน: `reports/tests/2026-10-01T17-59-10-723Z.tap` และ `.json`
 - Round56 selected actualdiff/whitespace/docs reviewed, focused14/default113/unchangedload1 passed; finalLuna read-onlyreview accepted boundedownerdisconnectscope. Historicalfailedfixtures retained; no old unknownprocesses killed, no broadproductioncertification.
+- Round5676a5b1a localcommit completed, push rejected non-fast-forward because concurrentremote work advanced again. No forcepush. Fetch/read exactremote diff, preserve both lines before merge.
+- Concurrentbb6d65f changesonlyREADME usecases; merged normally with76a5b1a, actualproduction/scripts/tests/public/dependency diff versus testedsource empty. No source retest solelyforREADMEmerge, no forcepush.
+- Round56 unchangedload17-59-10-723Zcapture3153ack/zero drops, performanceFAILED+39.091%aggregatep95 (base4.753ms/traced6.611ms), pairedmedian69.065%; noisyhostno causalclaim. Merged2e7b9f2 includes76a5b1alifecycleandbothconcurrentREADMEcommits withidenticaltestedsource. Pushsucceeded; freshLinuxbundleSHA97d56eedf734e3a26ff18445ac0e1aa29aac14aa162411f285c48ae33fa0a83e transferred, exactVMsequencepending.
+- Exact2e7b9f2 hosted matrix read-only snapshot inspected; runtime states shown in output, in-progress gates remainunverified.
+- Exact2e7b9f2 VM Node22.23.3 defaultmain113/113 (18-04-25-916Z), isolatedsource1/1 (18-05-04-891Z), realSDK+Chromium2/2 (18-05-05-694Z), unchangedload1/1 (18-05-13-111Z) passed. All3153ack/zero drops; performanceFAILED+168.869% aggregatep95 (baseline8.339ms/traced22.421ms), paired141.449%. ArchiveSHA256692fc46d89cf3ad2f252d7a8f259f079fec72e90af558b48c87a3948b7def26a. Retainpreviousda9failedmain andno stable/sustainedcaptureclaim. Importandprovenancenext; CI36903879419 inprogressall4atsnapshot.
+- Exact2e7b9f2 VM archive checksum matched; regular relative allowedpaths validated before fresh extraction, reportfiles imported no-overwrite, rawVMlog retained ignored. No current trackedhostlog overwritten.
+
+## 2026-10-01T18-08-17-538Z
+
+- จุดประสงค์: Round56 exact Linux and Windows merged-code provenance and benchmark report consistency
+- ผล: ไม่ผ่าน — 1/2; failed 1; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: 2e7b9f257377441eb59acc7db343d950080aa76b; dirty: true
+- หลักฐาน: `reports/tests/2026-10-01T18-08-17-538Z.tap` และ `.json`
+- ไม่ผ่าน: exact VM and premerge Windows inventories match current committed code bytes
+- Provenance18-08-17-538Z1/2 failed: allfourVM71-fileinventories exactlymatchGit, butfirstWindowsfocused inventorypackage.json hashdiffers. Actualbenchmarkacceptance replaysbothpassed. EarlieremptyGitdiff doesnotprovebyteidentical Windowsworkingtree/Gitlineendings. Inspecteverymismatch andnewline bytes before asserting sharedexactsource; preservefailedverification, noappchange inferred.
+
+## 2026-10-01T18-09-08-987Z
+
+- จุดประสงค์: Diagnose every Windows raw inventory mismatch against exact Git revision
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: 2e7b9f257377441eb59acc7db343d950080aa76b; dirty: true
+- หลักฐาน: `reports/tests/2026-10-01T18-09-08-987Z.tap` และ `.json`
+- Fullmismatchdiagnosis18-09-08-987Z1/1: Windows onlypackage.json differs; all70program/test/UI/scriptfiles exactlymatchGit. Currentpackage bytesmatchallthreeWindowsrawreporthashes; filehasCRLFinternallinesbutfinalLF (soallCRLFcounterpart didnotmatch). Gittextnormalization hides this inGitdiff. Comparetheactualrecordedhash-matchingfile normalizedtoLF plusparsedJSONwithGit, labelas lineending-equivalent, neverasrawbyteidentical. No package/dependencychange or broadretestrequired.
+
+## 2026-10-01T18-10-17-405Z
+
+- จุดประสงค์: Exact VM71 Gitbytes and Windows70 programbytes plus documented package newline equivalent
+- ผล: ผ่าน — 2/2; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: 2e7b9f257377441eb59acc7db343d950080aa76b; dirty: true
+- หลักฐาน: `reports/tests/2026-10-01T18-10-17-405Z.tap` และ `.json`
+- Exact2e7b9f2 hostedmatrix completion/artifact snapshot inspected after VMprovenance; actualstates shown inoutput, do not inferperformancefromgreenloadmeasurement.
+- Firstthree completed2e7b9f2 CIartifacts downloaded andrelativepaths/sizesvalidated; maincountsandload/performance inspected inoutput. RemainingUbuntu24job stillpending atprevioussnapshot; no fullmatrixclaimyet.
+- Remaining exactUbuntuNode24 job110509798579 stepstate inspected to distinguish delayed gate fromcompletion; no unreportedrerun orskip.
+
+## 2026-10-01T18-15-39-514Z
+
+- จุดประสงค์: Round57 reproduce controlled CLI signal forwarding bypasses managed shutdown on Windows
+- ผล: ไม่ผ่าน — 4/8; failed 4; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: 2e7b9f257377441eb59acc7db343d950080aa76b; dirty: true
+- หลักฐาน: `reports/tests/2026-10-01T18-15-39-514Z.tap` และ `.json`
+- ไม่ผ่าน: CLI SIGINT closes owned services and lock (plain HTTP)
+- ไม่ผ่าน: CLI SIGINT closes owned services and lock (HTTP SDK flush)
+- ไม่ผ่าน: CLI SIGTERM closes owned services and lock (plain HTTP)
+- ไม่ผ่าน: CLI SIGTERM closes owned services and lock (HTTP SDK flush)
+
+## 2026-10-01T18-17-08-856Z
+
+- จุดประสงค์: Round57 controlled SIGINT SIGTERM request SDK drain and lock cleanup with normal CLI integration
+- ผล: ผ่าน — 18/18; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: 2e7b9f257377441eb59acc7db343d950080aa76b; dirty: true
+- หลักฐาน: `reports/tests/2026-10-01T18-17-08-856Z.tap` และ `.json`
+
+## 2026-10-01T18-19-45-895Z
+
+- จุดประสงค์: Round57 default main CLI controlled signal shutdown and all affected capture paths
+- ผล: ผ่าน — 117/117; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: 2e7b9f257377441eb59acc7db343d950080aa76b; dirty: true
+- หลักฐาน: `reports/tests/2026-10-01T18-19-45-895Z.tap` และ `.json`
+- Exact2e7b9f2 GitHub run36903879419 completed SUCCESS4/4: Windows2025 andUbuntu24.04 onNode22.23.3/24.21.0, alljobs includingpackagegates passed. Read-only API verifiedexactSHA; remainingUbuntu24artifact/performance inspection pending. No applicationfailure inferred fromearlierChromiuminstall delay.
+
+## 2026-10-01T18-26-58-909Z
+
+- จุดประสงค์: Round57 owner-stop during startup fails closed and all managed lifetimes remain bounded
+- ผล: ผ่าน — 9/9; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: 2e7b9f257377441eb59acc7db343d950080aa76b; dirty: true
+- หลักฐาน: `reports/tests/2026-10-01T18-26-58-909Z.tap` และ `.json`
+- RemainingUbuntu24CIartifact downloaded andeveryentry checkedrelative/no-traversal. Initialreader selectedflattened benchmarks/tests paths butzip containsdifferentprefixes, yieldingnosummary; inspectactualentrynames beforeclaimingtestcounts/performance.
+- Round57 startupstopboundary18-26-58-909Z9/9passed failed/skipped0, noapplaunch/lockretained whenstartupownerrequestsstop; existingowner-kill/signalevent/plain/actualSDKcasesalso passed. No productionedits afterdefault117. Remaining2e7b9f2 CIarchive inspected usingactualreports/ prefixes; counts/performanceinoutput, no skip/rerun.
+- FinalRound57actualdiff/whitespace reviewed, startupowner-stop9/9passed; priorRound56CIremainingUbuntu24artifact11183292311 confirmsmain113/allgatespass,capture3153ack0drops,performanceFAILED+113.666%. CI4/4successdoesnotmeanperformanceacceptance. PLANupdatedwithoutclosingunverifiedgates.
+- Luna finalread-onlyRound57review foundnoblockinggap instartupstop/readyIPCcleanup; noedits/tests byLuna. Leadreview acceptscontrolledhandler scope, retainswatchdog/directinspectorkill/grandchild limitations. Commitselectedrepair+evidencedocs; nootherdirtyfilespresent.
