@@ -1758,3 +1758,27 @@ First matched3×1000 measurement: all6000 measured business responses pluswarmup
 - ไม่ผ่าน: real OTel preload captures cjs HTTP/Undici fan-out and isolates concurrent requests
 
 - Round51 final main2026-10-01T13-47-52-402Z102/103 failed: all storage/replacement/restart/obstruction checks passed, one actual CJS SDK case failed. Read its exact TAP failure before changing runner concurrency or startup behavior. No skips/test retries/deadline extensions; failed evidence retained.
+
+## 2026-10-01T13-54-46-940Z
+
+- จุดประสงค์: Bounded2worker diagnosis all103 cases retain prior default main failure
+- ผล: ผ่าน — 103/103; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: 847d37a0cab9a7d0a4ad01c3c65f2a74747acb0a; dirty: true
+- หลักฐาน: `reports/tests/2026-10-01T13-54-46-940Z.tap` และ `.json`
+
+- Exact2f40612 hosted final state inspected: run36868875718 failed only Ubuntu24 fixture load; Ubuntu22/Windows22/Windows24 succeeded. All main100/source/browser/SDK/offlinepackage/reinstall gates passed. Ubuntu24 artifact diagnosis remains overflow635/timeout64 in one round; newer validation/storage changes still need hosted verification after push.
+
+## 2026-10-01T13-56-58-375Z
+
+- จุดประสงค์: Default103case acknowledgement diagnosis with fixed counters retain all prior failures
+- ผล: ไม่ผ่าน — 101/103; failed 2; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: 847d37a0cab9a7d0a4ad01c3c65f2a74747acb0a; dirty: true
+- หลักฐาน: `reports/tests/2026-10-01T13-56-58-375Z.tap` และ `.json`
+- ไม่ผ่าน: copied adapter in a different Git repository captures three actions and survives collector outage
+- ไม่ผ่าน: real OTel preload captures cjs HTTP/Undici fan-out and isolates concurrent requests
+
+- Round52 default2026-10-01T13-56-58-375Z101/103 failed, bounded2worker103/103 previously passed. Fixed SDK diagnostics and exact failed assertions inspected next. Defaults, deadlines and acceptance unchanged; source kept for diagnosis, no claim of stable default testing.
+
+- Round52 full default101/103 failure retained: fixed counters prove SDK timeout1 despite persisted6, plus explicit external-repository incomplete capture. Two-worker103/103 is comparison only; no default gate certification. Diagnostics disclose fixed numbers only. Next resource-policy repair must account for measured burst635overflow/64timeout, without changing benchmark acceptance/workload or claiming pause rootcause solved.

@@ -16,13 +16,13 @@ Node.js เป็น integration ที่กำลังพัฒนาแล�
 
 | ความสามารถ | หลักฐานปัจจุบัน | งานที่เหลือ |
 | --- | --- | --- |
-| เปิด/ปิดเครื่องมือ | `inspect` เริ่ม collector กับแอปที่ลงทะเบียนแล้ว; Windows/Linux focused ผ่าน | แพ็กเกจ CLI, ตรวจความพร้อม, startup ของแอปทั่วไป |
-| ตั้งค่าแอป | `register-app` คัดลอก adapter และเพิ่ม explicit allowlist; focused ล่าสุด Windows/Linux 4/4 | ลด manual instrumentation, ถอน/อัปเดต integration, ทดสอบกับแอปจริง |
-| แผนที่และ source | แยก observed/inferred/unknown, evidence IDs, commit/digest และ hash mismatch | spans มาตรฐาน, async/fan-out, แผนที่ขนาดใหญ่, source รุ่นเก่า |
+| เปิด/ปิดเครื่องมือ | CLI/workspace/doctor/offline package/reinstall ผ่านบน Windows/Linux; SDK มี IPC flush | startup เป็นบางครั้ง, ปิดโปรเซสลูกเมื่อ wrapper ถูกบังคับหยุด, attach แอปที่เริ่มอยู่แล้ว |
+| ตั้งค่าแอป | register/allowlist และ managed adapter update/rollback มี backup; opt-in SDK HTTP ไม่ต้องใส่ handler hook | browser→SDK bridge, route/source mapping, existing SDK, แอปธุรกิจจริง |
+| แผนที่และ source | observed/inferred/unknown, digest/hash mismatch; schema0.2 HTTP/Undici concurrent fan-out และ parent ordering ผ่าน | แผนที่แตกแขนง, async นอก HTTP, source รุ่นเก่า, ห้ามอ้าง user click จาก SDK-only spans |
 | หน้าเว็บ | Chromium headless บน Linux และ Edge headless บน Windows ผ่านกับ fixtures | ผู้ใช้จริง, keyboard/accessibility, error/capture states |
-| ข้อมูล | restart/history/query, JSON schema 0.1, single writer, 100 actions | recovery, retention/export, schema migration, overhead |
-| คุณภาพ | Windows default ล่าสุด 54/54; Linux ส่วน registration 4/4; ชุดอื่นมีรายงานแยกตามรอบ | release matrix บนโค้ดรุ่นเดียวกัน และปิดประเด็นที่ยังค้าง |
-| ความเชื่อมั่น | collector localhost; sender metadata ยังถูกเชื่อ | session authorization, privacy, trusted instrumentation; auth ไม่ได้พิสูจน์ว่าเหตุการณ์เกิดจริง |
+| ข้อมูล | storageVersion1 อ่าน graph0.1/0.2, single writer/history100; Windows rename recovery แบบจำกัด ผ่าน simulation/obstruction/restart | persisted completeness, safe metadata retry, export/migration, lock owner/rootcause, overhead |
+| คุณภาพ | Windows default101/103; bounded2worker103/103; Linux VM e83f48f main98/load1/SDKChromium2; CI2f40612 main100 ผ่าน4ช่องแต่ load ล้ม1ช่อง | exact revision gates, intermittent acknowledgement/overflow/timeout, performance/sustained-load |
+| ความเชื่อมั่น | session bearer/pairing/Host/Origin checks; HTTP spans ลดรูปไม่เก็บ URL/header/body/baggage | export privacy/real-app gates; authentication ไม่ได้พิสูจน์ว่า sender report เกิดจริง |
 | การใช้งานจริง | ไม่มีแอปธุรกิจของผู้ใช้หรือ user trial | pilot แอปที่ไม่ได้สร้างเพื่อให้ FlowAtlas ผ่านเทสต์ และวัดประโยชน์ |
 
 มี storage recovery test บน Windows/OneDrive ล้มเหลวหนึ่งรอบ (503 หลังคืนไฟล์) แล้วผ่าน focused/serial/default retry สาเหตุยังไม่ยืนยัน ดู [QUALITY.md](docs/QUALITY.md) ห้ามถือว่าปิดปัญหานี้จากการรันซ้ำผ่านอย่างเดียว

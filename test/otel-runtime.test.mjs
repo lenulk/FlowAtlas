@@ -22,7 +22,7 @@ async function waitFor(work, timeoutMs = 5000) {
   while (Date.now() < deadline) { const value = await work(); if (value) return value; await new Promise((resolve) => setTimeout(resolve, 25)); }
   throw new Error('Asynchronous span delivery did not reach the expected state');
 }
-for (const extension of ['cjs', 'mjs']) test(`real OTel preload captures ${extension} HTTP/Undici fan-out and isolates concurrent requests`, { timeout: 25000 }, async () => {
+for (const extension of ['cjs', 'mjs']) test(`real OTel preload captures ${extension} HTTP/Undici fan-out and isolates concurrent requests`, { timeout: 25000 }, async (t) => {
   mkdirSync(parent, { recursive: true }); const workspace = mkdtempSync(join(parent, 'otel-runtime-'));
   const app = join(workspace, 'app'); mkdirSync(app); const entry = `server.${extension}`;
   const contexts = [];
@@ -98,7 +98,20 @@ process.stdin.resume();
     const done = once(child, 'close'); child.stdin.write('stop\n'); assert.equal((await done)[0], 0);
     const summaries = [...output.matchAll(/FlowAtlas trace summary: (\{[^\n]+\})/g)];
     assert.equal(summaries.length, 1, 'Shutdown reports one sanitized capture summary');
-    assert.deepEqual(JSON.parse(summaries[0][1]), { httpSpans: 6, invalidSpans: 0, delivered: 6, dropped: 0, queued: 0, inFlight: 0 });
+    const summary = JSON.parse(summaries[0][1]);
+    if (summary.dropped) {
+      for (const [prefix, fields] of [
+        ['delivery', ['overflow', 'invalid', 'rejected', 'timeout', 'transport', 'shutdown']],
+        ['rejection', ['400', '401', '403', '409', '413', '503', 'other']],
+        ['transport', ['batches', 'submittedSpans', 'smallBatches', 'peakRequests']]]) {
+        const match = output.match(new RegExp(`FlowAtlas trace ${prefix} health: (\\{[^\\n]+\\})`));
+        const health = match ? JSON.parse(match[1]) : null;
+        if (health && fields.every((field) => Number.isSafeInteger(health[field]) && health[field] >= 0)) {
+          t.diagnostic(`SDK ${prefix} diagnosis: ${JSON.stringify(Object.fromEntries(fields.map((field) => [field, health[field]])))}`);
+        }
+      }
+    }
+    assert.deepEqual(summary, { httpSpans: 6, invalidSpans: 0, delivered: 6, dropped: 0, queued: 0, inFlight: 0 });
     assert.equal(existsSync(join(workspace, 'data/actions/.writer.lock')), false);
     const state = readFileSync(join(workspace, 'data/actions/state.json'), 'utf8');
     assert.equal(state.includes('canary-'), false); assert.equal(state.includes(token), false);
