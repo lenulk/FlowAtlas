@@ -95,7 +95,10 @@ process.stdin.resume();
         console.log(`HTTP trace browser evidence: ${relative(root, evidence)}`);
       } finally { await browser.close(); }
     }
-    const done = once(child, 'exit'); child.stdin.write('stop\n'); assert.equal((await done)[0], 0);
+    const done = once(child, 'close'); child.stdin.write('stop\n'); assert.equal((await done)[0], 0);
+    const summaries = [...output.matchAll(/FlowAtlas trace summary: (\{[^\n]+\})/g)];
+    assert.equal(summaries.length, 1, 'Shutdown reports one sanitized capture summary');
+    assert.deepEqual(JSON.parse(summaries[0][1]), { httpSpans: 6, invalidSpans: 0, delivered: 6, dropped: 0, queued: 0, inFlight: 0 });
     assert.equal(existsSync(join(workspace, 'data/actions/.writer.lock')), false);
     const state = readFileSync(join(workspace, 'data/actions/state.json'), 'utf8');
     assert.equal(state.includes('canary-'), false); assert.equal(state.includes(token), false);

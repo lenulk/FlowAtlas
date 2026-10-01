@@ -39,8 +39,13 @@ async function stopTarget(child) {
   if (!child || child.exitCode !== null || child.signalCode !== null) return;
   const exited = once(child, 'exit');
   const timer = setTimeout(() => child.kill('SIGKILL'), 5000);
-  child.kill('SIGTERM');
-  try { await exited; } finally { clearTimeout(timer); }
+  const terminate = () => child.kill('SIGTERM');
+  const flushed = (message) => { if (message === 'flowatlas:flushed' || message === 'flowatlas:flush-failed') terminate(); };
+  if (child.connected) {
+    child.on('message', flushed);
+    child.send('flowatlas:shutdown', (error) => { if (error) terminate(); });
+  } else terminate();
+  try { await exited; } finally { clearTimeout(timer); child.off('message', flushed); }
 }
 function waitForTarget(child, expectedOrigin) {
   return new Promise((resolveReady, rejectReady) => {
@@ -120,7 +125,7 @@ async function runInspector(args = process.argv.slice(2)) {
     target = spawn(process.execPath, [...preload, entryPath], { cwd: projectRoot,
       env: { ...targetEnv, FLOWATLAS_URL: collectorUrl, FLOWATLAS_PROJECT_ID: project.id, FLOWATLAS_SESSION_TOKEN: credential,
         PORT: process.env.FLOWATLAS_APP_PORT ?? '0', EXTERNAL_PORT: process.env.FLOWATLAS_EXTERNAL_PORT ?? '0' },
-      stdio: ['pipe', 'pipe', 'pipe'] });
+      stdio: trace ? ['pipe', 'pipe', 'pipe', 'ipc'] : ['pipe', 'pipe', 'pipe'] });
     const targetExited = once(target, 'exit');
     target.stderr.on('data', (chunk) => process.stderr.write(chunk));
     const readyUrl = await waitForTarget(target, appUrl);

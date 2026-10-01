@@ -29,6 +29,11 @@ export class LocalHttpSpanExporter {
     this.url = url.origin + '/flowatlas/ingest'; this.projectId = projectId; this.codeDigest = codeDigest;
     this.sessionToken = sessionToken; this.capacity = capacity; this.timeoutMs = timeoutMs; this.onDrop = onDrop;
     this.queue = []; this.inFlight = 0; this.dropped = 0; this.closed = false; this.pending = null; this.abort = null;
+    this.httpSpans = 0; this.invalidSpans = 0; this.delivered = 0;
+  }
+  summary() {
+    return Object.freeze({ httpSpans: this.httpSpans, invalidSpans: this.invalidSpans, delivered: this.delivered,
+      dropped: this.dropped, queued: this.queue.length, inFlight: this.inFlight });
   }
   drop(count) {
     this.dropped += count;
@@ -40,8 +45,9 @@ export class LocalHttpSpanExporter {
       try {
         const item = normalizeSdkHttpSpan(span);
         if (!item) continue;
+        this.httpSpans++;
         if (this.queue.length + this.inFlight >= this.capacity) this.drop(1); else this.queue.push(item);
-      } catch { this.drop(1); }
+      } catch { this.invalidSpans++; this.drop(1); }
     }
     callback({ code: 0 });
     void this.pump(); // SDK/application never awaits collector delivery.
@@ -70,6 +76,7 @@ export class LocalHttpSpanExporter {
           signal: controller.signal, redirect: 'error' }));
         await response.body?.cancel();
         if (!response.ok) this.drop(batch.length);
+        else this.delivered += batch.length;
       } catch { this.drop(batch.length); }
       finally { clearTimeout(timer); this.inFlight = 0; this.abort = null; }
     }

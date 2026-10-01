@@ -1432,4 +1432,44 @@
 - commit: 4a68a3c714cef8065657cd87265eb70ac8b3bc51; dirty: true
 - หลักฐาน: `reports/tests/2026-10-01T07-56-23-160Z.tap` และ `.json`
 
-- Cold-cache fix verified: separate online packed-artifact preparation then independent offline install succeeded, followed by guarded installed-package real SDK CJS/ESM run 2026-10-01T07-56-23-160Z 2/2. No application runtime code changed in this correction; CI requires a new hosted run. VM browser inventory uses an older browser build with current Playwright 1.63.0; install matching Chromium under the fresh QA directory, preserving existing tools/data.
+- Cold-cache fix verified: separate online packed-artifact preparation then independent offline install succeeded, followed by guarded installed-package real SDK CJS/ESM run 2026-10-01T07-56-23-160Z 2/2. No application runtime code changed in this correction; CI requires a new hosted run. VM browser inventory contains matching chromium_headless_shell-1243 but lacks full chromium-1243 required by channel=chromium; install full matching Chromium under the fresh QA directory, preserving existing tools/data.
+
+- Hosted API status: run 36832645864 completed with the same package-install failure in all four OS/Node jobs; other functional gates passed. New cache-correction run 36833414845 (18b9ddd) is running in all four jobs, no failures in the current snapshot. No full pass claimed yet. Browser setup diagnosis refined from actual VM inventory: existing Chromium headless shell matches build 1243, but channel=chromium requires full chromium-1243, which is absent; initial hypothesis of an older build was corrected.
+
+- Hosted correction run 36833414845 (18b9ddd) Ubuntu24.04 Node22.23.3 and24.21.0 completed success including offline package/preload/reinstall gates. Windows jobs still running with no failure in snapshot; full matrix not yet passed.
+- Next round planned: full CLI HTTP fixture benchmark, 3 paired baseline/traced rounds, 50 warm-up plus 1000 measured requests each, concurrency8; relative p95 target10%, tiny-baseline absolute budget5ms chosen before running. Add sanitized exporter delivery/drop summary so retained100graphs are not misused as request counts. This is fixture evidence, not a real-app pilot or production-load claim.
+
+## 2026-10-01T08-02-52-568Z
+
+- จุดประสงค์: Capture accounting: acknowledged delivery invalid ignored full queue and real SDK shutdown
+- ผล: ไม่ผ่าน — 4/6; failed 2; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: 18b9ddd6892bfd977e299f75eeef4b60d480c37a; dirty: true
+- หลักฐาน: `reports/tests/2026-10-01T08-02-52-568Z.tap` และ `.json`
+- ไม่ผ่าน: real OTel preload captures cjs HTTP/Undici fan-out and isolates concurrent requests
+- ไม่ผ่าน: real OTel preload captures mjs HTTP/Undici fan-out and isolates concurrent requests
+
+- Capture accounting regression 2026-10-01T08-02-52-568Z: exporter tests4/4 passed but real Windows SDK cases0/2 failed because no shutdown summary reached inspector output. Windows child.kill(SIGTERM) terminates the process without running the Node signal handler, so the previous stop path did not prove flushing. Add a private IPC flush handshake for trace-mode child before the existing termination step, retaining the5s outer deadline; verify actual CJS/ESM shutdown counters. Tool read also referenced nonexistent test/inspect-cli.test.mjs; inspected existing test inventory instead, no files changed by that failed search.
+
+## 2026-10-01T08-04-49-597Z
+
+- จุดประสงค์: Trace shutdown IPC flush and sanitized capture counters on Windows plus legacy inspect
+- ผล: ผ่าน — 10/10; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: 18b9ddd6892bfd977e299f75eeef4b60d480c37a; dirty: true
+- หลักฐาน: `reports/tests/2026-10-01T08-04-49-597Z.tap` และ `.json`
+
+- Hosted run36833414845 revision18b9ddd completed success in all4 Windows2025/Ubuntu24.04 ×Node22.23.3/24.21.0 jobs: main91, source, Chromium explicit/independent/SDK viewer, offline package/SDK/reinstall gates. This proves the cache correction at that revision; subsequent IPC/counter changes need their own gates.
+- VM4a68a3c full matching Chromium installation succeeded. Paired realSDK CJS/ESM UI2/2 (2026-10-01T08-03-12-214Z) and explicit browser module/restart1/1 (08-03-18-225Z) passed, failed/skipped0. Result archive SHA25646f36e56fd82fc91c03f6a8b984eeef413a8c31c482304dd53de1fd2ce896b7d; retrieval/check/visualinspection pending. These tests predate the newIPC/counter changes.
+
+- VM evidence retrieval: SCP succeeded and archive SHA256 matched. Windows tar inventory failed when given the absolute path containing Thai characters (rendered question marks); no extraction occurred. Use a project-relative archive/extraction path with the same checksum/type/path/no-overwrite checks.
+
+- Retrieved VM archive checksum/type/path validation and no-overwrite import succeeded using relative tar paths. Imported all5 raw TAP/JSON including failed browser setup into reports/tests and images into reports/browser/vm. All VM run digests equal1149fba920a1bfa9c82c3481acdcadec378243d52b4c3f5c4ad6a91ebcfe5dd4. Compared recorded files byte hashes with Git4a68a3c blobs (not current dirty source); no mismatch. Inspected realSDK HTTP screenshot and explicit5-row restart screenshot: SERVER precedes bothCLIENTspans, parent evidence matches, partialcoverage/unknownclientaction shown, no pairingsecret or canarytext visible. This does not certify large-graph branching UX.
+
+## 2026-10-01T08-10-28-953Z
+
+- จุดประสงค์: Final trace IPC shutdown stdio close accounting CJS ESM
+- ผล: ผ่าน — 2/2; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: 18b9ddd6892bfd977e299f75eeef4b60d480c37a; dirty: true
+- หลักฐาน: `reports/tests/2026-10-01T08-10-28-953Z.tap` และ `.json`

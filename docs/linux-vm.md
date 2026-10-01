@@ -104,3 +104,9 @@ node scripts/run-tests.mjs test/register-app.test.mjs
 ตรวจ clean bundle clone ใหม่บน VM เดิม /home/test/FlowAtlas-qa-a9b1a8d ด้วย portable Node 22.23.3: main 71/71 (2026-09-30T21-42-31-937Z), isolated source 1/1 (2026-09-30T21-42-48-575Z), secure Chromium inspector 1/1 (2026-09-30T21-42-48-983Z), failed/skipped 0; no writer lock after stop. ครอบคลุม pairing/graph/source/logout/reload/restart; source hashes ทุกไฟล์ตรง host ณ revision นี้
 
 Archive reports/vm/flowatlas-a9b1a8d-results.tgz SHA256 320efcdcbac65b2df4cf24b6cb6aad079173ddfe435777dea3b54a04abc25c28 ตรวจ checksum/paths/no-overwrite ก่อนนำเข้า; ตรวจภาพ restart ด้วยตาแล้ว ผลนี้ไม่รวม adapter-update feature ที่เพิ่มหลัง revision นี้ และไม่ใช่ external-business-app/user trial
+
+## HTTP SDK/browser revision4a68a3c
+
+Debian12 VM สำเนาใหม่ /home/test/FlowAtlas-qa-4a68a3c/project, Node22.23.3, root dependencies ติดตั้ง offline จาก cache ตรวจ SHA256: main91/91 (2026-10-01T07-54-39-018Z), source1/1 (07-55-00-123Z), realNodeSDK CJS/ESM+Chromium153.0.8010.12 viewer2/2 (08-03-12-214Z), explicit browser module/restart1/1 (08-03-18-225Z) ผ่าน ก่อนหน้านั้น browserrun07-55-00-488Z failed0/2 เพราะเลือก channel=chromium ขณะที่มีเฉพาะ headlessshell; ติดตั้ง fullChromium ใน QA directory ใหม่แล้วตรวจซ้ำ ไม่แก้ functional assertions หรือเพิ่ม retry
+
+Archive reports/vm/flowatlas-4a68a3c-results.tgz SHA25646f36e56fd82fc91c03f6a8b984eeef413a8c31c482304dd53de1fd2ce896b7d ตรวจ checksum/regularfiles/paths/no-overwrite ก่อนนำเข้า raw reports ทั้งpass/fail เก็บใน reports/tests ภาพHTTPtraceและrestartตรวจด้วยตาแล้ว Recorded source hashes ทุกไฟล์เทียบGitblobของ4a68a3cตรง (ปัจจุบันมีงานใหม่counter/IPC จึงไม่อ้างว่าตรงdirtyworkspaceปัจจุบัน) ผลนี้ไม่รวม IPCflush/capturecounter ที่เพิ่มหลัง18b9ddd, productionload หรือ realbusinessapp

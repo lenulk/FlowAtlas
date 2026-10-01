@@ -27,10 +27,20 @@ const sdk = new NodeSDK({ autoDetectResources: false, resourceDetectors: [],
 });
 sdk.start();
 let shutdown;
-const close = () => shutdown ??= sdk.shutdown().finally(() => {
+const close = () => shutdown ??= sdk.shutdown().finally(async () => {
   if (exporter.dropped) console.error(`FlowAtlas trace dropped spans: ${exporter.dropped}`);
+  await new Promise((resolve, reject) => process.stderr.write(`FlowAtlas trace summary: ${JSON.stringify(exporter.summary())}\n`,
+    (error) => error ? reject(error) : resolve()));
 });
 process.once('beforeExit', close);
+if (process.send) {
+  process.on('message', (message) => {
+    if (message === 'flowatlas:shutdown') close().then(() => process.send?.('flowatlas:flushed'),
+      () => process.send?.('flowatlas:flush-failed'));
+  });
+  // IPC must not keep an otherwise finished application alive.
+  process.channel?.unref();
+}
 for (const signal of ['SIGINT', 'SIGTERM']) process.once(signal, () => {
   // Inspector also has a 5s kill deadline; this bounds preload cleanup independently.
   const deadline = setTimeout(() => process.exit(1), 1500);

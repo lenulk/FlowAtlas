@@ -34,6 +34,7 @@ test('bounded exporter promptly acknowledges spans, reports drops and stops with
   const started = Date.now(); await exporter.shutdown();
   assert.ok(Date.now() - started < 1500, 'Shutdown must abort delivery within the documented budget');
   assert.equal(exporter.queue.length, 0); assert.equal(exporter.inFlight, 0); assert.equal(exporter.dropped, 20);
+  assert.deepEqual(exporter.summary(), { httpSpans: 20, invalidSpans: 0, delivered: 0, dropped: 20, queued: 0, inFlight: 0 });
   assert.equal(received, 1); assert.ok(health.length > 0); assert.equal(JSON.stringify(health).includes('canary-'), false);
 });
 
@@ -45,4 +46,22 @@ test('rejected span deliveries are attempted once and never follow a credential 
   exporter.export([sdkSpan()], () => {}); await exporter.forceFlush();
   assert.equal(calls, 1); assert.equal(foreignCalls, 0); assert.equal(exporter.dropped, 1);
   await exporter.shutdown();
+});
+
+test('exporter summary counts acknowledged HTTP spans separately from invalid and ignored spans', async (t) => {
+  const received = [];
+  const url = await serve(t, async (req, res) => {
+    let body = ''; for await (const part of req) body += part;
+    received.push(JSON.parse(body)); res.end('{}');
+  });
+  const exporter = new LocalHttpSpanExporter(config(url));
+  exporter.export([sdkSpan(1), sdkSpan(2), { ...sdkSpan(), kind: 0 },
+    { ...sdkSpan(), spanContext: () => ({ traceId: 'invalid' }) }], () => {});
+  await exporter.shutdown();
+  assert.equal(received.flatMap((batch) => batch.spans).length, 2);
+  assert.deepEqual(exporter.summary(), { httpSpans: 2, invalidSpans: 1, delivered: 2, dropped: 1, queued: 0, inFlight: 0 });
+  assert.equal(Object.isFrozen(exporter.summary()), true);
+  assert.equal(JSON.stringify(exporter.summary()).includes('canary-'), false);
+  let code; exporter.export([sdkSpan(3)], (result) => { code = result.code; });
+  assert.equal(code, 1); assert.equal(exporter.summary().httpSpans, 2);
 });
