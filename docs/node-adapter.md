@@ -2,6 +2,8 @@
 
 ตัวเชื่อมนี้ใช้ explicit instrumentation และโปรโตคอล metadata ของ FlowAtlas ยังไม่ใช่ OpenTelemetry SDK หรือ browser trace recorder ตัวอย่างพร้อมใช้เก็บใน `apps/message-app` ซึ่งมี Git repository ของตัวเองและไม่ import runtime ของ collector
 
+มี [browser action module](browser-client.md) สำหรับสร้าง correlation scope และเรียก API จากจุดที่เลือกเปิด capture; demo ที่สร้างใหม่ใช้ module นี้ แอปเดิมต้องคัดลอก static module/เพิ่ม allowlist/เชื่อม endpoint เอง ไม่มีการแก้ไฟล์ browser ของแอปเดิมตอน adapters update
+
 ## ทดลองตัวอย่าง
 
 จากโฟลเดอร์ FlowAtlas สร้างตัวอย่าง (ทำครั้งเดียว; จะไม่เขียนทับแอปเดิม):

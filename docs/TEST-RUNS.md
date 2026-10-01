@@ -1171,3 +1171,57 @@
 
 - GitHub API confirms run 36780927859 completed success at a9b1a8d3e091fc24ebdca665e73ebf68b2a8bb27. All four jobs Ubuntu 24.04/Windows 2025 × Node 22.23.3/24.21.0 completed success. Gates include main 71 tests, isolated source, both Chromium journeys, offline package and reinstall/replay. This verifies the committed revision; pending managed adapter update was not in that run.
 - Review of final managed adapter diff and documentation: update/rollback is limited to known byte fingerprints; no schema migration or power-loss guarantee added. Final offline package journey 2026-10-01T06-48-11-666Z passed 1/1 after CRLF catalog fix; installed files/config/history and session rotation checked by the journey.
+
+## 2026-10-01T06-53-36-099Z
+
+- จุดประสงค์: New browser action scope: concurrent isolation, metadata failure, origin/redirect and lifecycle boundaries
+- ผล: ผ่าน — 4/4; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: 3f054c5b08b4b0964f1e84a6813f3850f3c5af5e; dirty: true
+- หลักฐาน: `reports/tests/2026-10-01T06-53-36-099Z.tap` และ `.json`
+
+## 2026-10-01T06-54-35-555Z
+
+- จุดประสงค์: Browser scope integration with updated demo generator, registration, doctor and adapter upgrade
+- ผล: ผ่าน — 23/23; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: 3f054c5b08b4b0964f1e84a6813f3850f3c5af5e; dirty: true
+- หลักฐาน: `reports/tests/2026-10-01T06-54-35-555Z.tap` และ `.json`
+
+## 2026-10-01T06-55-35-708Z
+
+- จุดประสงค์: Real Edge browser module: three UI actions, two concurrent scopes, graph correlation and persisted replay
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: 3f054c5b08b4b0964f1e84a6813f3850f3c5af5e; dirty: true
+- หลักฐาน: `reports/tests/2026-10-01T06-55-35-708Z.tap` และ `.json`
+
+## 2026-10-01T06-56-24-216Z
+
+- จุดประสงค์: Isolated source regression after browser module demo source registration changes
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: 3f054c5b08b4b0964f1e84a6813f3850f3c5af5e; dirty: true
+- หลักฐาน: `reports/tests/2026-10-01T06-56-24-216Z.tap` และ `.json`
+## Manual browser evidence and documentation tool check — 2026-10-01
+
+- Inspected reports/vm/inspector-browser-2026-10-01T06-55-36-034Z-2d447efc/inspector-restart.png visually: five history rows, selected graph with five nodes and observed/unknown distinctions, readable Thai layout, no pairing code visible. Source regression 2026-10-01T06-56-24-216Z passed separately.
+- Documentation patch reported a missing README heading and failed verification; recheck files before applying a corrected patch. This was a tooling/edit-anchor error, not an application failure.
+
+
+## Manual browser package build — 2026-10-01
+
+- Pack inventory excludes private paths and includes src/browser-client.mjs; offline install without scripts and new demo with registered browser module succeeded. Artifact: reports/releases/browser-8d6363a5910f4048afbd9c4f81eb02a8; installation: reports/storage/browser-8d6363a5910f4048afbd9c4f81eb02a8. Automated package journey follows.
+
+## 2026-10-01T07-00-07-562Z
+
+- จุดประสงค์: Packaged browser module demo source snapshot plus adapter update and three business actions/restart
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: 3f054c5b08b4b0964f1e84a6813f3850f3c5af5e; dirty: true
+- หลักฐาน: `reports/tests/2026-10-01T07-00-07-562Z.tap` และ `.json`
+## Manual CI and browser documentation review — 2026-10-01
+
+- GitHub API: adapter revision 3f054c5b08b4b0964f1e84a6813f3850f3c5af5e run 36826886673 completed success; Ubuntu 24.04/Windows 2025 × Node 22.23.3/24.21.0 all success, including managed adapter main regressions and offline package probe/reinstall.
+- Luna performed read-only review of browser docs/source and new local links; no mismatch found. Lead reviewed source, affected diffs, real Edge evidence and package gate before accepting the review. No Luna code changes, tests or network operations.
+- Final browser module package journey 2026-10-01T07-00-07-562Z passed 1/1: generated app carries browser module in source snapshot and offline installation; real HTTP/auth/history restart checked. This test does not drive the installed package in a browser (Edge journey separately drives checkout-generated demo).

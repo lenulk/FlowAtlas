@@ -21,9 +21,10 @@ function fixture(t) {
   }));
   copyFileSync(join(root, 'examples/registered-app/server.mjs'), join(target, 'server.mjs'));
   copyFileSync(join(root, 'examples/registered-app/index.html'), join(target, 'index.html'));
+  copyFileSync(join(root, 'src/browser-client.mjs'), join(target, 'browser-client.mjs'));
   const config = join(workspace, 'flowatlas.config.json');
   writeFileSync(config, JSON.stringify({ projects: [{ id: 'target', root: 'apps/target',
-    files: ['server.mjs', 'index.html', 'node-adapter.mjs', 'project-sources.mjs'] }] }));
+    files: ['server.mjs', 'index.html', 'node-adapter.mjs', 'project-sources.mjs', 'browser-client.mjs'] }] }));
   t.after(() => {
     const path = relative(parent, workspace); assert.ok(path && !path.startsWith('..') && !isAbsolute(path));
     rmSync(workspace, { recursive: true, force: true });

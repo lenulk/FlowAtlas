@@ -8,18 +8,19 @@
 <button data-name="send-message" data-method="POST" data-path="/api/send">ส่งข้อความ</button>
 <button data-name="fail-message" data-method="POST" data-path="/api/fail">ทดลองบริการล้มเหลว</button>
 <pre id="result" role="status">เลือกการกระทำเพื่อเริ่ม</pre><p id="warning" hidden>บันทึกหลักฐานไม่ครบ แต่ผลการทำงานของแอปแสดงตามจริง</p><a id="viewer" hidden target="_blank" rel="noopener">เปิดแผนที่ใน FlowAtlas ↗</a></main>
-<script>
+<script type="module">
+import { createBrowserActions } from './browser-client.mjs';
+const actions=createBrowserActions();
 document.querySelectorAll('button').forEach((button)=>button.addEventListener('click',async()=>{
   const buttons=document.querySelectorAll('button');buttons.forEach((b)=>b.disabled=true);
   const viewer=document.querySelector('#viewer');viewer.hidden=true;document.querySelector('#warning').hidden=true;
   try{
-    const id=crypto.randomUUID();
-    const started=await fetch('/action-start',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({id,name:button.dataset.name,clientTime:new Date().toISOString()})});
-    if(!started.ok)throw new Error(`เริ่มไม่สำเร็จ (${started.status})`);
-    const response=await fetch(button.dataset.path,{method:button.dataset.method,headers:{'x-flowatlas-action-id':id}});
+    const action=await actions.start(button.dataset.name);
+    const response=await action.fetch(button.dataset.path,{method:button.dataset.method});
+    const id=action.id;
     const body=await response.json();document.querySelector('#result').textContent=`HTTP ${response.status}\n${body.message??body.error}\nAction: ${id}`;
-    document.querySelector('#warning').hidden=body.complete===true;
-    if(body.viewerUrl){viewer.href=body.viewerUrl;viewer.hidden=false;}
+    document.querySelector('#warning').hidden=action.complete;
+    if(action.viewerUrl){viewer.href=action.viewerUrl;viewer.hidden=false;}
   }catch(error){document.querySelector('#result').textContent=error.message;}
   finally{buttons.forEach((b)=>b.disabled=false);}
 }));

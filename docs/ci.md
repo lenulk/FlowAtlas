@@ -14,6 +14,6 @@ Actions pin ด้วย SHA, token ใช้ contents:read และไม่�
 
 ขั้นตอน QA ต่อกันบน source commit เดียวกัน; runner เพิ่ม TEST-RUNS ทำให้ Git dirty หลังชุดแรกได้ จึงต้องเทียบ source digest/files ด้วย `dirty=true` เพียงอย่างเดียวไม่ได้แปลว่า app code เปลี่ยน QA tools แยกจาก runtime app dependencies
 
-Hosted [run 36780927859](https://github.com/lenulk/FlowAtlas/actions/runs/36780927859) ของ a9b1a8d ผ่านครบทั้งสี่ช่อง รวม main 71 tests และ source/browser/package/reinstall gates หลักฐานนี้ครอบคลุม revision นั้น; adapter update gate ที่เพิ่มภายหลังต้องมีผลของ revision ใหม่ก่อนรับรอง เมื่ออัปเดต runtime/QA tools ต้องทบทวน lockfile และผล gate ใหม่ ไม่มี retry อัตโนมัติที่เปลี่ยน failed test เป็น pass
+Hosted [run 36780927859](https://github.com/lenulk/FlowAtlas/actions/runs/36780927859) ของ a9b1a8d ผ่านครบทั้งสี่ช่อง รวม main 71 tests และ source/browser/package/reinstall gates หลักฐานนี้ครอบคลุม revision นั้น; managed adapter update gates ผ่านครบสี่ช่องใน [run 36826886673](https://github.com/lenulk/FlowAtlas/actions/runs/36826886673) ของ 3f054c5 (main 77 tests); browser module ที่เพิ่มหลัง revision นี้ยังต้องตรวจ hosted รอบใหม่ เมื่ออัปเดต runtime/QA tools ต้องทบทวน lockfile และผล gate ใหม่ ไม่มี retry อัตโนมัติที่เปลี่ยน failed test เป็น pass
 
 อ้างอิง: [Node releases](https://nodejs.org/en/about/previous-releases), [checkout](https://github.com/actions/checkout), [setup-node](https://github.com/actions/setup-node), [upload-artifact](https://github.com/actions/upload-artifact)

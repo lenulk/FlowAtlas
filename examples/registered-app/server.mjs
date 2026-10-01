@@ -6,7 +6,7 @@ import { createInterface } from 'node:readline';
 import { createFlowAtlasClient, captureProjectVersion } from './node-adapter.mjs';
 
 const root = dirname(fileURLToPath(import.meta.url));
-const files = ['server.mjs', 'index.html', 'node-adapter.mjs', 'project-sources.mjs'];
+const files = ['server.mjs', 'index.html', 'node-adapter.mjs', 'project-sources.mjs', 'browser-client.mjs'];
 const projectId = process.env.FLOWATLAS_PROJECT_ID ?? 'message-app';
 const version = captureProjectVersion(root, files, projectId);
 const client = createFlowAtlasClient({ projectId, codeDigest: version.digest,
@@ -45,6 +45,10 @@ async function failMessage(capture) {
 }
 const app = createServer(async (request, response) => {
   try {
+    if (request.method === 'GET' && request.url === '/browser-client.mjs') {
+      response.writeHead(200, { 'content-type': 'text/javascript; charset=utf-8', 'x-content-type-options': 'nosniff' });
+      response.end(readFileSync(join(root, 'browser-client.mjs'))); return;
+    }
     if (request.method === 'GET' && request.url === '/') {
       response.writeHead(200, { 'content-type': 'text/html; charset=utf-8' });
       response.end(readFileSync(join(root, 'index.html'))); return;

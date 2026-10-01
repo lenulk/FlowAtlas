@@ -22,18 +22,19 @@ test('register command copies adapters, configures a separate app, and inspector
   const directory = workspace();
   const target = join(directory, 'target'); mkdirSync(target);
   for (const file of ['server.mjs', 'index.html']) copyFileSync(join(root, 'examples', 'registered-app', file), join(target, file));
+  copyFileSync(join(root, 'src/browser-client.mjs'), join(target, 'browser-client.mjs'));
   const config = join(directory, 'config.json');
   const state = join(directory, 'state');
   let child;
   try {
     const registered = spawnSync(process.execPath, ['scripts/register-app.mjs', '--id', 'registered-qa',
-      '--root', relative(root, target), '--source', 'index.html', '--config', relative(root, config)],
+      '--root', relative(root, target), '--source', 'index.html', '--source', 'browser-client.mjs', '--config', relative(root, config)],
     { cwd: root, encoding: 'utf8', timeout: 10000 });
     assert.equal(registered.status, 0, registered.stderr || registered.error?.message);
     assert.match(registered.stdout, /Copied 2 adapter file/);
     const record = JSON.parse(readFileSync(config, 'utf8')).projects[0];
     assert.equal(record.id, 'registered-qa');
-    assert.deepEqual(record.files, ['server.mjs', 'index.html', 'node-adapter.mjs', 'project-sources.mjs']);
+    assert.deepEqual(record.files, ['server.mjs', 'index.html', 'browser-client.mjs', 'node-adapter.mjs', 'project-sources.mjs']);
     for (const file of ['node-adapter.mjs', 'project-sources.mjs']) {
       assert.deepEqual(readFileSync(join(target, file)), readFileSync(join(root, 'src', file)));
     }

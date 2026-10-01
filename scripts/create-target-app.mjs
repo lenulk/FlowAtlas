@@ -7,7 +7,7 @@ import { resolveWorkspace } from '../src/workspace.mjs';
 
 const toolRoot = dirname(dirname(fileURLToPath(import.meta.url)));
 const root = resolveWorkspace(toolRoot);
-export const targetFiles = ['server.mjs', 'index.html', 'node-adapter.mjs', 'project-sources.mjs'];
+export const targetFiles = ['server.mjs', 'index.html', 'node-adapter.mjs', 'project-sources.mjs', 'browser-client.mjs'];
 export function createTargetApp(destination) {
   const directory = resolve(root, destination);
   const within = relative(root, directory);
@@ -19,7 +19,7 @@ export function createTargetApp(destination) {
   const physical = relative(realpathSync(root), realpathSync(ancestor));
   if (physical === '..' || physical.startsWith('..\\') || physical.startsWith('../') || isAbsolute(physical)) throw new Error('Target app path escaped the project');
   mkdirSync(directory, { recursive: true });
-  for (const file of targetFiles) copyFileSync(join(toolRoot, file.endsWith('adapter.mjs') || file === 'project-sources.mjs' ? 'src' : 'examples/registered-app', file), join(directory, file));
+  for (const file of targetFiles) copyFileSync(join(toolRoot, ['node-adapter.mjs', 'project-sources.mjs', 'browser-client.mjs'].includes(file) ? 'src' : 'examples/registered-app', file), join(directory, file));
   writeFileSync(join(directory, 'package.json'), JSON.stringify({ name: 'flowatlas-target-example', private: true, type: 'module', scripts: { start: 'node server.mjs' } }, null, 2) + '\n');
   return directory;
 }

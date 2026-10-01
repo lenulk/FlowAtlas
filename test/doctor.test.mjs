@@ -19,8 +19,9 @@ function workspace(t) {
   });
   const app = join(directory, 'app'); mkdirSync(app);
   for (const file of ['server.mjs', 'index.html']) copyFileSync(join(root, 'examples', 'registered-app', file), join(app, file));
+  copyFileSync(join(root, 'src/browser-client.mjs'), join(app, 'browser-client.mjs'));
   const config = join(directory, 'config.json');
-  registerApp({ id: 'doctor-app', root: relative(root, app), sources: ['index.html'], config: relative(root, config) });
+  registerApp({ id: 'doctor-app', root: relative(root, app), sources: ['index.html', 'browser-client.mjs'], config: relative(root, config) });
   return { directory, app, config, data: join(directory, 'state') };
 }
 function runDoctor(work, args = [], env = {}) {

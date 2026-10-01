@@ -137,6 +137,29 @@ test('on-demand command supports a complete browser journey and persisted replay
       await viewer.close();
       actions.push({ id, name, outcome, nodes: graph.nodes.length, edges: graph.edges.length });
     }
+    console.log('Inspector: two concurrent action scopes through the browser module');
+    const concurrent = await page.evaluate(async () => {
+      const { createBrowserActions } = await import('/browser-client.mjs');
+      const client = createBrowserActions();
+      return Promise.all([['view-message', '/api/message', 'GET'], ['send-message', '/api/send', 'POST']].map(async ([name, path, method]) => {
+        const scope = await client.start(name);
+        const response = await scope.fetch(path, { method });
+        const body = await response.json();
+        return { id: scope.id, name, status: response.status, complete: scope.complete, message: body.message };
+      }));
+    });
+    assert.notEqual(concurrent[0].id, concurrent[1].id);
+    for (const result of concurrent) {
+      assert.equal(result.status, 200); assert.equal(result.complete, true); assert.equal(result.message, 'MSG-1');
+      const response = await context.request.get(`${collector}/flowatlas/actions/${result.id}`, { headers: { authorization: `Bearer ${credential}` } })
+        .catch(() => { throw new Error('Concurrent authorized graph request failed'); });
+      assert.equal(response.status(), 200);
+      const graph = await response.json();
+      assert.equal(graph.name, result.name); assert.equal(graph.outcome, 'success');
+      assert.deepEqual(graph.edges.map((edge) => edge.status), ['observed', 'observed', 'observed', 'unknown']);
+      assert.ok(graph.edges.filter((edge) => edge.evidence.correlationId).every((edge) => edge.evidence.correlationId === result.id));
+      actions.push({ id: result.id, name: result.name, outcome: graph.outcome, nodes: graph.nodes.length, edges: graph.edges.length });
+    }
     console.log('Inspector: closing browser connections before first stop');
     await context.close();
     await stop();
@@ -157,8 +180,8 @@ test('on-demand command supports a complete browser journey and persisted replay
     await viewer.locator('#trace-content').waitFor({ state: 'visible' });
     assert.equal(await viewer.locator('#action-id').innerText(), actions[0].id);
     await viewer.locator('#history-status').waitFor();
-    await viewer.waitForFunction(() => document.querySelectorAll('#history-list tr').length === 3);
-    assert.equal(await viewer.locator('#history-list tr').count(), 3);
+    await viewer.waitForFunction(() => document.querySelectorAll('#history-list tr').length === 5);
+    assert.equal(await viewer.locator('#history-list tr').count(), 5);
     await viewer.screenshot({ path: join(evidence, 'inspector-restart.png'), fullPage: true, timeout: 20000 });
     await viewer.locator('#session-lock').click();
     await viewer.locator('#session-panel').waitFor({ state: 'visible' });
