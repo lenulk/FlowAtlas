@@ -79,6 +79,8 @@ jobs:
           if (-not ($taskPack.files | Where-Object { $_.path -eq 'npm-shrinkwrap.json' })) { throw 'Published dependency lock is missing' }
           $taskInstall = 'reports/storage/package-install'
           $taskArtifact = (Resolve-Path -LiteralPath ('reports/releases/' + $taskPack.filename)).Path
+          npm install --prefix reports/storage/package-cache-warm --cache reports/releases/npm-cache --ignore-scripts --no-audit --no-fund $taskArtifact
+          if ($LASTEXITCODE -ne 0) { throw 'Packed dependency cache preparation failed' }
           npm install --prefix $taskInstall --cache reports/releases/npm-cache --offline --ignore-scripts --no-audit --no-fund $taskArtifact
           if ($LASTEXITCODE -ne 0) { throw 'Offline package install failed' }
           $taskInstalledRoot = (Resolve-Path -LiteralPath ($taskInstall + '/node_modules/flowatlas-mvp')).Path

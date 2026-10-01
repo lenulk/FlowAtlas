@@ -9,7 +9,7 @@
 4. inspector browser journey พร้อม stop/restart/history
 5. independent browser journey พร้อมกราฟ/source ของสาม actions
    ตรวจจริง NodeSDK CJS/ESM HTTP/Undici กับ paired Chromium viewer และหลังติดตั้ง package ตรวจ preload/schema reload อีกครั้ง
-6. pack และ offline install พร้อม workspace แยก แล้วตรวจ package CLI/action/graph/source/stop/restart และถอน/ติดตั้งซ้ำโดยตรวจ hash ของประวัติเดิม; package journey ตรวจอัปเดต historical adapter ใน disposable fixture ด้วย
+6. pack แล้วติดตั้งออนไลน์ใน disposable prefix เพื่อเตรียม tarballs/metadata cache จากแพ็กเกจจริง ก่อนบังคับ offline install ใน prefix ใหม่ พร้อม workspace แยก แล้วตรวจ package CLI/action/graph/source/stop/restart และถอน/ติดตั้งซ้ำโดยตรวจ hash ของประวัติเดิม; package journey ตรวจอัปเดต historical adapter ใน disposable fixture ด้วย
 7. upload raw reports และภาพ fixtures พร้อม TEST-RUNS และ pack inventory แม้ทดสอบไม่ผ่าน
 
 Actions pin ด้วย SHA, token ใช้ contents:read และไม่เก็บ credential หลัง checkout; artifacts อายุ 14 วัน ไม่ส่ง data/, reports/ssh/, QA runtime หรือแอปของผู้ใช้ขึ้น GitHub CI ไม่ push ผลทดสอบกลับ branch หาก job ถูก cancel บางชุดอาจไม่รัน ให้ตรวจสถานะตามจริง

@@ -1398,3 +1398,38 @@
 - Environment: win32/x64; OS 10.0.26200; Node v24.18.0
 - commit: b5c7fd0a9605f1d1a13913b78ae72e4b7900b489; dirty: true
 - หลักฐาน: `reports/tests/2026-10-01T07-41-41-463Z.tap` และ `.json`
+
+## 2026-10-01 — revision 4a68a3c upload and VM preparation
+
+- Manual: reviewed staged diff and dependency-lock presence guard; git diff --cached --check passed. Committed 4a68a3c714cef8065657cd87265eb70ac8b3bc51 and pushed master successfully. Test evidence is the previously recorded 91/91 local main, isolated source, browser and offline-package runs; Git push itself is not a test.
+- Prepared exact-HEAD source bundle SHA256 529624066f355b5b7387bf20c49d1004a0656a23df39407766bc012fd56ece7c and npm content cache archive SHA256 7eb5c81c20c17af3c9253539d449f851cd8993f1ed53b917715dcde9283d424d under reports/vm. Linux install and hosted results pending.
+
+## 2026-10-01 — remote QA preparation and initial hosted status
+
+- VM tool failure before tests: both upload SHA256 checks passed and exact 4a68a3c checkout succeeded, but Python tar extraction rejected the newer filter keyword (older VM Python). No automated VM run started; validated regular-file/directory-only member checks had already passed. Resume extraction using that explicit validation with the older API, in the fresh QA directory only.
+- GitHub run 36832645864: initial snapshot Ubuntu22/24 main/source/browser/SDK steps passed, package-install step failed; Windows still running. Investigating actual logs; this revision has not passed hosted gates.
+
+- Hosted failure analysis: Ubuntu job log reports ENOTCACHED for the @opentelemetry/api registry metadata during offline tarball install. Root npm ci caches locked tarballs but does not necessarily fetch package metadata needed by a downstream install; the earlier local cache already contained metadata from development installs. Package shrinkwrap was present and main/SDK tests passed. Next correction explicitly warms the packed package install in a separate disposable prefix before requiring the independent offline install. This is a cache preparation defect, not a reason to remove the offline gate.
+
+## 2026-10-01T07-55-30-094Z
+
+- จุดประสงค์: Cold cache prepared from packed artifact then offline SDK CJS ESM install
+- ผล: ไม่ผ่าน — 0/1; failed 1; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: ไม่มี; dirty: null
+- หลักฐาน: `reports/tests/2026-10-01T07-55-30-094Z.tap` และ `.json`
+- ไม่ผ่าน: test\\otel-runtime.test.mjs
+
+- VM exact 4a68a3c Node22.23.3: offline root npm ci succeeded (74 packages); main 91/91 (2026-10-01T07-54-39-018Z), isolated source 1/1 (07-55-00-123Z). Optional paired browser runtime run 07-55-00-488Z failed 0/2 because Chromium executable was absent at configured browser-runtime path; this is browser QA setup failure, not a passed UI result. Subsequent inspector-browser step was not run. Inspect existing VM browser inventory before selecting/installing runtime. Raw reports remain on VM and will be copied back.
+
+- Cold-cache correction manual check: fresh online packed-artifact warm install and separate offline install both succeeded (75 packages each). Follow-up SDK run 2026-10-01T07-55-30-094Z failed before cases because the install prefix was under reports/releases instead of the QA guard's required reports/storage. Guard behaved correctly; no SDK capture ran. Escalated runner also lacked Git safe-directory context (revision metadata unavailable). Re-run installed SDK from an allowed disposable reports/storage prefix with the ordinary sandbox runner; keep cache in reports/releases.
+
+## 2026-10-01T07-56-23-160Z
+
+- จุดประสงค์: Corrected cold-cache offline package SDK CJS ESM in guarded reports/storage
+- ผล: ผ่าน — 2/2; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: 4a68a3c714cef8065657cd87265eb70ac8b3bc51; dirty: true
+- หลักฐาน: `reports/tests/2026-10-01T07-56-23-160Z.tap` และ `.json`
+
+- Cold-cache fix verified: separate online packed-artifact preparation then independent offline install succeeded, followed by guarded installed-package real SDK CJS/ESM run 2026-10-01T07-56-23-160Z 2/2. No application runtime code changed in this correction; CI requires a new hosted run. VM browser inventory uses an older browser build with current Playwright 1.63.0; install matching Chromium under the fresh QA directory, preserving existing tools/data.
