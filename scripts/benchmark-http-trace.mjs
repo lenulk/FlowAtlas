@@ -199,6 +199,15 @@ function parseRejections(output) {
   return Object.fromEntries(fields.map((field) => [field, value[field]]));
 }
 
+function parseTransport(output) {
+  const value = summaryLine(output, 'FlowAtlas trace transport health: ');
+  const fields = ['batches', 'submittedSpans', 'smallBatches', 'peakRequests'];
+  if (!value || fields.some((field) => !Number.isSafeInteger(value[field]) || value[field] < 0)
+    || value.peakRequests > 2 || value.smallBatches > value.batches
+    || value.submittedSpans < value.batches || value.submittedSpans > 32 * value.batches) return null;
+  return Object.fromEntries(fields.map((field) => [field, value[field]]));
+}
+
 function storageDiagnostics(output) {
   const operations = new Set(['initialize', 'load', 'save']);
   const stages = new Set(['directory', 'lock', 'stat', 'read', 'parse', 'validate', 'retention', 'open', 'write', 'sync', 'close', 'rename']);
@@ -267,7 +276,7 @@ async function runCondition(condition, runIndex, manifest, profileDirectory = nu
   const result = { condition, runIndex, workloadDigest: manifest.workloadDigest, requestIdDigest: manifest.requestIdDigest,
     warmupRequests: warmupCount, measuredRequests: measuredCount, concurrency,
     expectedHttpSpans: condition === 'traced' ? expectedTraceSpans : 0,
-    warmup: null, measurement: null, app: null, trace: null, dropReasons: null, rejectionStatuses: null, storageDiagnostics: [], metricsEndpoint: null,
+    warmup: null, measurement: null, app: null, trace: null, dropReasons: null, rejectionStatuses: null, transport: null, storageDiagnostics: [], metricsEndpoint: null,
     gracefulShutdown: false, processCleanupConfirmed: false, workspaceRemoved: false, retainedWorkspace: null,
     valid: false, failure: null };
   let stopSent = false;
@@ -323,6 +332,7 @@ async function runCondition(condition, runIndex, manifest, profileDirectory = nu
     if (condition === 'traced') {
       result.trace = parseTraceSummary(outputRef.value); result.dropReasons = parseDropReasons(outputRef.value);
       result.rejectionStatuses = parseRejections(outputRef.value);
+      result.transport = parseTransport(outputRef.value);
     }
     const lockExists = existsSync(join(workspace, 'data', 'actions', '.writer.lock'));
     const storageSafe = result.gracefulShutdown && !lockExists && (condition !== 'traced'
@@ -336,7 +346,9 @@ async function runCondition(condition, runIndex, manifest, profileDirectory = nu
       && (condition !== 'traced' || Boolean(result.trace && result.trace.httpSpans === expectedTraceSpans
         && result.trace.invalidSpans === 0 && result.trace.delivered + result.trace.dropped === expectedTraceSpans
         && result.dropReasons && Object.values(result.dropReasons).reduce((sum, count) => sum + count, 0) === result.trace.dropped
-        && result.rejectionStatuses && Object.values(result.rejectionStatuses).reduce((sum, count) => sum + count, 0) === result.dropReasons.rejected));
+        && result.rejectionStatuses && Object.values(result.rejectionStatuses).reduce((sum, count) => sum + count, 0) === result.dropReasons.rejected
+        && result.transport && result.transport.submittedSpans <= result.trace.httpSpans
+        && result.transport.submittedSpans >= result.trace.delivered));
     if (!result.failure && !result.valid) result.failure = 'counts_or_capture_validation_failed';
     const actualWorkspace = realpathSync(workspace);
     const cleanupAllowed = isInside(canonicalStorage, actualWorkspace) && actualWorkspace === canonicalWorkspace

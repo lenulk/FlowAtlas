@@ -99,6 +99,8 @@ test('collector uploads use at most two slots and preserve cross-trace batch acc
   assert.equal(peak, 2); assert.equal(active, 0);
   assert.equal(received.length, 4); assert.ok(received.every((batch) => batch.items.length === 32));
   assert.equal(new Set(received.flatMap((batch) => batch.items.map((item) => item.traceId))).size, 128);
+  assert.deepEqual(exporter.transportHealth(), { batches: 4, submittedSpans: 128, smallBatches: 0, peakRequests: 2 });
+  assert.equal(Object.isFrozen(exporter.transportHealth()), true);
   assert.deepEqual(exporter.summary(), { httpSpans: 128, invalidSpans: 0, delivered: 128,
     dropped: 0, queued: 0, inFlight: 0 });
   await exporter.shutdown();
@@ -115,4 +117,38 @@ test('shutdown aborts both active upload slots and accounts for queued spans onc
   assert.deepEqual(exporter.summary(), { httpSpans: 96, invalidSpans: 0, delivered: 0,
     dropped: 96, queued: 0, inFlight: 0 });
   assert.equal(exporter.deliveryHealth().shutdown, 96);
+});
+
+test('small exports coalesce without holding callbacks and sparse traffic drains on its own', async (t) => {
+  const received = []; let firstReceived;
+  const arrived = new Promise((resolve) => { firstReceived = resolve; });
+  const url = await serve(t, async (req, res) => {
+    let body = ''; for await (const part of req) body += part;
+    received.push(JSON.parse(body)); res.end('{}'); firstReceived();
+  });
+  const exporter = new LocalHttpSpanExporter(config(url));
+  let callbacks = 0;
+  for (let index = 1; index <= 24; index++) exporter.export([sdkSpan(index)], () => { callbacks++; });
+  assert.equal(callbacks, 24);
+  assert.equal(exporter.transportHealth().batches, 0, 'Partial batch waits independently of SDK callbacks');
+  let deadline;
+  try { await Promise.race([arrived, new Promise((_resolve, reject) => {
+    deadline = setTimeout(() => reject(new Error('Sparse batch did not drain')), 2000);
+  })]); } finally { clearTimeout(deadline); }
+  await exporter.forceFlush();
+  assert.equal(received.length, 1); assert.equal(received[0].items.length, 24);
+  assert.equal(exporter.summary().delivered, 24); await exporter.shutdown();
+});
+
+test('full batches dispatch immediately and forceFlush bypasses the partial-batch wait', async (t) => {
+  const url = await serve(t, (req, res) => { req.resume(); res.end('{}'); });
+  const exporter = new LocalHttpSpanExporter(config(url));
+  exporter.export(Array.from({ length: 32 }, (_v, index) => sdkSpan(index + 1)), () => {});
+  assert.equal(exporter.transportHealth().batches, 1);
+  await exporter.forceFlush();
+  exporter.export([sdkSpan(33)], () => {});
+  assert.equal(exporter.transportHealth().batches, 1);
+  const flushed = exporter.forceFlush();
+  assert.equal(exporter.transportHealth().batches, 2, 'Flush starts the pending batch synchronously');
+  await flushed; assert.equal(exporter.summary().delivered, 33); await exporter.shutdown();
 });

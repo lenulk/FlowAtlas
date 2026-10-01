@@ -29,7 +29,7 @@ sdk.start();
 let shutdown;
 const close = () => shutdown ??= sdk.shutdown().finally(async () => {
   if (exporter.dropped) console.error(`FlowAtlas trace dropped spans: ${exporter.dropped}`);
-  await new Promise((resolve, reject) => process.stderr.write(`FlowAtlas trace summary: ${JSON.stringify(exporter.summary())}\nFlowAtlas trace delivery health: ${JSON.stringify(exporter.deliveryHealth())}\nFlowAtlas trace rejection health: ${JSON.stringify(exporter.rejectionHealth())}\n`,
+  await new Promise((resolve, reject) => process.stderr.write(`FlowAtlas trace summary: ${JSON.stringify(exporter.summary())}\nFlowAtlas trace delivery health: ${JSON.stringify(exporter.deliveryHealth())}\nFlowAtlas trace rejection health: ${JSON.stringify(exporter.rejectionHealth())}\nFlowAtlas trace transport health: ${JSON.stringify(exporter.transportHealth())}\n`,
     (error) => error ? reject(error) : resolve()));
 });
 process.once('beforeExit', close);

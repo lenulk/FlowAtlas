@@ -30,7 +30,9 @@ export class LocalHttpSpanExporter {
     this.sessionToken = sessionToken; this.capacity = capacity; this.timeoutMs = timeoutMs; this.onDrop = onDrop;
     this.queue = []; this.inFlight = 0; this.dropped = 0; this.closed = false;
     this.active = new Set(); this.controllers = new Set();
+    this.batchTimer = null; this.flushing = 0;
     this.httpSpans = 0; this.invalidSpans = 0; this.delivered = 0;
+    this.batches = 0; this.submittedSpans = 0; this.smallBatches = 0; this.peakRequests = 0;
     this.dropReasons = { overflow: 0, invalid: 0, rejected: 0, timeout: 0, transport: 0, shutdown: 0 };
     this.rejectedStatuses = { '400': 0, '401': 0, '403': 0, '409': 0, '413': 0, '503': 0, other: 0 };
   }
@@ -40,6 +42,10 @@ export class LocalHttpSpanExporter {
   }
   deliveryHealth() { return Object.freeze({ ...this.dropReasons }); }
   rejectionHealth() { return Object.freeze({ ...this.rejectedStatuses }); }
+  transportHealth() {
+    return Object.freeze({ batches: this.batches, submittedSpans: this.submittedSpans,
+      smallBatches: this.smallBatches, peakRequests: this.peakRequests });
+  }
   drop(count, reason = 'transport') {
     this.dropped += count;
     this.dropReasons[Object.hasOwn(this.dropReasons, reason) ? reason : 'transport'] += count;
@@ -56,13 +62,26 @@ export class LocalHttpSpanExporter {
       } catch { this.invalidSpans++; this.drop(1, 'invalid'); }
     }
     callback({ code: 0 });
-    void this.pump(); // SDK/application never awaits collector delivery.
+    this.schedule(); // SDK/application never awaits collector delivery.
   }
-  pump() {
-    while (this.queue.length && this.active.size < 2) {
+  schedule() {
+    if (!this.queue.length || this.closed || this.flushing) return;
+    if (this.queue.length >= 32) {
+      clearTimeout(this.batchTimer); this.batchTimer = null;
+      void this.pump(false);
+    }
+    if (this.queue.length && this.queue.length < 32 && this.active.size < 2 && !this.batchTimer) {
+      this.batchTimer = setTimeout(() => {
+        this.batchTimer = null;
+        void this.pump(true);
+      }, 20);
+    }
+  }
+  pump(includePartial = true) {
+    while (this.queue.length && this.active.size < 2 && (includePartial || this.queue.length >= 32)) {
       const work = this.sendBatch().finally(() => {
         this.active.delete(work);
-        if (this.queue.length && !this.closed) void this.pump();
+        this.schedule();
       });
       this.active.add(work);
     }
@@ -72,6 +91,8 @@ export class LocalHttpSpanExporter {
     const batch = this.queue.splice(0, 32);
     this.inFlight += batch.length;
     const controller = new AbortController(); this.controllers.add(controller);
+    this.batches++; this.submittedSpans += batch.length; if (batch.length < 32) this.smallBatches++;
+    this.peakRequests = Math.max(this.peakRequests, this.controllers.size);
     const timer = setTimeout(() => controller.abort('timeout'), this.timeoutMs);
     try {
       const response = await context.with(suppressTracing(context.active()), () => fetch(this.url, {
@@ -87,7 +108,12 @@ export class LocalHttpSpanExporter {
     } catch { this.drop(batch.length, ['timeout', 'shutdown'].includes(controller.signal.reason) ? controller.signal.reason : 'transport'); }
     finally { clearTimeout(timer); this.inFlight -= batch.length; this.controllers.delete(controller); }
   }
-  async forceFlush() { do { await this.pump(); } while (this.queue.length || this.active.size); }
+  async forceFlush() {
+    this.flushing++;
+    clearTimeout(this.batchTimer); this.batchTimer = null;
+    try { do { await this.pump(); } while (this.queue.length || this.active.size); }
+    finally { this.flushing--; this.schedule(); }
+  }
   async shutdown() {
     this.closed = true;
     const timer = setTimeout(() => {

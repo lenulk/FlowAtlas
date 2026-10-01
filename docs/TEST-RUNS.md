@@ -1631,3 +1631,61 @@ First matched3×1000 measurement: all6000 measured business responses pluswarmup
 
 - Imported VM ae55301 provenance: all four runner inventories matched exact Git ae55301 blobs (67 files each), no mismatches. Main96/96 (12-42-40-837Z), source1/1 (12-43-01-371Z), benchmark1/1 (12-43-01-675Z), SDK+Chromium2/2 (12-43-08-227Z); raw TAP/JSON retained. This verifies the prior serial batch revision, not the new two-slot implementation.
 - Round48 focused 2026-10-01T13-04-10-194Z20/20 passed including two-slot bounded delivery/abort, real CJS/ESM SDK, out-of-order atomic batch contracts and legacy inspector. Unprofiled matched benchmark2026-10-01T13-04-29-290Z1/1 capture/measurement passed: 3153 acknowledged spans, zero drops/invalid/pending, business results correct. Performance target FAILED: aggregate baselinep95 4.201ms, traced27.368ms (+551.464%); paired median380.559%. Passing capture does not establish overhead acceptance or repeatable stability. Hosted exact-revision gate next.
+
+- e83f48f pushed successfully. Exact hosted run snapshot fetched via private GitHub API; job states shown in session output. New Linux VM bundle SHA256a8889f28e0e4f3f7300fa9d1037b72eee0809b5098bd5a54962bcb1f2d06107c prepared for fresh checkout, no owner application source edits.
+
+- Hosted e83f48f run36866592260 snapshot: at least one job already failed while other jobs continued. Downloaded completed failed job logs and Ubuntu24 evidence archive where available. Inspect exact failed step and counters before claiming the two-slot repair fixes hosted overflow.
+
+- Exact e83f48f Ubuntu22 hosted job110383480372 failed only unchanged fixture load capture; Ubuntu24 succeeded. Downloaded Ubuntu22 artifact for per-round diagnostic inspection. Normal business responses/counts reconcile, but capture and performance acceptance are false. Two slots alone have not established hosted stability.
+
+- e83f48f Ubuntu22 artifact11163982273 read with path/size guards; benchmark JSON saved separately under ignored reports/vm without overwrite. Per-round fixed counters inspected in session output before selecting the next repair.
+
+- VM e83f48f exact checkout: main98/98 (13-13-00-385Z), unchanged benchmark1/1 (13-13-30-236Z), realSDK+Chromium2/2 (13-13-42-102Z), failed/skipped0; no writerlock printed. All3153 spans acknowledged, performance FAILED (+86.069% aggregatep95; baseline14.55ms/traced27.073ms). Archive SHA256dda5a81816d6a69402e5a6ec481ee794885084c5d502e861dd0e8324a31d6c1b, retrieval pending. Host timing differs materially, no causal speed claim from this comparison.
+
+## 2026-10-01T13-17-49-275Z
+
+- จุดประสงค์: Fixed numeric transport counters preserve SDK flush and batch accounting
+- ผล: ผ่าน — 9/9; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: e83f48f5744ed94566d48904c827769f44a232a1; dirty: true
+- หลักฐาน: `reports/tests/2026-10-01T13-17-49-275Z.tap` และ `.json`
+
+## 2026-10-01T13-18-10-868Z
+
+- จุดประสงค์: Diagnose fixed transport batch utilization unchanged HTTP load
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: e83f48f5744ed94566d48904c827769f44a232a1; dirty: true
+- หลักฐาน: `reports/tests/2026-10-01T13-18-10-868Z.tap` และ `.json`
+
+## 2026-10-01T13-20-57-231Z
+
+- จุดประสงค์: Partial batch coalescing sparse-drain and immediate forceFlush regression before fix
+- ผล: ไม่ผ่าน — 7/9; failed 2; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: e83f48f5744ed94566d48904c827769f44a232a1; dirty: true
+- หลักฐาน: `reports/tests/2026-10-01T13-20-57-231Z.tap` และ `.json`
+- ไม่ผ่าน: small exports coalesce without holding callbacks and sparse traffic drains on its own
+- ไม่ผ่าน: full batches dispatch immediately and forceFlush bypasses the partial-batch wait
+
+## 2026-10-01T13-21-50-095Z
+
+- จุดประสงค์: 20ms partial batch scheduling callbacks sparse traffic flush abort and actual SDK
+- ผล: ผ่าน — 22/22; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: e83f48f5744ed94566d48904c827769f44a232a1; dirty: true
+- หลักฐาน: `reports/tests/2026-10-01T13-21-50-095Z.tap` และ `.json`
+
+- VM e83f48f archive retrieved/checksummed (dda5a81816d6a69402e5a6ec481ee794885084c5d502e861dd0e8324a31d6c1b), paths/regular types checked, raw reports and images imported without overwrite; VM log retained in ignored extraction. Provenance check still pending.
+
+## 2026-10-01T13-22-33-249Z
+
+- จุดประสงค์: Round49 20ms coalesced batches matched load density capture and unchanged performance budgets
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: e83f48f5744ed94566d48904c827769f44a232a1; dirty: true
+- หลักฐาน: `reports/tests/2026-10-01T13-22-33-249Z.tap` และ `.json`
+
+- VM e83f48f all three runner source inventories matched Git e83f48f blobs (67 files), no mismatch. This establishes source provenance of imported main98/load1/SDKChromium2 results, not of the current coalescing change.
+
+- Round49 load2026-10-01T13-22-33-249Z1/1 measurement/capture passed, all3153 acknowledged; batch density36/42/39 with fixed maximum2 uploads. Existing relative10% performance target FAILED; host-side evidence import/provenance work overlapped, so measured timings are not causal improvement evidence. Review actual diff and exact-revision CI next; all logs/rawresults retained.
