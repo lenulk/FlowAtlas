@@ -10,6 +10,12 @@ async function serve(t, handle) {
   return `http://127.0.0.1:${server.address().port}`;
 }
 
+function replyBusiness(req, res, body, requests) {
+  requests.push({ id: req.headers['x-flowatlas-action-id'], method: req.method, body, auth: req.headers.authorization });
+  res.writeHead(req.url.split('?')[0] === '/slow' ? 503 : 200, { 'x-flowatlas-telemetry': 'complete' });
+  res.end(body || 'actual business response');
+}
+
 test('concurrent browser scopes keep distinct IDs, bodies and business outcomes', async (t) => {
   const starts = new Map(); const requests = []; const metadata = [];
   const origin = await serve(t, async (req, res) => {
@@ -20,9 +26,7 @@ test('concurrent browser scopes keep distinct IDs, bodies and business outcomes'
       res.writeHead(201, { 'content-type': 'application/json' });
       res.end(JSON.stringify({ id: action.id, complete: true, viewerUrl: `http://127.0.0.1:4173/?actionId=${action.id}` }));
     } else {
-      requests.push({ id: req.headers['x-flowatlas-action-id'], method: req.method, body, auth: req.headers.authorization });
-      res.writeHead(starts.get(req.headers['x-flowatlas-action-id']) === 'slow' ? 503 : 200, { 'x-flowatlas-telemetry': 'complete' });
-      res.end(body || 'actual business response');
+      replyBusiness(req, res, body, requests);
     }
   });
   const actions = createBrowserActions({ origin });
@@ -42,6 +46,23 @@ test('concurrent browser scopes keep distinct IDs, bodies and business outcomes'
   assert.equal(sourceHeaders.get('x-flowatlas-action-id'), 'stale-id');
   assert.equal(JSON.stringify(metadata).includes('canary-'), false);
   await assert.rejects(slow.fetch('/again'), /already used/);
+});
+
+test('fixture business outcomes stay independent when action-start metadata is unavailable', async (t) => {
+  const requests = []; let startCalls = 0;
+  const origin = await serve(t, async (req, res) => {
+    let body = ''; for await (const part of req) body += part;
+    if (req.url === '/action-start') { startCalls++; res.writeHead(503); res.end('metadata unavailable'); }
+    else replyBusiness(req, res, body, requests);
+  });
+  const actions = createBrowserActions({ origin });
+  const [slow, fast] = await Promise.all([actions.start('slow'), actions.start('fast')]);
+  const [a, b] = await Promise.all([slow.fetch('/slow', { method: 'POST', body: 'business payload' }), fast.fetch('/fast')]);
+  assert.equal(a.status, 503); assert.equal(await a.text(), 'business payload');
+  assert.equal(b.status, 200); assert.equal(await b.text(), 'actual business response');
+  assert.equal(startCalls, 2); assert.equal(requests.length, 2);
+  assert.deepEqual(new Set(requests.map(({ id }) => id)), new Set([slow.id, fast.id]));
+  for (const scope of [slow, fast]) { assert.equal(scope.complete, false); assert.equal(scope.viewerUrl, null); }
 });
 
 test('foreign origins and redirects never receive browser correlation', async (t) => {
