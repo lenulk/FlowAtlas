@@ -1739,3 +1739,22 @@ First matched3×1000 measurement: all6000 measured business responses pluswarmup
 - Round50 affected run2026-10-01T13-41-26-268Z32/33: validator boundaries/SDK/atomic contracts passed, but legacy restart test failed after a real storage save/rename EPERM (3graphs instead of4). This is actual Windows filesystem evidence with fixed diagnostics, not a validator rejection. Original-state preservation behavior remains; no cause process/OneDrive attribution confirmed. Follow-up unprofiled benchmark was already started before this final result arrived; retain its result, do not call the related storage gate passed. Handle transient rename recovery as separate Round51 after reviewing the completed report.
 
 - Round50 unprofiled2026-10-01T13-41-57-648Z1/1 measurement/capture passed, performance stillFAILED; related persistence run32/33 remains failed. Actual diffs and whitespace reviewed before the separate storage round. No package/production/user readiness claim.
+
+## 2026-10-01T13-46-31-959Z
+
+- จุดประสงค์: Windows transient replacement recovery simulation and actual persistence restart obstruction
+- ผล: ผ่าน — 21/21; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: 5fc55323865c3b18fca4b3825c60e97d6ac5f867; dirty: true
+- หลักฐาน: `reports/tests/2026-10-01T13-46-31-959Z.tap` และ `.json`
+
+## 2026-10-01T13-47-52-402Z
+
+- จุดประสงค์: Final main regression Windows bounded rename recovery plus SDK delivery and validation
+- ผล: ไม่ผ่าน — 102/103; failed 1; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.18.0
+- commit: 5fc55323865c3b18fca4b3825c60e97d6ac5f867; dirty: true
+- หลักฐาน: `reports/tests/2026-10-01T13-47-52-402Z.tap` และ `.json`
+- ไม่ผ่าน: real OTel preload captures cjs HTTP/Undici fan-out and isolates concurrent requests
+
+- Round51 final main2026-10-01T13-47-52-402Z102/103 failed: all storage/replacement/restart/obstruction checks passed, one actual CJS SDK case failed. Read its exact TAP failure before changing runner concurrency or startup behavior. No skips/test retries/deadline extensions; failed evidence retained.

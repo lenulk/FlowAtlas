@@ -39,3 +39,9 @@ UI และ `/flowatlas/status` แสดง mode ตามจริง ค่�
 ## ข้อจำกัด
 
 ยังไม่ทดสอบไฟดับ, disk เต็มจริง, บังคับ kill ระหว่าง rename, lock recovery แบบอัตโนมัติ หรือ OneDrive บนหลายเครื่อง การเขียนเป็น synchronous และ serialize state ทั้งชุดจึงต้องวัด overhead ก่อนเพิ่มโหลด production ไม่มีการเข้ารหัสหรือ authentication เพิ่มจาก filesystem ของเครื่อง และยังไม่มี archive ระยะยาว/schema migration
+
+## Bounded Windows replacement recovery
+
+A real save/rename EPERM occurred in the restart regression2026-10-01T13-41-26-268Z. Windows state replacement now retries only EPERM/EACCES/EBUSY, up to5 attempts with nominal5/10/20/40ms pauses (75ms requested total). It reuses the same already-flushed temporary file; validation/write/fsync and business requests are not retried. These synchronous pauses briefly block the collector; actual elapsed time also depends on OS scheduling. Linux and other error codes are attempted once.
+
+If refusal persists, the same503/error cause is retained, the old state/memory remains unchanged and temporary cleanup still runs. Controlled transient-error simulation, actual permanent filesystem obstruction, restart/fresh-process/20concurrent persistence passed21/21 (13-46-31-959Z). Later fullmain storage checks passed, while an unrelated SDK acknowledgement gate failed; do not claim the fullsuite passed. The original lock owner/rootcause and long-term transient recovery are unverified; this is bounded recovery support, not proof that OneDrive or transport stalls are fixed.

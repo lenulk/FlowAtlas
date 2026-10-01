@@ -12,6 +12,21 @@ const storageStages = new Set(['directory', 'lock', 'stat', 'read', 'parse', 'va
 const filesystemCodes = new Set(['EACCES', 'EPERM', 'EIO', 'EROFS', 'EBADF', 'EINVAL', 'EMFILE', 'ENFILE',
   'ENOTDIR', 'EISDIR', 'EEXIST', 'ENOENT', 'ENOSPC', 'EBUSY', 'ENOTEMPTY', 'EFBIG', 'EDQUOT',
   'ENOMEM', 'EXDEV', 'ENAMETOOLONG', 'ELOOP']);
+const renamePauses = [5, 10, 20, 40];
+const renameWait = new Int32Array(new SharedArrayBuffer(4));
+
+export function replaceStateFile(source, destination, { platform = process.platform, rename = renameSync,
+  pause = (milliseconds) => Atomics.wait(renameWait, 0, 0, milliseconds) } = {}) {
+  for (let attempt = 0; ; attempt++) {
+    try { rename(source, destination); return; }
+    catch (error) {
+      if (platform !== 'win32' || !['EPERM', 'EACCES', 'EBUSY'].includes(error.code)
+        || attempt >= renamePauses.length) throw error;
+      // Reuse the same flushed temporary file. Memory changes only after a successful replacement.
+      pause(renamePauses[attempt]);
+    }
+  }
+}
 export class StorageError extends Error {
   constructor(message, cause, { operation, stage } = {}) {
     super(message, { cause });
@@ -124,7 +139,7 @@ export class JsonActionStore {
       closeSync(fd);
       fd = undefined;
       stage = 'rename';
-      renameSync(temporary, this.file);
+      replaceStateFile(temporary, this.file);
     } catch (error) {
       if (fd !== undefined) closeSync(fd);
       if (created) { try { unlinkSync(temporary); } catch { /* Preserve the original state on write failure. */ } }
