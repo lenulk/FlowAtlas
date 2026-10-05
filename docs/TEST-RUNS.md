@@ -2874,3 +2874,32 @@ First matched3×1000 measurement: all6000 measured business responses pluswarmup
 - หลักฐาน: `reports/tests/2026-10-05T16-44-24-388Z.tap` และ `.json`
 
 - Final QA labels verification16-42-28-528Z2/2: explicit innercollector-cost-slow-sync JSON, actual injection counters and hashes correlated, innercapturefailure retained; nootherdrop. Existing503guard16-44-16-361Z1/1 and ordinarycomponent16-44-24-388Z1/1 both passed serially after labelchange, allcontrolscomplete/reopenexact. Finaldiffcheck and review verify src/public/examples/test/package/lock unchanged; QAscripts/workflow/docs only. Exacthosted bundle is stillpending.
+
+## Round65 partial exact hosted evidence
+
+- 6d08a53 PR37343310494 Linux22/24 completed success; push37343288536 Linux22 success/Linux24 failure in ordinary componentcost gate. Raw Linuxartifacts downloaded into separateci-6d08a53-pr/push directories, syntaxaudit script checkpassed. Windows pending.
+- PushLinux24 uninstrumented component diskround1 ack192/shutdown859, deadlineFired1/shutdown902.340ms, storage8saves1150.097ms/sync1138.121ms/syncMax215.827ms, nootherdrop. Actual failure kept; controlledpreload applies only later explicitstep and is not inherited by ordinarycomponent child.
+- All4completedLinuxjobs controlledscope/faultguard passed2/2, injection24calls/descriptor0/reloadexact; controlleddiskloss827or859. Matching historical count827 does not establish the historical failure had the samecause. Fullsource/reportaudit waits all4artifacts perrun; no passingrerun of failedjob.
+
+## 2026-10-05T16-52-49-069Z
+
+- จุดประสงค์: Round65 exact PR81file14gate controlled fault evidence audit
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 6d08a5332d90a10d0fa540b42448b73ccdd7a328; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T16-52-49-069Z.tap` และ `.json`
+
+## 2026-10-05T16-52-55-491Z
+
+- จุดประสงค์: Round65 exact push81file14gate preserved unexpected disk loss audit
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 6d08a5332d90a10d0fa540b42448b73ccdd7a328; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T16-52-55-491Z.tap` และ `.json`
+
+## Round65 final exact hosted audit and handoff
+
+- Exact6d08a53 PR37343310494 success4/4; push37343288536 failure3/4, onlyLinux24normalcomponentdiskconditionfailed. Windowsrawartifacts downloaded successfully. Audit16-52-49-069Z/16-52-55-491Z passed1/1 each:112runnerreports,81files exactGit6d08a53 in everyinventory despitePRmerge338d34fd, main134all8jobs, ordinaryHTTP+timingcapture3153ack/no drop eachchannel, FA15innerassertion+cleanup.
+- Newcontrolledscope/reproduction2/2 all8jobs, scopeinjectiononeownedfile only,24injectedrealfsync calls/zero trackeddescriptors,24diskconditions failedinnercapture/loss827or859/reloadexact, transport/memorycontrolscomplete. Matching827count is not historicalcauseproof. Reports explicitlyrequestedpreloadlabels/actualwrapperstats+hashes/met=null. Auditpass does not turn unexpectedordinarycomponentloss intoacceptance.
+- OrdinaryperformanceFAILED all8unchangedrelative10%criterions: PRLinux22/24/Windows22/24 +95.725/+167.838/+147.930/+184.471%; push+89.737/+164.634/+225.856/+159.336%. No productioncodechange orcausalimprovementclaim.
+- FinalreviewupdatesHANDOFF/QUALITY/PLAN/ADR with exactCI and failedrawscope. Documentation-only record after6d08a53 leaves testedsource unchanged; PR7stackedbasePR6 stillOPEN. Nextisolatedjournal-vs-snapshot comparison beforedurablebackend/drainrepair; SDK-onlycost/sustainedload/realpilot/users/release stillpending.
