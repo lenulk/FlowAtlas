@@ -3003,3 +3003,8 @@ First matched3×1000 measurement: all6000 measured business responses pluswarmup
 
 - FocusedCLI20-06-51-061Z9/9passed; originalmainfailure retained/unresolved. Lockreadonretainedcli-owner-bWOl5s returnedENOENT byinspectiontime; subsequentGetProcessnull causedargumenterror, noPIDtarget/killing/deletion. Lockabsentlater doesnotprovetargetclosedorrootcausefixed.
 - Finalcomparison20-05-10-833Z1/1:18conditions/35realfsync each/exactfinalsnapshotbytes/35journalframes/reopengraphs/ownedcleanup. Validfixtureupdatecounts0→32→64/sharedfrozenmap. Format20-03-30-019Z2/2 allincompleteprefixesandoversizebound. Finalbytes1file6,371,360snapshot/2,181,529journal;64files25,359,776/8,423,299. Journalretains2,181,529/8,423,299bytes versusfinalsnapshot241,908/801,708. Rawtimingsexcludevalidation/encoding/locking/compaction/recovery; no backendadoption/productionperformanceclaim. Newdocs/ADRdetail constraints and nextisolate repeatedimmutablemetadatawork. src/public/examples/test/package/lock unchanged.
+
+## Round66 hosted queue and independent continuation
+
+- Exact47472a6 PR37367971959/push37367959610 remainqueued all4jobs aftertwoAPIreads; no jobstarted, nohostedtestresult/artifactexists to audit yet. Preparedignored audit-round66-ci.mjs for16gates/84files/7benchmarkJSON and exactdurablebytes/scopes; syntaxcheckpassed but auditnotexecuted. This is pendingexternalrunner state, notpassingCI/failure/rootcauseproof. PR8OPENstackedbasePR7/attached. Localmainfailure remainsopen.
+- Continueindependentround67on ownbranch onlyaftercommitting thishandoff record; sourceoptimization requires localnegativeguards/equivalence and itsownPR/exactCI. Do not imply queuedround66code was hostedverified or eraseoldfailedruns.
