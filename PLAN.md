@@ -14,6 +14,8 @@ Node.js เป็น integration ที่กำลังพัฒนาแล�
 
 ## สถานะเริ่มต้น
 
+รอบ70ownednativeHTTPtransport แก้connectionownership/complete2xxackพร้อมlazyimportหลบCJSduplicate-spanregression:main143/actualSDK+Edge+failure3/source1passedlocal. ไม่พิสูจน์performancegain;ordinary560.428%FAILED และbaselineCIมี443/923shutdowndrops. ต้องexacthostedCIและstoragecostrepair/retention/bounds/negativeguardsต่อ; sustained30min/pilot/usersยังไม่ผ่าน
+
 รอบ69เพิ่มactualSDKHTTPcomponentdiagnostic/controlledsink/parity/503guardบนsharedordinaryfixtureแล้ว ค่าmet=null/capturecountsครบไม่แทนperformance/pilot. Main140ผ่าน แต่ordinaryp95+506.817%ยังไม่ผ่าน10%. ถัดไปทดลองnativeHTTPtransportตามcostevidence พร้อมconformance/cleanup/abort/privacyและexactCI; startuprootcause/stablecapture/sustained/realpilot/usertrial/releaseยังไม่ผ่าน
 
 อัปเดตรอบ68 (6ตุลาคม2026): เพิ่มQAstartupfailureevidence/original-errorpreservation ไม่ใช่แก้CLIreadinessrootcause; localmain140/140. ตรวจhostedรอบ66–67จริงครบ10completedartifactchannels/160reports/exactsource84files แต่แต่ละrunมีcancelledmissingchannels ไม่มีmatrix4/4. Ordinarycaptureครบ3153/ช่องแต่performanceยังFAILEDทั้งหมด. ขั้นต่อไปexactround68CI + SDK-onlycost/controlledCLIstartupdiagnosticsก่อนrepair; ไม่ขยายtimeout/ลดthresholdและไม่ใช้fixtureแทนpilot. ยังไม่มีแอปธุรกิจหรือผู้ทดลอง ดูHANDOFF/QUALITYสำหรับรุ่นและข้อจำกัด
@@ -148,3 +150,4 @@ FA-07 bounded resource policy: measured Ubuntu24 635overflow/64timeout and local
 Current exact-evidence update: da9a0b6 hosted3/4 (Windows22mainfixturefailed), VMmain102/104failed; isolatedVMsource/load/SDKChromiumpassed and allfourhostedloadcapturescomplete. AllhostedperformancebudgetsandVM185.79%failed. Next priority is acknowledgement/lifecycle/fixturediagnosis and overhead; largerboundedpolicydoesnotclose them. Round54 reporting repair prevents incomplete orprofiled runs issuingperformanceverdicts (met=null), verifiedfocused4/replay2/unchangedload1. No performance/sustained-load/pilot acceptance.
 
 FA-03 lifecycle repair: managed CLIinspect now has private ownership proof and disconnect shutdown. Windows hidden inspector escapes parentforced-kill job so it can performexistingboundedstop/SDKflush/collectorlockclose; Linux remainsnon-detached. Focused14/14 verifies ready/startup/silentowner paths and actualSDKdrain, defaultmain/exactCI/VM pending. Directinspectorkill/arbitrarygrandchildren and historicalprocesscleanup remainunverified; see installguide.
+

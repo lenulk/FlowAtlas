@@ -18,6 +18,44 @@ async function serve(t, handle) {
 }
 const config = (url, extra = {}) => ({ collectorUrl: url, projectId: 'target', codeDigest: 'b'.repeat(64), sessionToken: randomBytes(32).toString('base64url'), ...extra });
 
+test('exporter closes its own reused HTTP connections after draining without leaking headers', async (t) => {
+  const sockets = new Set(); let connections = 0, received = 0;
+  const token = randomBytes(32).toString('base64url');
+  const server = createServer(async (req, res) => {
+    assert.equal(req.headers.authorization, `Bearer ${token}`);
+    const chunks = []; for await (const chunk of req) chunks.push(chunk);
+    received += JSON.parse(Buffer.concat(chunks)).items.length; res.end('{}');
+  });
+  server.on('connection', socket => { connections++; sockets.add(socket); socket.on('close', () => sockets.delete(socket)); });
+  await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
+  t.after(() => { server.closeAllConnections(); return new Promise(resolve => server.close(resolve)); });
+  const exporter = new LocalHttpSpanExporter(config(`http://127.0.0.1:${server.address().port}`, { sessionToken: token }));
+  exporter.export(Array.from({ length: 96 }, (_, index) => sdkSpan(index + 1)), () => {});
+  await exporter.shutdown();
+  assert.equal(received, 96); assert.equal(exporter.delivered, 96); assert.ok(connections <= 2);
+  const end = Date.now() + 250;
+  while (sockets.size && Date.now() < end) await new Promise(resolve => setTimeout(resolve, 10));
+  assert.equal(sockets.size, 0, 'Shutdown closes exporter-owned keepalive connections');
+});
+
+test('a successful header with incomplete response body remains bounded and is not acknowledged', async (t) => {
+  const url = await serve(t, (req, res) => { req.resume(); res.writeHead(200, { 'content-length': '100' }); res.write('partial'); });
+  const exporter = new LocalHttpSpanExporter(config(url, { timeoutMs: 100 }));
+  exporter.export([sdkSpan()], () => {});
+  await exporter.forceFlush();
+  assert.equal(exporter.delivered, 0); assert.equal(exporter.dropped, 1);
+  assert.equal(exporter.deliveryHealth().timeout, 1); await exporter.shutdown();
+});
+
+test('an incomplete rejection response is counted once without waiting for its body', async (t) => {
+  const url = await serve(t, (req, res) => { req.resume(); res.writeHead(503, { 'content-length': '100' }); res.write('partial'); });
+  const exporter = new LocalHttpSpanExporter(config(url, { timeoutMs: 100 }));
+  exporter.export([sdkSpan()], () => {}); await exporter.forceFlush();
+  assert.equal(exporter.delivered, 0); assert.equal(exporter.dropped, 1);
+  assert.equal(exporter.deliveryHealth().rejected, 1); assert.equal(exporter.deliveryHealth().timeout, 0);
+  assert.equal(exporter.rejectionHealth()['503'], 1); await exporter.shutdown();
+});
+
 test('opt-in timing distinguishes stalled shutdown from successful acknowledgement without sensitive data', async (t) => {
   const url = await serve(t, (req, _res) => req.resume());
   const exporter = new LocalHttpSpanExporter(config(url, { timing: true }));

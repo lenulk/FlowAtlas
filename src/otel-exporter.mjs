@@ -28,6 +28,7 @@ export class LocalHttpSpanExporter {
       || !Number.isInteger(capacity) || capacity < 1 || capacity > 2048
       || !Number.isInteger(timeoutMs) || timeoutMs < 1 || timeoutMs > 1000) throw new Error('Invalid local trace exporter configuration');
     this.url = url.origin + '/flowatlas/ingest'; this.projectId = projectId; this.codeDigest = codeDigest;
+    this.agent = null; this.transport = null;
     this.sessionToken = sessionToken; this.capacity = capacity; this.timeoutMs = timeoutMs; this.onDrop = onDrop;
     this.queue = []; this.inFlight = 0; this.dropped = 0; this.closed = false;
     this.active = new Set(); this.controllers = new Set();
@@ -102,13 +103,31 @@ export class LocalHttpSpanExporter {
     this.peakRequests = Math.max(this.peakRequests, this.controllers.size);
     const timer = setTimeout(() => controller.abort('timeout'), this.timeoutMs);
     try {
-      const response = await context.with(suppressTracing(context.active()), () => fetch(this.url, {
-        method: 'POST', headers: { 'content-type': 'application/json', authorization: `Bearer ${this.sessionToken}` },
-        body: JSON.stringify({ kind: 'otel-span-batch', projectId: this.projectId, codeDigest: this.codeDigest, items: batch }),
-        signal: controller.signal, redirect: 'error' }));
-      await response.body?.cancel();
-      if (!response.ok) {
-        this.rejectedStatuses[Object.hasOwn(this.rejectedStatuses, response.status) ? response.status : 'other'] += batch.length;
+      // Loading HTTP before SDK startup interferes with its CJS/ESM hooks.
+      // Delay the built-in import until the target has already created a span.
+      this.transport ??= import('node:http').then(({ Agent, request }) => {
+        this.agent = new Agent({ keepAlive: true, maxSockets: 2, maxFreeSockets: 2 });
+        return request;
+      });
+      const request = await this.transport;
+      const body = JSON.stringify({ kind: 'otel-span-batch', projectId: this.projectId, codeDigest: this.codeDigest, items: batch });
+      const status = await context.with(suppressTracing(context.active()), () => new Promise((resolve, reject) => {
+        const req = request(this.url, { method: 'POST', agent: this.agent, signal: controller.signal,
+          headers: { 'content-type': 'application/json', 'content-length': Buffer.byteLength(body),
+            authorization: `Bearer ${this.sessionToken}` } }, (res) => {
+          const status = res.statusCode ?? 0;
+          res.once('error', reject);
+          // Native HTTP never follows redirects. Refusals need no response body.
+          if (status < 200 || status >= 300) { res.destroy(); resolve(status); return; }
+          // Do not acknowledge a truncated or stalled successful response.
+          res.once('aborted', () => reject(new Error('Incomplete collector response')));
+          res.once('end', () => resolve(status));
+          res.resume(); // Drain without retaining or interpreting collector response data.
+        });
+        req.once('error', reject); req.end(body);
+      }));
+      if (status < 200 || status >= 300) {
+        this.rejectedStatuses[Object.hasOwn(this.rejectedStatuses, status) ? status : 'other'] += batch.length;
         this.drop(batch.length, 'rejected');
       }
       else { this.delivered += batch.length; if (this.timing) this.timing.acknowledgedBatches++; }
@@ -140,6 +159,7 @@ export class LocalHttpSpanExporter {
     }, 900);
     try { await this.forceFlush(); } finally {
       clearTimeout(timer);
+      this.agent?.destroy();
       if (this.timing) { this.timing.shutdownMs = performance.now() - started; this.timing.shutdownDelivered = this.delivered - delivered; }
     }
   }
