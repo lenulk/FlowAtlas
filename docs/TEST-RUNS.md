@@ -3008,3 +3008,81 @@ First matched3×1000 measurement: all6000 measured business responses pluswarmup
 
 - Exact47472a6 PR37367971959/push37367959610 remainqueued all4jobs aftertwoAPIreads; no jobstarted, nohostedtestresult/artifactexists to audit yet. Preparedignored audit-round66-ci.mjs for16gates/84files/7benchmarkJSON and exactdurablebytes/scopes; syntaxcheckpassed but auditnotexecuted. This is pendingexternalrunner state, notpassingCI/failure/rootcauseproof. PR8OPENstackedbasePR7/attached. Localmainfailure remainsopen.
 - Continueindependentround67on ownbranch onlyaftercommitting thishandoff record; sourceoptimization requires localnegativeguards/equivalence and itsownPR/exactCI. Do not imply queuedround66code was hostedverified or eraseoldfailedruns.
+
+## 2026-10-05T20-13-23-681Z
+
+- จุดประสงค์: Round67 immutable path scan regression before optimization
+- ผล: ไม่ผ่าน — 4/5; failed 1; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 5ab910de639e9fa7293abc0a12071307cfa8a83d; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T20-13-23-681Z.tap` และ `.json`
+- ไม่ผ่าน: repeated immutable source path checks scan once per scope without caching graph or claimed metadata
+
+## Round67 immutable source path metadata optimization
+
+- Ownbranchperf/immutable-source-path-checks from5ab910d, round66hostedCIstillqueued/notverified. Scope: onlyrepeatimmutable file path/hash format checks; nographvalidationcache, noack/deadline/backend/schema change. Source-map count/projectID/claimed digest/graph remainchecked everycall. Reuseonlyfrozenplain/nullprototypeownstringdata and distinguish tool/project pathpolicy; mutable/accessor/customprototype fallbackfresh.
+- Before20-13-23-681Z4/5: pathentry scans3 for3saves instead1; alloldguards and newmutable/accessor/prototype checksalready passed. Rawfailure retained. Extractsamepathloopinto scope-keyedWeakMap plusreuseeligibilitypredicate; negativeguardsmust still reject claimedversion/graph/scope changes and preserve priorbytes.
+
+## 2026-10-05T20-14-25-784Z
+
+- จุดประสงค์: Round67 source scope immutable identity and persistence negative guards after optimization
+- ผล: ผ่าน — 26/26; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 5ab910de639e9fa7293abc0a12071307cfa8a83d; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T20-14-25-784Z.tap` และ `.json`
+
+## 2026-10-05T20-16-40-033Z
+
+- จุดประสงค์: Round67 paired identical data original store bytes and immutable metadata cost
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 5ab910de639e9fa7293abc0a12071307cfa8a83d; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T20-16-40-033Z.tap` และ `.json`
+
+## 2026-10-05T20-17-53-120Z
+
+- จุดประสงค์: Round67 main regression optimized source path checks
+- ผล: ผ่าน — 136/136; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 5ab910de639e9fa7293abc0a12071307cfa8a83d; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T20-17-53-120Z.tap` และ `.json`
+
+## 2026-10-05T20-18-51-639Z
+
+- จุดประสงค์: Round67 original validator source shape scope and bounds equivalence
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 5ab910de639e9fa7293abc0a12071307cfa8a83d; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T20-18-51-639Z.tap` และ `.json`
+
+- Round67 focused20-14-25-784Z26/26 passed before additionalfreshprojectIDnegativeassertion; full20-17-53-120Z136/136 passed includingthatassertion. Originalround66CLIreadinesstimeoutnotclosedfromthispass. Baselineequivalence20-18-51-639Z1/1:76source-scope/path/hash/bounds/nullprototype/digest/projectID/graphmutation outcomes andsavedbytes matchoriginal5ab910d store.
+- Pairedidenticalfixture20-16-40-033Z1/1 usesactualbaselineGitbytes5ab910d andverifiescoredependencybytes unchanged; sameimmutablefixture/digest35saves/before-after alternating5pairs×1/64sourcefiles, exactreload/writecounts/sync35allconditions. Rawpairtimings onlystorecost/met=null, notappHTTP/SDK/pilotperformance. Original/loaded/candidateSHArecorded separately, dependencyimports adjustedonlyforarchivecopy.
+- Round66original47472a6CI37367971959/37367959610cancelled beforejobstart afterdocumentationpush; workflowcancel-in-progress=true/refgroupverified. Replacement5ab910dPR37368387270/push37368382200stillqueuedalljobs; sourcefilesidenticalto47472a6 (onlyTEST-RUNS differs), nohostedartifactaudit yet. Do not callcancelledrunpassing or rerunoldSHAtoeraseanything.
+
+## 2026-10-05T20-19-36-126Z
+
+- จุดประสงค์: Round67 actual SDK Edge geometry reload and deliberate assertion cleanup
+- ผล: ผ่าน — 3/3; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 5ab910de639e9fa7293abc0a12071307cfa8a83d; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T20-19-36-126Z.tap` และ `.json`
+
+## 2026-10-05T20-20-14-027Z
+
+- จุดประสงค์: Round67 ordinary matched HTTP responses and capture performance criterion unchanged
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 5ab910de639e9fa7293abc0a12071307cfa8a83d; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T20-20-14-027Z.tap` และ `.json`
+
+## 2026-10-05T20-22-39-603Z
+
+- จุดประสงค์: Round67 isolated source identity serving regression final
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 5ab910de639e9fa7293abc0a12071307cfa8a83d; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T20-22-39-603Z.tap` และ `.json`
+
+- FinalactualSDKCJS/ESM+Edge+deliberateassertion20-19-36-126Z3/3passed onoptimizedsource, fanout/privacy/exactreload andownedcleanup confirmed; geometrysyntheticfixtures labeledseparately. OrdinaryHTTP20-20-14-027Z1/1responses/capture3153ack0drops, performanceFAILED+280.412% (baseline5.248/traced19.964ms;10%unchanged). Noordinarybeforematchedbaseline thisround, no causalHTTPimprovement/declineclaim. Pairedstore64filevalidation213.155→40.801ms/total418.062→259.741ms;1filetotal156.249→159.963msnotbetter.
+
+- Finalisolatedsource20-22-39-603Z1/1 passed onunchangedoptimizedsource afterallothergates complete. Finalreviewdiffonlypathmetadatahelper/privateWeakMap/sharedeligibility +twonegativeregressions +ADR/docs; JSONserialization/sourcegraphvalidation/fsync/replace/backend/ack/deadline untouched. Graph/projectID/digest/filecountalwaysfresh; cachepolicy separatesproject/tool. Main136/source1/SDK+Edge+fault3/76equivalence/paired35saveallpassed locally, butHTTPperformanceFAILED andhostedstillpending. This doesnotclosepriorCLIreadinessfailure/pilot/users/sustained/release.
