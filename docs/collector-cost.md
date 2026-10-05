@@ -1,0 +1,21 @@
+# Collector component diagnostic
+
+Run `node scripts/run-tests.mjs scripts/benchmark-collector-cost.mjs` to replay1,051 simulated SDK-shaped HTTP spans per condition. Three rotated rounds compare a controlled HTTP sink, the real memory collector, and the real disk collector. The exporter runs in a separate process and uses the existing production normalization, batching, two slots,2,048 capacity,1,000ms upload timeout and900ms shutdown deadline. Collector startup, span object construction and worker startup are excluded from the timed export/drain interval.
+
+This is a burst replay component diagnostic. It does not run an application or create spans through NodeSDK instrumentation and is not comparable directly to application request p95 in `benchmark-http-trace.mjs`. The report declares simulated evidence and `performanceAcceptance.met=null`/`component_diagnostic`. Do not subtract its timings from the ordinary benchmark to estimate SDK cost, certify the10% budget or replace a real-app pilot. SDK-only cost remains a separate investigation.
+
+| Condition | What acknowledgement proves | Additional verification |
+| --- | --- | --- |
+| transport | The controlled HTTP sink accepted the batch; no graph validation or storage | received count reconciles with exporter acknowledgements |
+| memory | The real collector accepted and retained metadata in memory |100 retained traces have expected identities and root status |
+| disk | The real collector acknowledged after existing atomic write/fsync/rename |100 retained traces match and exactly reload after closing/reopening the store |
+
+Disk timing contains fixed numeric stage aggregates/maxima from round62. Exporter output contains numeric counts/durations/CPU only; the IPC credential is not written to reports or worker source. The worker clears inherited Node preload/test context and OTEL settings. Report hashes bind the diagnostic script and generated worker separately from the core tool snapshot. Reports retain relative workspace paths and sanitized exit codes/signals on failure. This reopen check is in-process, not proof of power-loss/torn-write recovery or schema migration. The same small single-file simulated snapshot is used per condition; real projects can differ substantially.
+
+Each condition closes owned services and confirms worker close and writer-lock removal before deleting its canonical workspace. A failed capture/reload retains its workspace; hosted artifacts include sanitized reports/TAP, not the entire retained workspace. Unexpected worker errors retain numeric outcome/fixed failure codes rather than arbitrary stderr or private data.
+
+Run `node scripts/run-tests.mjs scripts/collector-cost-failure-check.mjs` for the negative guard. It deliberately rejects the first transport replay with503. The inner test must fail, report all1,051 rejected spans and retain the owned workspace, while the outer guard passes. The other eight conditions must still succeed. The raw inner TAP and JSON stay under `reports/benchmarks/`. This fault is QA-only and cannot change a production collector.
+
+The real ordinary HTTP benchmark, SDK/browser, privacy, install/reinstall, sustained load and pilot gates remain required. A storage redesign needs an ADR specifying batch atomicity, fsync acknowledgement, crash/corruption behavior, size bounds, migration, backup and rollback before implementation.
+
+Exact revision ceddc0f demonstrates that this diagnostic can fail on real hosted conditions: PR37339435370 has disk shutdown losses635/891, plus795 in the negative guard's independent disk replay. Fixed numeric timings show sync915/944/860ms, while the exporter deadline remains900ms. The failure reports are preserved and the checks remain failed. Push37339368441 passing every condition does not erase these failures. Reloading100 retained graphs does not establish complete acknowledged capture; an aborted upload can still have been persisted by the collector. These are simulated component failures, not a business-app pilot or proof of the prior827-span failure's cause. See QUALITY.md round64 for the complete evidence audit and next repair prerequisites.

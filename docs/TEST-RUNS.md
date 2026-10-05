@@ -1,5 +1,7 @@
 # บันทึกการรันทดสอบ
 
+Manual round64 start/review: round63code5c6172a exactCI/audit completed before creatingdiag/trace-cost-isolation fromdocs6bac098; productionfiles unchanged. Component results are simulated replay only, timed export/drain excludesstartup/spanconstruction/SDK. Initial9conditions1051ackeach zero drops anddisk100graphreload; controlledfailureguard first0/1 retained, after1/1 preserves inner503failure/rejected1051 andworkspace. Workflow separate sequential component/fault steps reviewed and no empty duplicate step remains beforecommit; no productioncollector flag added.
+
 Manual round63 partial CI read: Linux artifacts PR37334972757/push37334881014 downloaded separately; all4jobs normal+diagnosticcapture complete but ordinaryperformanceFAILED. PRUbuntu24diagnostic firstpair shutdownQueued795/inFlight64/deliveredDuringShutdown859 in146.454ms/deadlineFired0, storage33saves total420.003ms/sync348.711ms/syncMax89.272ms. Not a reproduction of827 loss. Windows stillInstallChromium at review; exactinventory audit pending. QA audit file copied/adapted from round62 usesGit5c6172a/main134/11reports, not priorcodeinventory.
 
 Manual round63 start: clean3ebc2b5/fetch/pullup-to-date; ownbranch perf/span-validation-json. Prior docs push37332918966success, PR37332925143in-progress at check; do not infer stablecapture from a documentation run. Tool read src/http-traces.mjs failed nonexistentpath; corrected via rg --files to src/http-spans.mjs. Isolatedcost raw reports/benchmarks/round63-validator-cost.json read:1spanmedian10.644→9.996ms,48span293.582→304.038ms; no latency improvement claim. Git3ebc2b5 programarchive extracted only after canonical destination/entries check and refusing existing destination; testdir empty to avoid duplicate default discovery, dependencies unchanged via ancestor node_modules.
@@ -2625,3 +2627,157 @@ First matched3×1000 measurement: all6000 measured business responses pluswarmup
 - Environment: win32/x64; OS 10.0.26200; Node v24.19.0
 - commit: 5c6172ae644ef65064cc495ed147a8736d405709; dirty: true
 - หลักฐาน: `reports/tests/2026-10-05T15-49-10-526Z.tap` และ `.json`
+
+## 2026-10-05T15-56-56-908Z
+
+- จุดประสงค์: Round64 component cost simulated replay transport memory durable storage
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 6bac098c350bb0a6eb7de8bb7a07c468107279ce; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T15-56-56-908Z.tap` และ `.json`
+
+## 2026-10-05T15-58-43-010Z
+
+- จุดประสงค์: Round64 before controlled-failure guard implementation
+- ผล: ไม่ผ่าน — 0/1; failed 1; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 6bac098c350bb0a6eb7de8bb7a07c468107279ce; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T15-58-43-010Z.tap` และ `.json`
+- ไม่ผ่าน: rejected component replay remains a reported failure and retains its owned workspace
+
+## 2026-10-05T15-59-42-944Z
+
+- จุดประสงค์: Round64 controlled rejected replay fails and retains evidence after guard
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 6bac098c350bb0a6eb7de8bb7a07c468107279ce; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T15-59-42-944Z.tap` และ `.json`
+
+## 2026-10-05T16-02-31-759Z
+
+- จุดประสงค์: Round64 final simulated component cost transport memory disk with reload
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 6bac098c350bb0a6eb7de8bb7a07c468107279ce; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T16-02-31-759Z.tap` และ `.json`
+
+## 2026-10-05T16-03-50-795Z
+
+- จุดประสงค์: Round64 final component canonical path and capture guards
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 6bac098c350bb0a6eb7de8bb7a07c468107279ce; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T16-03-50-795Z.tap` และ `.json`
+
+## 2026-10-05T16-04-50-225Z
+
+- จุดประสงค์: Round64 final controlled component failure with canonical cleanup
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 6bac098c350bb0a6eb7de8bb7a07c468107279ce; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T16-04-50-225Z.tap` และ `.json`
+
+## 2026-10-05T16-04-58-492Z
+
+- จุดประสงค์: Round64 final main production behavior unchanged
+- ผล: ผ่าน — 134/134; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 6bac098c350bb0a6eb7de8bb7a07c468107279ce; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T16-04-58-492Z.tap` และ `.json`
+
+## 2026-10-05T16-06-52-505Z
+
+- จุดประสงค์: Round64 final component policy counters explicit defaults
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 6bac098c350bb0a6eb7de8bb7a07c468107279ce; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T16-06-52-505Z.tap` และ `.json`
+
+## 2026-10-05T16-07-00-834Z
+
+- จุดประสงค์: Round64 final negative component policy counters
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 6bac098c350bb0a6eb7de8bb7a07c468107279ce; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T16-07-00-834Z.tap` และ `.json`
+
+## 2026-10-05T16-07-55-642Z
+
+- จุดประสงค์: Round64 final main exact QA source inventory
+- ผล: ผ่าน — 134/134; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 6bac098c350bb0a6eb7de8bb7a07c468107279ce; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T16-07-55-642Z.tap` และ `.json`
+
+## 2026-10-05T16-09-44-914Z
+
+- จุดประสงค์: Round64 final component code and fixture digest binding
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 6bac098c350bb0a6eb7de8bb7a07c468107279ce; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T16-09-44-914Z.tap` และ `.json`
+
+## 2026-10-05T16-09-52-898Z
+
+- จุดประสงค์: Round64 final controlled failure code digest binding
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 6bac098c350bb0a6eb7de8bb7a07c468107279ce; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T16-09-52-898Z.tap` และ `.json`
+
+## 2026-10-05T16-11-44-629Z
+
+- จุดประสงค์: Round64 final isolated worker environment and component identity
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 6bac098c350bb0a6eb7de8bb7a07c468107279ce; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T16-11-44-629Z.tap` และ `.json`
+
+## 2026-10-05T16-11-54-374Z
+
+- จุดประสงค์: Round64 final isolated worker rejected replay evidence
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 6bac098c350bb0a6eb7de8bb7a07c468107279ce; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T16-11-54-374Z.tap` และ `.json`
+
+## 2026-10-05 round64 exact CI failure investigation
+
+- PR CI 37339435370 on ceddc0f: Linux Node22/24 component diagnostic failed. Artifact download succeeded; raw reports retained under reports/releases/ci-ceddc0f-pr.
+- Normal simulated disk replay: Node22 round3 delivered416/dropped635; Node24 round1 delivered160/dropped891. Both health.shutdown equals dropped; deadlineFired=1, shutdown approximately902ms, no overflow/invalid/rejected/timeout/transport losses. Disk reopen verified retained100 graphs, which does not prove full capture.
+- Controlled-fault gate Node22 also failed: its intended transport503 rejected1051 correctly, but independent disk round1 additionally delivered256/dropped795 at the shutdown deadline. Node24 controlled-fault gate passed. These are real unexpected capture failures in simulated replay, not a test-runner crash.
+- Keep the 900ms deadline and failed checks; do not rerun or weaken assertions to erase failures. Storage timings and exact remaining matrix evidence must be audited before choosing a repair. No business pilot or performance acceptance implied.
+
+## 2026-10-05T16-25-37-271Z
+
+- จุดประสงค์: Round64 exact PR source and unexpected shutdown losses evidence audit
+- ผล: ไม่ผ่าน — 0/1; failed 1; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: ceddc0f2a635989e52b9c52a3c8d4f3780f235b6; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T16-25-37-271Z.tap` และ `.json`
+- ไม่ผ่าน: round64 exact source and failed capture evidence reconcile without accepting performance
+
+- Round64 audit 16-25-37-271Z failed0/1 because its provisional audit assumed every ordinary performance report must fail. PR Windows24 actually met the existing absolute criterion: baseline0.975ms (<1ms), delta3.214ms≤5ms; relative329.641% is not the selected criterion. Correct the evidence audit to recompute the existing policy, not alter benchmark/source/threshold. All other seven ordinary reports fail their relative criterion. This one passing fixture measurement does not prove performance readiness.
+
+## 2026-10-05T16-26-18-933Z
+
+- จุดประสงค์: Round64 exact PR evidence audit with existing performance criterion
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: ceddc0f2a635989e52b9c52a3c8d4f3780f235b6; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T16-26-18-933Z.tap` และ `.json`
+
+## 2026-10-05T16-26-24-944Z
+
+- จุดประสงค์: Round64 exact push evidence audit separate from failed PR replay
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: ceddc0f2a635989e52b9c52a3c8d4f3780f235b6; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T16-26-24-944Z.tap` และ `.json`
+
+## 2026-10-05 round64 final hosted evidence review
+
+- Exactceddc0f PR37339435370 completed failure2/4; push37339368441 success4/4. Downloads succeeded for all8artifacts. Audits16-26-18-933Z/16-26-24-944Z passed1/1 each:104runnerreports,79codefiles exactGit,main134 all8jobs,FA15assertion/cleanup,ordinary+diagnosticcapture3153 allchannels. Audit includes expected unexpecteddiskfailures and negativefault innerTAP; it does not turn capture failures into acceptance.
+- Unexpecteddisk measured sync915.331/944.152/860.015ms, total935.270/954.990/880.782ms for Node22normal/Node24normal/Node22negative. Nofsync errors; deadline abort may race with server persistence, so ackloss does not establish all spans absent on disk. Transport/memorycomplete; prior827cause still not proven.
+- Existingperformancecriterion:7/8ordinary reports FAILED; PRWindows24 tinybaseline0.975ms selectsabsolute delta3.214ms≤5ms PASS. No criteria changed; not projectperformance readiness. Full details in QUALITY/HANDOFF/PLAN.
+- Final documentation records afterceddc0f are documentation-only. No productionpolicy/workload/backend/source change; allsix stacked PRs remain OPEN. Next round controlled slow-fsync regression and durable drain ADR, SDK-onlycost still pending, no realbusinesspilot/users.

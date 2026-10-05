@@ -10,6 +10,8 @@ Repository: https://github.com/lenulk/FlowAtlas; branch หลัก `master` �
 
 ## สถานะที่ตรวจแล้ว
 
+**สถานะปัจจุบันบนbranchของงานต่อ:** [PR#6](https://github.com/lenulk/FlowAtlas/pull/6) `diag/trace-cost-isolation`, โค้ดceddc0f; PR CI37339435370ผ่าน2/4เพราะsimulated disk burstชนshutdown900msในLinuxทั้งสอง, push37339368441ผ่าน4/4แต่ไม่ปิดfailure. Main134ทุกช่อง/79filesตรงGit/104runnerreportsauditครบ. ดูQUALITYรอบ64สำหรับfsync915/944/860msและackloss635/891/795. PR#1–#6ยังOPENstacked ไม่merge/forcepush; เอกสารบันทึกหลังceddc0fไม่เปลี่ยนโค้ดที่auditแล้ว. รอบ65เริ่มcontrolled slow-fsync regression+ADRdurable drainก่อนrepairหนึ่งประเด็น; SDK-onlycostยังต้องวัดแยก. Performance/sustained/pilot/users/releaseยังไม่ผ่าน. ย่อหน้ารอบ58ด้านล่างเป็นประวัติฐาน ไม่ใช่รุ่นล่าสุดของbranchนี้.
+
 - Functional code ล่าสุดที่ส่งขึ้น GitHub: `4ab1c61d6f5d2267a3c9ad37ff6830797988147d` รอบ 58 แก้เส้นแผนที่ไม่ให้พาดผ่านกล่องอื่น เพิ่มหัวลูกศร/title และระบุว่าตำแหน่งกล่องไม่ใช่เวลา ยังเรียงกล่องเป็นแถวเดิม เส้นต่าง edge ยังตัดกันหรือมีช่วงร่วมกันใน gutter ได้ ไม่ใช่ layered graph ที่เสร็จแล้ว
 - ตรวจ GitHub API วันที่ส่งต่องาน: [run 36910555723](https://github.com/lenulk/FlowAtlas/actions/runs/36910555723) ของ SHA นี้ completed/success ทั้ง 4 jobs: Windows 2025 และ Ubuntu 24.04 กับ Node 22.23.3 / 24.21.0 ไม่มี failed step ผลนี้ไม่ได้รับรอง performance; ยังไม่ได้อ่าน benchmark artifacts ของ run นี้
 - รุ่นก่อน `0e49f48` ผ่าน CI 4/4 และ main118/118 ทุกช่อง รวม browser/offline package/reinstall; Linux VM main118/source1/SDK+Chromium2/load1 ผ่าน Capture fixture3153 spans acknowledged ไม่มี drops แต่ p95 overhead ไม่ผ่าน: VM +199.569%; CI Windows22 +229.851%, Windows24 +224.212%, Ubuntu22 +161.766%, Ubuntu24 +144.292%
@@ -18,6 +20,14 @@ Repository: https://github.com/lenulk/FlowAtlas; branch หลัก `master` �
 - Raw TAP/JSON/screenshots/archives อยู่ใน `reports/` ที่ Git ignore เครื่องใหม่จะไม่ได้ไฟล์เหล่านี้จาก clone ให้สร้างหลักฐานใหม่หรือขอเจ้าของส่งไฟล์เมื่อจำเป็น ห้ามอ้างว่าอ่าน raw artifact แล้วจากบันทึกอย่างเดียว
 
 ## งานค้างแรก: รอบ 59 / FA-15
+
+### งานรับช่วงรอบ64 — collector cost isolation
+
+Branch `diag/trace-cost-isolation` ต่อจาก6bac098/PR5 สำหรับstackedPR base perf/span-validation-json. เพิ่ม [component diagnostic](collector-cost.md) และ503negativeguardเป็นQA-only: productionexporterคนละprocessกับcontrolledsink/memory/diskcollector, 3rotatedrounds×1051simulatedspans, disk100graphsexactstore-reopen. Defaultapp/SDK/sourcecode/policyไม่เปลี่ยน; CIเพิ่ม2gatesเป็น13reportsต่อช่อง
+
+Finallocalcomponent1/1และnegativeguard1/1ผ่าน, coremain134ผ่านก่อนfinalQAmetadata-only/envsanitationpatch; ต้องตรวจexacthostedrevisionต่อ. SHAผูกdiagnosticscript/generatedfixtureแยกจากcoresource; privateIPCtokenไม่เข้ารายงาน Faultinnerยังfailed/rejected1051/workspaceretainedและother8conditionscomplete ไม่ใช้passingguardแทนcaptureacceptance. Met=null/component_diagnosticทั้งnormal/fault, SDKcreation/applicationp95ไม่ถูกวัดและห้ามsubtractcrossworkloads. ระหว่างfixturedevelopmentมีค่าจับเวลาเปลี่ยน ไม่claimcausalproductionimprovement
+
+รอบ65ปรับpriorityจากexactCI: simulateddiskdeadlinefailuresมีsyncเป็นช่วงใหญ่ของsave; ทำcontrolled slow-fsync reproductionและADRdurable drainก่อนเลือกระหว่างstorage/drainrepair ไม่ขยายdeadlineหรือลดfsync. NodeSDK-onlycostยังค้างแยก; ถ้าเปลี่ยนbackendต้องADRatomicity/ackหลังfsync/crash/corruption/bounds/migration/rollback. Prior827shutdownlossยังไม่พิสูจน์samecause; performance/sustained/pilot/usertrial/releaseยังเปิด ผู้ใช้ยังไม่มีแอปธุรกิจ/ผู้ทดลอง
 
 ### งานรับช่วงรอบ63 — span validation JSON
 
