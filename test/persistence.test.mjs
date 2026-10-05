@@ -6,7 +6,7 @@ import { createHash } from 'node:crypto';
 import { dirname, join, relative, isAbsolute } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { startServers } from '../src/server.mjs';
-import { StorageError, storageErrorDiagnostic } from '../src/action-store.mjs';
+import { JsonActionStore, StorageError, storageErrorDiagnostic } from '../src/action-store.mjs';
 
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
 const storageTests = join(root, 'reports', 'storage');
@@ -22,6 +22,27 @@ function temporaryStorage(t) {
 }
 const post = (base, path, body) => fetch(`${base}${path}`, { method: 'POST',
   headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) });
+
+test('opt-in storage timing records bounded numeric stages and preserves failed-save state', async (t) => {
+  const dataDir = temporaryStorage(t);
+  const servers = await startServers({ port: 0, inventoryPort: 0, dataDir, traceTiming: true });
+  try {
+    const id = randomUUID();
+    assert.equal((await post(`http://127.0.0.1:${servers.port}`, '/flowatlas/action-start', { id, name: 'view-product' })).status, 201);
+    const before = readFileSync(servers.atlas.store.file, 'utf8');
+    assert.throws(() => servers.atlas.store.save([{}]), /Unable to persist/);
+    assert.equal(readFileSync(servers.atlas.store.file, 'utf8'), before);
+    const timing = servers.atlas.store.timingHealth();
+    assert.equal(timing.saves, 2); assert.equal(timing.failures, 1);
+    assert.ok(timing.validateMs > 0 && timing.syncMs > 0 && timing.serializeMs > 0);
+    assert.ok(timing.totalMs >= timing.maxMs);
+    assert.equal(Object.isFrozen(timing), true);
+    assert.ok(Object.values(timing).every(value => Number.isFinite(value) && value >= 0));
+    assert.equal(JSON.stringify(timing).includes('canary'), false);
+  } finally { await servers.close(); }
+  const disabled = new JsonActionStore(dataDir);
+  try { assert.equal(disabled.timingHealth(), null); } finally { disabled.close(); }
+});
 async function expectStartupFailure(options, pattern) {
   let opened;
   try { await assert.rejects(async () => { opened = await startServers(options); }, pattern); }

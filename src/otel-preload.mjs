@@ -10,6 +10,7 @@ import { LocalHttpSpanExporter } from './otel-exporter.mjs';
 const collector = new URL(process.env.FLOWATLAS_URL);
 let warned = false;
 const exporter = new LocalHttpSpanExporter({ collectorUrl: collector.origin, projectId: process.env.FLOWATLAS_PROJECT_ID,
+  timing: process.env.FLOWATLAS_TRACE_TIMING === '1',
   codeDigest: process.env.FLOWATLAS_TRACE_DIGEST, sessionToken: process.env.FLOWATLAS_SESSION_TOKEN,
   onDrop: (health) => { if (!warned) { warned = true; console.error(`FlowAtlas trace capture incomplete: ${JSON.stringify(health)}`); } } });
 const loopback = (host) => ['127.0.0.1', 'localhost', '::1', '[::1]'].includes(host);
@@ -29,6 +30,7 @@ sdk.start();
 let shutdown;
 const close = () => shutdown ??= sdk.shutdown().finally(async () => {
   if (exporter.dropped) console.error(`FlowAtlas trace dropped spans: ${exporter.dropped}`);
+  if (exporter.timingHealth()) console.error(`FlowAtlas trace timing: ${JSON.stringify(exporter.timingHealth())}`);
   await new Promise((resolve, reject) => process.stderr.write(`FlowAtlas trace summary: ${JSON.stringify(exporter.summary())}\nFlowAtlas trace delivery health: ${JSON.stringify(exporter.deliveryHealth())}\nFlowAtlas trace rejection health: ${JSON.stringify(exporter.rejectionHealth())}\nFlowAtlas trace transport health: ${JSON.stringify(exporter.transportHealth())}\n`,
     (error) => error ? reject(error) : resolve()));
 });

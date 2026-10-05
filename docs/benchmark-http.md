@@ -1,5 +1,13 @@
 # Fixture HTTP trace overhead benchmark
 
+## Opt-in shutdown/storage diagnostics
+
+For investigation only, set `FLOWATLAS_BENCHMARK_TIMING=1` and run `node scripts/run-tests.mjs scripts/benchmark-http-trace.mjs`. PowerShell: `$env:FLOWATLAS_BENCHMARK_TIMING='1'`; clear it with `Remove-Item Env:FLOWATLAS_BENCHMARK_TIMING` before an ordinary measurement. The same workload and capture gates apply, but performance is unassessable (`diagnostic_run`, `met=null`). CI runs ordinary and diagnostic benchmarks separately.
+
+The inspector/target receive `FLOWATLAS_TRACE_TIMING=1` only in this mode. Default capture has no timing clock calls or timing log output. Diagnostics retain fixed numeric aggregates, never URLs, paths, tokens, span IDs, payloads or arbitrary error strings. Report parsing allowlists finite nonnegative numbers and discards extra fields. Missing enabled diagnostics fail the run and retain its workspace.
+
+Exporter fields include first/max/summed batch duration, shutdown starting queue/in-flight counts, delivered during shutdown, duration and deadline lateness. Batch durations overlap across two slots; their sum is not wall time. Storage reports save count/failures, total/max duration and cumulative/max validate/serialize/open/write/fsync/close/rename times. Failed-stage time includes error cleanup. These independent process clocks report durations, not a synchronized distributed timeline, and cannot alone prove which component caused an intermittent shutdown loss. No retries, durability, queue or deadline changes accompany them.
+
 Run this only when you explicitly want the local fixture benchmark:
 
 ```powershell

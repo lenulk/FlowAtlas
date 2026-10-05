@@ -18,6 +18,34 @@ async function serve(t, handle) {
 }
 const config = (url, extra = {}) => ({ collectorUrl: url, projectId: 'target', codeDigest: 'b'.repeat(64), sessionToken: randomBytes(32).toString('base64url'), ...extra });
 
+test('opt-in timing distinguishes stalled shutdown from successful acknowledgement without sensitive data', async (t) => {
+  const url = await serve(t, (req, _res) => req.resume());
+  const exporter = new LocalHttpSpanExporter(config(url, { timing: true }));
+  exporter.export(Array.from({ length: 96 }, (_v, index) => sdkSpan(index + 1)), () => {});
+  await exporter.shutdown();
+  const timing = exporter.timingHealth();
+  assert.equal(timing.shutdownQueued, 32); assert.equal(timing.shutdownInFlight, 64);
+  assert.equal(timing.shutdownDelivered, 0); assert.equal(timing.deadlineFired, 1);
+  assert.ok(timing.shutdownMs >= 800 && timing.shutdownMs < 1500);
+  assert.equal(timing.batches, 2); assert.equal(timing.acknowledgedBatches, 0);
+  assert.ok(timing.batchMaxMs > 0); assert.ok(timing.deadlineLateMs >= 0);
+  assert.equal(Object.isFrozen(timing), true);
+  assert.ok(Object.values(timing).every(value => Number.isFinite(value) && value >= 0));
+  assert.equal(JSON.stringify(timing).includes('canary'), false);
+  assert.equal(new LocalHttpSpanExporter(config(url)).timingHealth(), null);
+});
+
+test('successful timing counts uploads and shutdown progress without changing delivery', async (t) => {
+  const url = await serve(t, (req, res) => { req.resume(); res.end('{}'); });
+  const exporter = new LocalHttpSpanExporter(config(url, { timing: true }));
+  exporter.export(Array.from({ length: 96 }, (_v, index) => sdkSpan(index + 1)), () => {});
+  await exporter.shutdown();
+  const timing = exporter.timingHealth();
+  assert.equal(exporter.summary().delivered, 96); assert.equal(timing.shutdownDelivered, 96);
+  assert.equal(timing.batches, 3); assert.equal(timing.acknowledgedBatches, 3);
+  assert.equal(timing.deadlineFired, 0); assert.ok(timing.batchTotalMs >= timing.batchMaxMs);
+});
+
 test('SDK metadata normalization strips sensitive fields and ignores non-HTTP spans', () => {
   assert.equal(JSON.stringify(normalizeSdkHttpSpan(sdkSpan())).includes('canary-'), false);
   assert.equal(normalizeSdkHttpSpan({ ...sdkSpan(), kind: 0 }), null);

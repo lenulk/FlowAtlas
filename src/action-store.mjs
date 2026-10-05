@@ -2,6 +2,7 @@ import { openSync, closeSync, writeFileSync, readFileSync, fsyncSync, renameSync
 import { join } from 'node:path';
 import { randomUUID, createHash } from 'node:crypto';
 import { hostname } from 'node:os';
+import { performance } from 'node:perf_hooks';
 import { validateGraph } from './evidence-contract.mjs';
 import { validSourcePath } from './project-sources.mjs';
 
@@ -84,7 +85,10 @@ function validateSavedAction(action) {
 }
 
 export class JsonActionStore {
-  constructor(directory) {
+  constructor(directory, { timing = false } = {}) {
+    this.timing = timing === true ? { saves: 0, failures: 0, totalMs: 0, maxMs: 0,
+      validateMs: 0, serializeMs: 0, openMs: 0, writeMs: 0, syncMs: 0, closeMs: 0, renameMs: 0,
+      validateMaxMs: 0, serializeMaxMs: 0, openMaxMs: 0, writeMaxMs: 0, syncMaxMs: 0, closeMaxMs: 0, renameMaxMs: 0 } : null;
     this.directory = directory;
     this.file = join(directory, 'state.json');
     this.lock = join(directory, '.writer.lock');
@@ -133,6 +137,14 @@ export class JsonActionStore {
   }
 
   save(actions) {
+    const started = this.timing ? performance.now() : null;
+    let measuredAt = started, measuredStage = 'validate';
+    const measure = this.timing ? (next) => {
+      const now = performance.now(), elapsed = now - measuredAt;
+      this.timing[`${measuredStage}Ms`] += elapsed;
+      this.timing[`${measuredStage}MaxMs`] = Math.max(this.timing[`${measuredStage}MaxMs`], elapsed);
+      measuredAt = now; measuredStage = next;
+    } : null;
     const temporary = join(this.directory, `.state-${randomUUID()}.tmp`);
     let fd;
     let created = false;
@@ -140,27 +152,41 @@ export class JsonActionStore {
     try {
       if (this.closed) throw new Error('Storage is closed');
       if (actions.length > 100 || actions.some((action) => validateSavedAction(action).length)) throw new Error('Invalid graph');
+      measure?.('serialize');
       const content = JSON.stringify({ storageVersion: 1, actions });
       if (Buffer.byteLength(content) > maxBytes) throw new Error('Storage size limit exceeded');
+      measure?.('open');
       stage = 'open';
       fd = openSync(temporary, 'wx', 0o600);
       created = true;
+      measure?.('write');
       stage = 'write';
       writeFileSync(fd, content);
+      measure?.('sync');
       stage = 'sync';
       fsyncSync(fd);
+      measure?.('close');
       stage = 'close';
       closeSync(fd);
       fd = undefined;
+      measure?.('rename');
       stage = 'rename';
       replaceStateFile(temporary, this.file);
     } catch (error) {
+      if (this.timing) this.timing.failures++;
       if (fd !== undefined) closeSync(fd);
       if (created) { try { unlinkSync(temporary); } catch { /* Preserve the original state on write failure. */ } }
       throw new StorageError('Unable to persist action; previous saved state has been preserved', error,
         { operation: 'save', stage });
+    } finally {
+      if (this.timing) {
+        measure(measuredStage); const elapsed = performance.now() - started;
+        this.timing.saves++; this.timing.totalMs += elapsed; this.timing.maxMs = Math.max(this.timing.maxMs, elapsed);
+      }
     }
   }
+
+  timingHealth() { return this.timing ? Object.freeze({ ...this.timing }) : null; }
 
   close() {
     if (this.closed) return;

@@ -62,6 +62,7 @@ function placeOrder(inventoryUrl, actionId) {
 }
 
 export async function startServers({ port = 4173, inventoryPort = 4174, dataDir = null, actionLimit = 100, projects = [], workspace, sessionToken = null,
+  traceTiming = false,
   onStorageError = (diagnostic) => console.error(`FlowAtlas storage: ${JSON.stringify(diagnostic)}`) } = {}) {
   const reportStorageError = (error) => {
     if (error.code !== 'FLOWATLAS_STORAGE_ERROR') return;
@@ -77,7 +78,7 @@ export async function startServers({ port = 4173, inventoryPort = 4174, dataDir 
   try {
     if (dataDir !== null) {
       const directory = resolveDataDirectory(workspaceRoot, dataDir);
-      store = new JsonActionStore(directory);
+      store = new JsonActionStore(directory, { timing: traceTiming });
     }
     atlas = new FlowAtlas(version, actionLimit, store, projectSources);
   } catch (error) { reportStorageError(error); store?.close(); throw error; }
