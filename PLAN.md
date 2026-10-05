@@ -14,6 +14,8 @@ Node.js เป็น integration ที่กำลังพัฒนาแล�
 
 ## สถานะเริ่มต้น
 
+รอบ69เพิ่มactualSDKHTTPcomponentdiagnostic/controlledsink/parity/503guardบนsharedordinaryfixtureแล้ว ค่าmet=null/capturecountsครบไม่แทนperformance/pilot. Main140ผ่าน แต่ordinaryp95+506.817%ยังไม่ผ่าน10%. ถัดไปทดลองnativeHTTPtransportตามcostevidence พร้อมconformance/cleanup/abort/privacyและexactCI; startuprootcause/stablecapture/sustained/realpilot/usertrial/releaseยังไม่ผ่าน
+
 อัปเดตรอบ68 (6ตุลาคม2026): เพิ่มQAstartupfailureevidence/original-errorpreservation ไม่ใช่แก้CLIreadinessrootcause; localmain140/140. ตรวจhostedรอบ66–67จริงครบ10completedartifactchannels/160reports/exactsource84files แต่แต่ละrunมีcancelledmissingchannels ไม่มีmatrix4/4. Ordinarycaptureครบ3153/ช่องแต่performanceยังFAILEDทั้งหมด. ขั้นต่อไปexactround68CI + SDK-onlycost/controlledCLIstartupdiagnosticsก่อนrepair; ไม่ขยายtimeout/ลดthresholdและไม่ใช้fixtureแทนpilot. ยังไม่มีแอปธุรกิจหรือผู้ทดลอง ดูHANDOFF/QUALITYสำหรับรุ่นและข้อจำกัด
 
 | ความสามารถ | หลักฐานปัจจุบัน | งานที่เหลือ |

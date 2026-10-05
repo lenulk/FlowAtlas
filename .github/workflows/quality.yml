@@ -108,6 +108,16 @@ jobs:
         env:
           FLOWATLAS_TEST_PURPOSE: CI isolated synthetic snapshot journal writes and exact replay
         run: node scripts/run-tests.mjs scripts/benchmark-durable-write.mjs
+      - name: Actual SDK HTTP component cost
+        if: ${{ !cancelled() }}
+        env:
+          FLOWATLAS_TEST_PURPOSE: CI actual SDK HTTP count-only and controlled sink costs
+        run: node scripts/run-tests.mjs scripts/benchmark-sdk-http.mjs
+      - name: SDK cost configuration and rejected sink evidence
+        if: ${{ !cancelled() }}
+        env:
+          FLOWATLAS_TEST_PURPOSE: CI SDK cost configuration parity and rejected sink evidence
+        run: node scripts/run-tests.mjs scripts/sdk-http-fixture-check.mjs scripts/sdk-http-failure-check.mjs
       - name: Pack and install in disposable workspace
         id: package_install
         if: ${{ !cancelled() }}

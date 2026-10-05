@@ -1,0 +1,9 @@
+# แยกต้นทุน SDK HTTP
+
+รอบ69 / 6ตุลาคม2026 รัน `node scripts/run-tests.mjs scripts/benchmark-sdk-http.mjs` แยกจาก benchmarkอื่น เพื่อไม่ให้กระทบlatency. 3rotated rounds × baseline / actualSDKcount-only / productionSDK+exporter+controlledHTTPsink ใช้appSourceร่วมกับordinaryHTTPbenchmarkแบบbyte-identicalต่อจากb60ea05: warmup50/measured1000/concurrency8/metrics1. ทุกรอบตรวจresponsebytes/unique requests/1051SDKspanหรือsinkack; fixtureและruntime/scriptSHAแยกในJSON
+
+Count-onlyใช้SDK/instrumentation/sampler/propagator/optionsเดียวกับproduction (มีparitygate) แต่นับfixedfieldsแทนnormalize/transport/store. `counted`ไม่ใช่durableack. Sinkใช้productionpreload/exporterจริงแต่controlled202endpoint ไม่มีgraphvalidation/storage. Startupและshutdownไม่เข้าช่วงrequestp95; CPU/RSSจากappรวมwarmup/metrics. JSONกำหนดmet=null/diagnosticเสมอ ไม่หักลบผลต่างเป็นต้นทุนบริสุทธิ์และไม่ใช้แทนordinary10%budget/businesspilot
+
+`node scripts/run-tests.mjs scripts/sdk-http-fixture-check.mjs scripts/sdk-http-failure-check.mjs` ตรวจconfigurationparityและ503negativeguard. InnermeasurementยังFAILED/dropped1051และretainedfixture; outerguardผ่านเฉพาะเมื่อother8conditionsครบ เก็บrawrunner/benchmarkทั้งinnerและouter ไม่ใช้guardpassซ่อนcapturefailure. รายงานไม่บันทึกtoken/rawstdout/stderr/spanattributes/generatedIDs/URLport มีเฉพาะnumericfieldsและcanonicalownedworkspace relativepathเมื่อfailed
+
+Finalisolated21-02-26-560Z1/1:9conditionscomplete/removed; medianp95 baseline2.486/count-only2.864/productionexporter-sink4.138ms. เป็นเหตุผลทดลองลดtransportallocation ไม่พิสูจน์causeหรือผ่านperformance. Combinednormal+negative21-01-41-103Z3/3ผ่านaccounting แต่รันconcurrentจึงไม่ใช้timing. Ordinary21-02-33-117Zcapture3153ack0drop แต่performanceFAILED+506.817% (2.083→12.640ms); main21-02-42-936Z140/140. Productionยังไม่เปลี่ยนรอบนี้
