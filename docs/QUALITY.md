@@ -2,6 +2,14 @@
 
 ### รอบ63 — reuse normalized span JSON within one validation
 
+**Exact5c6172a:** [PR37334972757](https://github.com/lenulk/FlowAtlas/actions/runs/37334972757) และ [push37334881014](https://github.com/lenulk/FlowAtlas/actions/runs/37334881014)success4/4ทั้งสอง. Audit `15-49-10-072Z`/`15-49-10-526Z`1/1แต่ละชุด ตรวจ88runnerreports/77filesตรงGit5c6172aทุกชุดแม้PRmergec9bfa5ab; main134ทุกช่อง/11gatesexit0/failed0/skipped0, innerERR_ASSERTION/cleanupครบ, ordinaryและdiagnosticcapture3153ack0dropsทุกช่อง, diagnosticmet=null/allowlistednumericfieldsครบ
+
+OrdinaryperformanceFAILEDทุกช่อง: PR Ubuntu22+91.518%,Ubuntu24+125.723%,Windows22+182.691%,Windows24+197.292%; push +71.669%,+167.517%,+233.651%,+252.867%ตามลำดับ. ไม่อ้างHTTPimprovementหรือshutdown827ปิดแล้ว DiagnosticdeadlineFired0ทุกpair/peakshutdown146.454msตามfindingข้างล่าง. โค้ดมีเพียงper-callcleanJSONreuse+2regressions ไม่เปลี่ยนpolicy/API/backend; finaldocscommitไม่เปลี่ยนprogramsourceที่ตรวจแล้ว
+
+Round64priority: แยกSDK-only/transport/memorycollector/durablecollectorcostด้วยdiagnosticconditionsที่labelชัดและไม่แทนordinaryacceptanceก่อนเลือกbackend. หากjournalคุ้มค่าจึงADRbatchatomicity/ackหลังfsync/tornwrite/corruption/retention+bounds/migration+backup/rollbackก่อนimplementation ไม่ยกdeadlineหรือลดdurabilityเพื่อให้ผ่าน. Performance/sustainedload/realpilot/users/releaseยังเปิด
+
+Partialhostedread: Linuxทั้ง4jobsของPR37334972757/push37334881014ผ่าน, captureครบordinary/diagnosticแต่performanceFAILED(PR22+91.518%,PR24+125.723%;push22+71.669%,push24+167.517%). PRUbuntu24diagnosticpairแรกqueue795/inflight64ตอนshutdown ส่งเพิ่ม859ครบใน146.454ms/deadlineFired0; storage33saves420.003ms/sync348.711ms/syncMax89.272ms. ยังไม่reproduce827และไม่อ้างcauseจากdifferentrun รอบ64ควรแยกSDK/transport/storageต้นทุนด้วยdiagnosticsก่อนเลือกjournalbackend ไม่ข้ามADR/recoveryproof
+
 Finalmain `15-37-51-032Z`134/134, isolatedsource `15-38-44-161Z`1/1, actualSDKCJS/ESM+Edge+deliberatefailure `15-38-56-220Z`3/3ผ่าน; audit `15-40-10-222Z`1/1ยืนยันทุกfinalgate/ordinary+diagnosticprograminventoryตรงcheckoutและarchivebeforeตรงGit3ebc2b5. Diagnosticaftervalidation62.113–73.528ms/serialize45.687–56.458ms/fsync31.983–56.761msทั้ง3pairs; shutdown7.69–20.28ms/deadlineFired0 ไม่มีprior827repro. ExactCIยังตรวจต่อ ไม่ใช้CIรุ่นก่อนรับรอง
 
 Ordinarybaselinearchive3ebc2b5 `15-35-57-302Z`1/1 / after `15-36-58-537Z`1/1 capture3153ack0dropsทั้งคู่ แต่performanceFAILED568.733% (2.613→17.474ms) /304.718% (3.370→13.639ms). Baselineต่าง/ลำดับbefore-after/ไม่มีpairedrandomizedimplementationconditions จึงไม่อ้างcausallatencyimprovement. Diagnosticafter `15-37-26-158Z`1/1captureครบ/met=null ไม่แทนperformancegate Main/source/SDK/exactCIกำลังตรวจต่อ

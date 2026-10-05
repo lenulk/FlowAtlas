@@ -1,5 +1,7 @@
 # บันทึกการรันทดสอบ
 
+Manual round63 partial CI read: Linux artifacts PR37334972757/push37334881014 downloaded separately; all4jobs normal+diagnosticcapture complete but ordinaryperformanceFAILED. PRUbuntu24diagnostic firstpair shutdownQueued795/inFlight64/deliveredDuringShutdown859 in146.454ms/deadlineFired0, storage33saves total420.003ms/sync348.711ms/syncMax89.272ms. Not a reproduction of827 loss. Windows stillInstallChromium at review; exactinventory audit pending. QA audit file copied/adapted from round62 usesGit5c6172a/main134/11reports, not priorcodeinventory.
+
 Manual round63 start: clean3ebc2b5/fetch/pullup-to-date; ownbranch perf/span-validation-json. Prior docs push37332918966success, PR37332925143in-progress at check; do not infer stablecapture from a documentation run. Tool read src/http-traces.mjs failed nonexistentpath; corrected via rg --files to src/http-spans.mjs. Isolatedcost raw reports/benchmarks/round63-validator-cost.json read:1spanmedian10.644→9.996ms,48span293.582→304.038ms; no latency improvement claim. Git3ebc2b5 programarchive extracted only after canonical destination/entries check and refusing existing destination; testdir empty to avoid duplicate default discovery, dependencies unchanged via ancestor node_modules.
 
 Manual round62 artifact transfer failure: push CI Windows artifact download failed TLS handshake timeout from GitHub artifact storage. Kept existing Linux artifacts and retry only Windows download; this is network/tool failure, not a software test. PR CI37331499111 and push37331409424 both completed success at latest API check; raw Windows audit still pending when transfer failed. Do not persist temporary signed artifact URLs.
@@ -2607,3 +2609,19 @@ First matched3×1000 measurement: all6000 measured business responses pluswarmup
 - Environment: win32/x64; OS 10.0.26200; Node v24.19.0
 - commit: 3ebc2b5722da48ea053fee2c6927cbfb230ad339; dirty: true
 - หลักฐาน: `reports/tests/2026-10-05T15-40-10-222Z.tap` และ `.json`
+
+## 2026-10-05T15-49-10-072Z
+
+- จุดประสงค์: Round63 exact PR CI source inventories timing and capture
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 5c6172ae644ef65064cc495ed147a8736d405709; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T15-49-10-072Z.tap` และ `.json`
+
+## 2026-10-05T15-49-10-526Z
+
+- จุดประสงค์: Round63 exact push CI source inventories timing and capture
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 5c6172ae644ef65064cc495ed147a8736d405709; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T15-49-10-526Z.tap` และ `.json`

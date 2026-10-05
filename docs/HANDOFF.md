@@ -21,11 +21,13 @@ Repository: https://github.com/lenulk/FlowAtlas; branch หลัก `master` �
 
 ### งานรับช่วงรอบ63 — span validation JSON
 
+**โค้ดล่าสุดที่ตรวจแล้ว:**5c6172a [PR#5](https://github.com/lenulk/FlowAtlas/pull/5), stackedbase `diag/shutdown-timing`/PR4. ExactPR37334972757/push37334881014ผ่าน4/4ทั้งสอง; artifactaudit88reports/77filesตรงGit, main134ทุกช่อง/11gatesต่อช่อง, normal+diagnosticcapture3153ack0drops, originalassertionreportครบ. OrdinaryperformanceFAILEDทุกช่อง(71.669–252.867% across bothruns), diagnosticmet=null; ดูQUALITY. Docscommitถัดจาก5c6172aไม่เปลี่ยนprogramsourceนี้ PR1–5ยังOPENไม่merge
+
 Branch `perf/span-validation-json` ต่อจาก3ebc2b5, stackedbase `diag/shutdown-timing`/PR4. เก็บcleanJSONภายในvalidateGraph callเดิมเพื่อเทียบnode แทนserializecleanobjectซ้ำ ลด4→3calls/span แต่ยังserializetraceinput/nodeinputแยกทุกครั้ง และทุกvalidationอ่านข้อมูลใหม่ ไม่มีcacheข้ามcall/readonlyAPI/backend/schema/durabilitypolicyเปลี่ยน
 
 Before8/9จากserializationcountregression; afterfocused28/28, diagnosticsเทียบGit3ebc2b5+isolatedcost2/2, main134/source1/SDK+Edge+failure3/audit1ผ่าน. Isolated1spanmedian10.644→9.996msแต่48spans293.582→304.038ms จึงไม่claimlatencyimprovement. Ordinarybefore/aftercapture3153ack0dropsแต่performanceFAILED568.733%/304.718%; diagnosticmet=null. ExactCIรุ่นใหม่ยังรอ; prior827shutdowndropsยังเปิด
 
-รอบ64ควรประเมินdurablejournalเพื่อลดการserialize/เขียนhistoryทั้งชุดต่อbatch เทียบกับJSONsnapshotเดิมก่อนเปลี่ยนbackend: ADRต้องกำหนดackหลังfsync, batchatomicity, crash/torn-write/corruptionrecovery, retention/sizebounds, migration+backup/rollback และbenchmarkworkloadเดิม. ไม่ใช้microcostreductionหรือCIgreenรับรองperformance/realpilot; ผู้ใช้ยังไม่มีแอปหรือผู้ทดลอง
+รอบ64แยกSDK-only/transport/memorycollector/durablecollectorcostด้วยdiagnosticsที่labelชัดก่อนเลือกbackend แล้วประเมินdurablejournalเพื่อลดการserialize/เขียนhistoryทั้งชุดต่อbatch เทียบกับJSONsnapshotเดิม: ADRต้องกำหนดackหลังfsync, batchatomicity, crash/torn-write/corruptionrecovery, retention/sizebounds, migration+backup/rollback และbenchmarkworkloadเดิม. Diagnosticconditionsไม่แทนordinaryacceptance/realpilot ไม่เปลี่ยนqueue/deadlineเพื่อให้ผ่าน; ผู้ใช้ยังไม่มีแอปหรือผู้ทดลอง
 
 ### งานรับช่วงรอบ62 — วิเคราะห์ shutdown drain
 
