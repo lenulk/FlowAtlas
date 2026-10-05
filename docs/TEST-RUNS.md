@@ -2188,3 +2188,83 @@ First matched3×1000 measurement: all6000 measured business responses pluswarmup
 - Userrequestedpullallupdates: fetchedallconfiguredremotes/branchesandpulledmasterwith--ff-only. GitHubalreadyat4ab1c61d6f5d2267a3c9ad37ff6830797988147d; HEAD...origin/master0/0, no source/dependencychanges. Threeexistingdirtyevidencedocsexactlypreservedbychecksum; backupreports/vm/pull-backup-2026-10-05-165843-231 retained. Noautomatedsoftwaretests rerun forunchangedcode. Round59diagnosticremainsunfinished; pulldidnotclaimrepairorproductionreadiness.
 - Handoffinspection2026-10-05(clientdate): exact4ab1c61GitHubrun36910555723completedSUCCESS4/4, Windows2025/Ubuntu24.04Node22.23.3/24.21.0, nofailedstep. Read-onlyAPIonly; benchmarkartifactsnotdownloadedforthisrun, no performanceacceptance inferred. Existingthreedirtyevidencedocsreviewed/preserved; docs/HANDOFF.md prepared withunfinishedRound59/FA-15diagnosticandignoredrawartifactavailabilityexplicit.
 - Handoffmanualreview: allsevenreferenceddocuments exist, actualselecteddiff/unfinishedissue/CIrevision/evidencelimits reviewed, nocredentialcontentadded; PLANstatusupdatedtoverified4ab1c61CIandVM. Documentation-onlychanges; no softwaretests repeated because source/dependencies unchanged.
+
+## รับช่วงงาน 2026-10-05 — เตรียม checkout และ QA
+
+- Clone ใน sandbox ล้มเหลวด้วย schannel SEC_E_NO_CREDENTIALS; clone ที่ได้รับอนุมัตินอก sandbox สำเร็จ HEAD c9563bd, master ตรง origin/master และ working tree สะอาดก่อนสร้าง branch fix/fa15-fixture-cleanup
+- อ่าน HANDOFF/AGENTS/PLAN/QUALITY/TEST-RUNS และตรวจ failure cleanup ใน test/otel-runtime.test.mjs; raw reports จากเครื่องเก่าไม่อยู่ใน clone จึงยังไม่ได้ตรวจ artifacts เก่าเอง
+- gh ใน sandbox อ่าน config ไม่ได้; npm ไม่มีใน PATH ทำให้ npm ci ไม่เริ่ม (ยังไม่มีผล software test) เตรียม npm เฉพาะ QA directory โดยไม่เปลี่ยน runtime ระบบ
+- Node ที่มีจริง v24.19.0; Edge executable และ bundled Playwright package มีอยู่ ผลเก่า Node v24.18.0 ไม่ใช้แทนผลเครื่องนี้
+- QA npm bootstrap ครั้งแรก pnpm ENOENT เนื่องจากยังไม่มี reports/npm-tool; สร้าง directory ก่อนลองใหม่ ไม่มี dependency ของแอปเปลี่ยน
+- การย้าย QA npm ไป reports/releases ทำให้ junction npm ของ pnpm ชี้พาธเดิมและ launcher MODULE_NOT_FOUND; ใช้ executable ใน virtual store ที่ย้ายมาจริงแทน ไม่แก้ dependencies/lockfile ของโปรเจกต์
+
+## 2026-10-05T10-23-44-212Z
+
+- จุดประสงค์: Round59 baseline deliberate CJS assertion fault before cleanup repair
+- ผล: ไม่ผ่าน — 0/1; failed 1; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: c9563bd740ecc46d9b5b5deb2e060d4b08e1f799; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T10-23-44-212Z.tap` และ `.json`
+- ไม่ผ่าน: test\\otel-runtime.test.mjs
+- Baseline deliberatefault 10-23-44-212Z: 0/1, native exit3221226505 บน Node24.19.0/Edge รายละเอียด assertion หาย; geometry/screenshot อยู่ reports/browser/otel-runtime-1791195836942-cjs ตรวจ retained workspace ไม่มี writer lock ณ snapshot แต่ไม่ถือว่าพอร์ต/close ยืนยันแล้ว
+
+## 2026-10-05T10-25-48-947Z
+
+- จุดประสงค์: Round59 deliberate CJS assertion fault after graceful bounded fixture cleanup
+- ผล: ไม่ผ่าน — 0/1; failed 1; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: c9563bd740ecc46d9b5b5deb2e060d4b08e1f799; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T10-25-48-947Z.tap` และ `.json`
+- ไม่ผ่าน: real OTel preload captures cjs HTTP/Undici fan-out and isolates concurrent requests
+
+## 2026-10-05T10-28-09-391Z
+
+- จุดประสงค์: Round59 owned cleanup boundaries stop close lock port timeout canonical path
+- ผล: ผ่าน — 5/5; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: c9563bd740ecc46d9b5b5deb2e060d4b08e1f799; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T10-28-09-391Z.tap` และ `.json`
+
+## 2026-10-05T10-28-10-558Z
+
+- จุดประสงค์: Round59 normal actual SDK CJS ESM and Edge viewer after cleanup repair
+- ผล: ผ่าน — 2/2; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: c9563bd740ecc46d9b5b5deb2e060d4b08e1f799; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T10-28-10-558Z.tap` และ `.json`
+
+## 2026-10-05T10-28-47-833Z
+
+- จุดประสงค์: Round59 repeatable deliberate browser assertion reporting regression
+- ผล: ไม่ผ่าน — 0/1; failed 1; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: c9563bd740ecc46d9b5b5deb2e060d4b08e1f799; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T10-28-47-833Z.tap` และ `.json`
+- ไม่ผ่าน: deliberate browser assertion retains its original report and confirms fixture cleanup
+- Failure harness10-28-47-833Z0/1: subprocess สืบทอด NODE_TEST_CONTEXT แล้ว Node ข้าม recursive test runner/exit0; raw inner TAP ยืนยันสาเหตุ แก้ให้ลบเฉพาะตัวแปรนี้จาก separate runner env ไม่เปลี่ยน expectation
+
+## 2026-10-05T10-29-27-979Z
+
+- จุดประสงค์: Round59 independent deliberate failure harness preserves ERR_ASSERTION and verified cleanup
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: c9563bd740ecc46d9b5b5deb2e060d4b08e1f799; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T10-29-27-979Z.tap` และ `.json`
+
+## 2026-10-05T10-29-45-335Z
+
+- จุดประสงค์: Round59 default main regression with unchanged tracing capture policy
+- ผล: ผ่าน — 123/123; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: c9563bd740ecc46d9b5b5deb2e060d4b08e1f799; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T10-29-45-335Z.tap` และ `.json`
+
+## 2026-10-05T10-31-43-458Z
+
+- จุดประสงค์: Round59 final catch guard cleanup boundaries and deliberate browser assertion regression
+- ผล: ผ่าน — 6/6; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: c9563bd740ecc46d9b5b5deb2e060d4b08e1f799; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T10-31-43-458Z.tap` และ `.json`
+- FinalRound59 10-31-43-458Z6/6ผ่าน หลัง catch-onlyunrefguard; main123/123ก่อนguard, normalSDK+Edge2/2 และ deliberatefailureยัง0/1พร้อมERR_ASSERTION/cleanupครบ ภาพactualSDK MJSตรวจด้วยตาแล้ว evidencepartial/observed/unknownคงเดิม ไม่มีwriterlockพบในreports/storage ณ snapshot; Get-CimInstance process inventoryถูก sandboxปฏิเสธ จึงไม่อ้างว่าตรวจทุกprocessบนเครื่องแล้ว
+- Commitครั้งแรกไม่สำเร็จเพราะ checkoutใหม่ไม่มี Git author config; คำสั่งpushที่ตามมาเผยแพร่เฉพาะbranchฐานc9563bd ยังไม่มีrepaircommit ตรวจauthorcommitเดิมเป็น Codex <codex@localhost> แล้วใช้ identity นี้เฉพาะคำสั่งcommit ไม่แก้globalconfig

@@ -70,7 +70,7 @@ Node.js เป็น integration ที่กำลังพัฒนาแล�
 | FA-12 | pilot แอปอิสระ | FA-03–FA-10 | inspect แอปก่อนติดตั้งและมี rollback; known-answer cases success/error/slow/upstream outage; บันทึกเวลาติดตั้งและ overhead; ใช้ fixtures เพื่อเตรียมได้แต่ไม่แทน real-app gate |
 | FA-13 | user trial | FA-10, FA-12 | ผู้ทดลอง 3–5 คน, 6 โจทย์เทียบเครื่องมือ/ไม่มีเครื่องมือแบบสลับลำดับและโจทย์ใกล้เคียง; เก็บคำตอบผิด/เวลา/ขอบเขตที่ช่วยไม่ได้; ไม่สรุปทั่วไปจากกลุ่มเล็ก |
 | FA-14 | release และคำแนะนำ support | FA-02, FA-06–FA-13 | license ที่เจ้าของเลือก, artifact checksum/dependency review, clean install/update/uninstall, release notes, known limits; ไฟล์ข้อมูล/credentials ไม่เข้าชุดเผยแพร่ |
-| FA-15 | วินิจฉัย native QA exit บน Windows เมื่อ browser assertion ล้มเหลว | FA-02 | รอบ58พบ Node subprocess exit3221226505 สองครั้งหลัง geometryพบ4crossings; ตรวจ failure cleanup กับโปรเซสที่ระบุตัวตนได้ เก็บ assertion/artifact ได้แม้ cleanupผิดพลาด ไม่ใช้การรันผ่านมาปิดสาเหตุ |
+| FA-15 | วินิจฉัย native QA exit บน Windows เมื่อ browser assertion ล้มเหลว | FA-02 | รอบ59บนNode24.19.0/Edge reproduce nativeก่อนแก้; graceful boundedcleanupหลังแก้เก็บ ERR_ASSERTION/stackและclose/lock/portsครบ; boundary5/normalSDK2/failureharness1/main123ผ่าน รอexactCI/Linuxรุ่นใหม่ สาเหตุภายในNodeและnativefaultทุกชนิดยังไม่ยืนยัน |
 
 FA-11 ทำการทดลองได้ระหว่าง R3 แต่ raw Playwright trace ไม่ใช่ข้อบังคับของ v1 ถ้า metadata capture และ reproduction ที่กำหนดผ่านแล้ว การบันทึก DOM/screenshots/network แบบเต็มต้องมี consent และตรวจข้อมูลก่อนใช้งานจริง แผนนี้ไม่รับประกันว่าจะบันทึกได้ครบทุกฟังก์ชันในแอป
 

@@ -625,3 +625,15 @@ InspectionfoundCLIforward useschild.kill evenforWindows, whereNode forciblytermi
 
 FA-15 พบ native exit3221226505 สองรอบใน Windows ขณะ browsergeometryassertionล้มเหลว ข้อมูลgeometryยืนยันปัญหาได้แต่TAPไม่มีassertionละเอียด completioncheck: ใช้test-onlyfaultdriverบังคับ assertionเดียวในtestprocess CJS; ต้องเก็บERR_ASSERTIONผลเดิมพร้อมclosefixtureที่ระบุตัวตนและไม่ทิ้งล็อก โดยboundedcleanup ไม่เปลี่ยนproduction/SDKqueue/deadline/workload. ยังไม่สรุปสาเหตุภายในNodeจากexitcode; ทดลองreproduceก่อนแก้finallyซึ่งปัจจุบันforcekillCLIแม้ownerตอบสนองได้
 - ส่งต่องาน5ต.ค.2026: ตรวจAPI run36910555723 exact4ab1c61แล้ว CIผ่าน4/4 ไม่มีfailedstep แก้สถานะเก่าที่ยังรอให้ชัด ผลperformanceของrunนี้ยังไม่ได้อ่านartifact ไม่ใช้CIสีเขียวรับรองperformance รอบ59ยังมีแค่deliberatefaultreproduction ยังไม่แก้finally; สรุปขั้นตอน/เกณฑ์และข้อจำกัดไว้ในHANDOFF.md เพื่อให้อีกเครื่องตรวจต่อจากโค้ดจริง
+
+#### รับช่วงรอบ 59 บน checkout ใหม่ — 5 ตุลาคม 2026
+
+- ฐาน `c9563bd`/functional `4ab1c61` สะอาดก่อนสร้าง branch `fix/fa15-fixture-cleanup`; ตรวจ API สดแล้ว run36910555723 success ทั้ง 4 jobs ไม่มีการอ่าน raw artifacts เก่าจากเครื่องก่อน
+- Reproduction ก่อนแก้ `2026-10-05T10-23-44-212Z` 0/1: Windows10.0.26200/Node24.19.0/Edge พบ native3221226505 อีกครั้งเมื่อ inject assertion geometry เดิม ไม่มีรายละเอียด assertion ใน TAP ไม่ยืนยันสาเหตุภายใน Node จาก exit code
+- แก้เฉพาะ QA cleanup: ส่ง `stop\n`, สังเกต `close` ตั้งแต่ spawn และรอแบบมีเพดาน8วินาที ตรวจ writer lock และ collector/target ports ที่อ่านจาก fixture ก่อนลบ canonical workspace ถ้าไม่ครบเก็บ directory/lock ไว้และ unref เฉพาะ handles ที่ harness สร้าง ไม่มีการเดา PID/ลบ stale lock/เปลี่ยน SDK หรือ production policy ข้อผิดพลาด cleanup ไม่แทน assertion เดิม
+- หลังแก้ deliberatefault `10-25-48-947Z` ยัง0/1ตามตั้งใจ แต่มี ERR_ASSERTION/message/expected/actual/operator/stack ครบ cleanup closed/lockRemoved/portsClosed/removed true ทั้งหมด หลักฐานเปรียบเทียบนี้รองรับการแก้ teardown gap ไม่รับรองว่า native fault ทุกชนิดแก้แล้ว
+- Boundary `10-28-09-391Z` 5/5: ordinary stop, wrapperปิดแล้วแต่lockค้าง, knownportยังเปิด, childไม่ตอบสนองพร้อมdeadline, canonicalpathผิด; สองกรณีท้ายไม่ forcekill/lบ evidence โดย helper การปิดโปรเซสใน finally ของ boundary test ใช้เฉพาะ child handle ที่สร้างเอง
+- ActualSDK CJS/ESM+Edge `10-28-10-558Z` 2/2: fan-out/concurrentrequests/outcome/privacy/6spanack/exactreload/actualgeometryผ่าน; 200edges/cycle/selfloopยังเป็น synthetic viewer fixture เท่านั้น
+- Regression harnessแรก `10-28-47-833Z`0/1: inherited NODE_TEST_CONTEXT ทำ Node ข้าม recursive test runnerแล้วexit0; raw inner TAPยืนยัน แก้เฉพาะ environment ของ separate QA runner ล่าสุด `10-29-27-979Z`1/1 ผ่าน โดยตรวจว่าผล inner ยังคง failed assertion และcleanupครบ เพิ่ม gate นี้ในCIทุกช่อง ไม่ใช้ outerpassซ่อนinnerfault
+- Default main `10-29-45-335Z`123/123 failed/skipped0 ผ่านก่อนเพิ่ม catch-only unref guard; final focused checksตามท้าย TEST-RUNS. ไม่มีsource serving/SDK/workloadเปลี่ยน จึงไม่ใช้ผลนี้รับรองperformance ต้องรอexactCIและLinuxfailuregateรุ่นใหม่
+- ผู้ใช้ยืนยันยังไม่มีแอปธุรกิจ ให้พัฒนาฐาน/เตรียมpilotต่อ R4/R5และusertrialยังไม่ผ่าน
