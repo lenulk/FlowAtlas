@@ -1,5 +1,13 @@
 # รอบทดสอบและปรับปรุง FlowAtlas
 
+### รอบ71 — bounded timestamp parsing reuse
+
+[ADR](adr-timestamp-cache.md). ยกเลิกแนวwhole-recordserialization/graphvalidationcacheโดยไม่มีproductionpatchแนวนั้น; ใช้pureDate.parseผลของimmutableUTCstringsเพื่อลดงานซ้ำทุกvalidationแทน. จำกัด2048/FIFO/24chars/nativeparseridentity+sourceguard; mutable/oddformat/overridefresh, schema/nativecalendarsemanticsเดิม. Before21-44-55-633Z2/4, initialfocused21-45-32-129Z22/22, final23/23เพิ่มpreexistingoverrideguard. No graph/metadata validation skipped, no timers/I/O/persistence/durability/capturedeadline changes
+
+Finalexactsource93files:focused21-57-16-888Z23/23,compare21-57-19-081Z1/1 exactbaseline81f3846 oldgraph/spanbytes+100samegraphs/18malformeddiagnosticsmatched. Alternating5pairs/20kfullvalidations median142.644→113.647ms,met=null/syntheticonly. Main21-57-47-076Z148/148,SDKcomponent21-57-31-478Z1/1 all9conditionscomplete,parity/503guard21-57-39-396Z2/2(inner21-57-39-830Z0/1 expected),SDK+Edge+assertion22-02-26-598Z3/3/source22-02-47-215Z1/1. Ordinary21-57-21-584Z1/1capture3153ack0drop butperformanceFAILED200.909%(3.079→9.265ms). No causalityclaimfromearlierdifferentbaseline. Allfailed/earlierexperimentalreports retained
+
+Native81f3846hostedaudit22-07-24-975Z/22-07-32-956Z1/1matches8artifacts/152runnerreports/91programfiles; PR37376281944all4success/main143 everychannel. Push37376272085mainWindows24failedbrowser-client metadata3!=4(50ms), othermain143; Linux22negativecomponentguardfailedonmemoryround2 despiteack1051/drop0, mustinspectretention-order/cleanup assumption. SDKcount-only+sink9normalconditions/503faultvalidatedeverychannel andoldassertioninnerfailure/cleanupconfirmed. Ordinarycapture3153every8channels/performanceFAILEDall. Truefsync443/923oldloss notclosed bynewPR. Historicmissingjobs runnerannotationnowconfirmedacquisitionfailure; no needalterapp deadlines orhidecancelledhistory
+
 ### รอบ70 — owned HTTP transport และ complete acknowledgement
 
 [ADR](adr-local-http-transport.md). Before21-05-40-428Z13/15failedconnectionbound/incomplete2xxdelivered. NativeAgent2sockets/2free/no redirects/retries/importlazy/drainresponse2xxcomplete/destroyownedagent; deadlines/capacity/storage unchanged. Initialeagerimport caused reproducibleCJSextraCLIENT:2graphs×4spans(1SERVER3CLIENT) vs3 expected. SDKfaultgate21-09-08-444Z1/3และmain21-09-30-018Z142/143failedจริง (ESMpassed); fixednumericgraphdiagnostic21-11-35-837Z0/1 preserved. LazyimportหลังapplicationHTTPspanrestoresCJS/ESMwithoutrelaxingcounts; focused21-13-45-658Z2/2. This is response/connectioncorrectness repair, not provenperformancewin

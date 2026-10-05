@@ -3416,3 +3416,126 @@ First matched3×1000 measurement: all6000 measured business responses pluswarmup
 - หลักฐาน: `reports/tests/2026-10-05T21-19-50-319Z.tap` และ `.json`
 
 - Round70 final manualinventory: sevenfinalgates21-14-47/21-14-52/21-15-04/21-15-16/21-15-39/21-19-34/21-19-50 all91programSHA256matchcurrentfinalcandidate; allouterexit0/failed-skipped0. Deliberateassertion/503innerfailures retainedseparately. gitdiffcheckpassed. Baseb60PR/pushauditsconfirmedraw443/923losses; do not close fromcandidatepassinglocalgates. Ordinary560.428%FAILED, no transportcausalperformanceclaim. Candidatehostedpending.
+
+## 2026-10-05T21-44-55-633Z
+
+- จุดประสงค์: Round71 before timestamp reuse extracted native parser preserves semantics but repeats parsing
+- ผล: ไม่ผ่าน — 2/4; failed 2; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 81f3846e2fa63c5b0609a1dc1c08daa729b2749a; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T21-44-55-633Z.tap` และ `.json`
+- ไม่ผ่าน: an unchanged canonical timestamp is computed once without caching its surrounding graph
+- ไม่ผ่าน: canonical timestamp cache has a fixed resource bound and evicted values remain correct
+
+## 2026-10-05T21-45-32-129Z
+
+- จุดประสงค์: Round71 bounded timestamp parsing semantic boundary and mutable metadata regression
+- ผล: ผ่าน — 22/22; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 81f3846e2fa63c5b0609a1dc1c08daa729b2749a; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T21-45-32-129Z.tap` และ `.json`
+
+- Round71 scope narrowed from whole-record caching to bounded canonical timestamp parsing: graph/source/status/digestvalidation stillfresh andno mutablegraph cache. Before21-44-55-633Z2/4:semantic/overridepass butrepeatedparseandboundedcachetestsfailed; after21-45-32-129Z22/22includingcontract/HTTP/source-mutationguards. RuntimeUTCstringsonly/2048FIFO/functionidentityguard, NaNkeptnative, otherformats/objectinputs/replacedparserfresh. Prepare exact81f3846 baselinevalidator copies with only archivedimportpath adjusted; no .test filenames/no broadmain discovery.
+
+## 2026-10-05T21-55-25-430Z
+
+- จุดประสงค์: Round71 exact previous validator equivalence and alternating same-graph timestamp cost
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 81f3846e2fa63c5b0609a1dc1c08daa729b2749a; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T21-55-25-430Z.tap` และ `.json`
+
+## 2026-10-05T21-57-16-888Z
+
+- จุดประสงค์: Round71 final cache bounds original native parser and preexisting overrides
+- ผล: ผ่าน — 23/23; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 81f3846e2fa63c5b0609a1dc1c08daa729b2749a; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T21-57-16-888Z.tap` และ `.json`
+
+## 2026-10-05T21-57-19-081Z
+
+- จุดประสงค์: Round71 final old validator equivalence alternating identical workload cost
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 81f3846e2fa63c5b0609a1dc1c08daa729b2749a; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T21-57-19-081Z.tap` และ `.json`
+
+## 2026-10-05T21-57-21-584Z
+
+- จุดประสงค์: Round71 final ordinary HTTP timestamp reuse capture and unchanged performance
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 81f3846e2fa63c5b0609a1dc1c08daa729b2749a; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T21-57-21-584Z.tap` และ `.json`
+
+## 2026-10-05T21-57-31-478Z
+
+- จุดประสงค์: Round71 final SDK numeric digest guard rejection and parity
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 81f3846e2fa63c5b0609a1dc1c08daa729b2749a; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T21-57-31-478Z.tap` และ `.json`
+
+## 2026-10-05T21-57-39-830Z
+
+- จุดประสงค์: Controlled SDK HTTP sink rejection must fail measurement
+- ผล: ไม่ผ่าน — 0/1; failed 1; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 81f3846e2fa63c5b0609a1dc1c08daa729b2749a; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T21-57-39-830Z.tap` และ `.json`
+- ไม่ผ่าน: actual SDK HTTP count-only and production exporter sink costs remain diagnostic
+
+## 2026-10-05T21-57-39-396Z
+
+- จุดประสงค์: Round71 final SDK configuration and rejection evidence
+- ผล: ผ่าน — 2/2; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 81f3846e2fa63c5b0609a1dc1c08daa729b2749a; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T21-57-39-396Z.tap` และ `.json`
+
+## 2026-10-05T21-57-47-076Z
+
+- จุดประสงค์: Round71 final main regression unchanged validation diagnostics
+- ผล: ผ่าน — 148/148; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 81f3846e2fa63c5b0609a1dc1c08daa729b2749a; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T21-57-47-076Z.tap` และ `.json`
+
+## 2026-10-05T22-02-26-598Z
+
+- จุดประสงค์: Round71 final actual SDK Edge replay and assertion cleanup with timestamp cache
+- ผล: ผ่าน — 3/3; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 81f3846e2fa63c5b0609a1dc1c08daa729b2749a; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T22-02-26-598Z.tap` และ `.json`
+
+## 2026-10-05T22-02-47-215Z
+
+- จุดประสงค์: Round71 isolated source identity for added timestamp runtime module
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 81f3846e2fa63c5b0609a1dc1c08daa729b2749a; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T22-02-47-215Z.tap` และ `.json`
+
+- Round71 hosted81f3846pushWindows24main142/143failedbrowser-clientmetadataacceptance count3!=4 (test/browser-client.test.mjs:101); not a nativeSDKfanout failure. Rawreportsretained; examine test separately nextrepair. Read-only guessedtest/browser-scope.test.mjs doesnotexist; actualfilebrowser-client.test.mjs. No code changed byfailedread.
+
+- Round71 read-only public/browser-client.mjs guess failed; locate actual client by test imports/rg --files. Browsermetadata failure requires deterministic QA of attempted requests vs serveradmission under50ms; no application timeoutchangeplanned. NativePR81f3846run37376281944 all4jobs success; push37376272085 genuineLinux22 componentguard/Windows24browser-client failure; rawall8artifact sets saved.
+
+## 2026-10-05T22-07-24-975Z
+
+- จุดประสงค์: Round71 audit exact native transport PR91files four channels nineteen reports
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 81f3846e2fa63c5b0609a1dc1c08daa729b2749a; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T22-07-24-975Z.tap` และ `.json`
+
+## 2026-10-05T22-07-32-956Z
+
+- จุดประสงค์: Round71 audit native transport push preserves browser and Linux component failures
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 81f3846e2fa63c5b0609a1dc1c08daa729b2749a; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T22-07-32-956Z.tap` และ `.json`
+
+- Round71 final manualinventory: eightfinalgate93programSHA256matchcurrentcandidate; allouterexit0/no failed-skipped. Numericparsercache only; graphmetadatafresh. NativeCIaudit8sets/152reports/91exactfiles; PR4/4/push2/4. PushfailureWindows24servermetadata3!=4despite4businessresponses, Linux22faultmemoryack1051/drop0completefalse toinspect separately. CandidateHTTP200.909%stillFAIL/CLIoldtimeout/fsync/pilot/sustainedunclosed. gitdiffcheckpassed; docs updated; nativebody/completionpolicyunchanged.
