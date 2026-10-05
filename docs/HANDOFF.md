@@ -19,6 +19,16 @@ Repository: https://github.com/lenulk/FlowAtlas; branch หลัก `master` �
 
 ## งานค้างแรก: รอบ 59 / FA-15
 
+### งานรับช่วงรอบ62 — วิเคราะห์ shutdown drain
+
+**รุ่นโค้ดที่ตรวจแล้ว:** b554312, [PR#4](https://github.com/lenulk/FlowAtlas/pull/4), stackedbase diagจากPR3 `perf/immutable-snapshot-digest`. PRCI37331499111และpush37331409424ผ่าน4/4ทั้งสอง; audit88reports/77filesตรงGit, main132ทุกช่อง/11gatesต่อช่อง/normalและdiagnosticcapture3153ack0drops. PerformanceยังFAILEDทุกช่อง ดูQUALITY. Docscommitถัดไปไม่เปลี่ยนprogramsourceนี้ PR1–4ยังOPENไม่merge
+
+**สิ่งที่พบ/งานถัดไป:** DiagnosticPRUbuntu24firstpairfsync589.189ms/save684.922ms/shutdown297.307msแต่captureครบ พิสูจน์pauseเฉพาะrunนี้ ยังไม่พิสูจน์causeของ827dropsรุ่นก่อน; เก็บfailedrun37302472603ไว้. รอบ63วัด/ลดvalidationหรือserializationที่ยังทำซ้ำด้วยnegativeevidenceguardsบนworkloadเดิม; หากเลือกdurablejournal/asyncstorageต้องมีADRdurability/crashrecovery/migration/rollbackก่อนimplementation ไม่เลื่อนackก่อนdurablewrite/ไม่ขยาย900msdeadlineเพื่อให้ผ่าน. Performance≤10%,sustained20actions×30นาที,persisted/export/migration,browser→SDK/pilot/usertrial/releaseยังเปิด
+
+Branch `diag/shutdown-timing` ต่อจากcb82561, stackedbase `perf/immutable-snapshot-digest`. เพิ่มopt-in numericdiagnostics exporter/atomicstorage+benchmarkreport/CIgateแยก ตาม [วิธีรัน](benchmark-http.md). Defaultไม่มีtiminglog/clock; diagnosticsไม่เก็บข้อมูลแอปและไม่เปลี่ยนqueue/slots/900msshutdown/1000msupload/fsync/ack. Diagnosticperformance met=null คงordinaryworkload/thresholdเดิม
+
+Localmain132/source1/SDK+Edge+failure3/audit1ผ่านตรงsourceเดียวกัน; normalและdiagnosticloadcapture3153ack0drops แต่normalperformanceFAILED194.036%. Diagnosticshutdown12–17ms/deadlineFired0ไม่reproduceUbuntu22shutdown827 จึงยังไม่ปิดrootcause/stablecapture. ขั้นต่อไปตรวจexactCI11gatesต่อช่องและtimingถ้าfailed; หากยังไม่reproduceให้เลือกcostrepairจากvalidation/serialization/fsyncที่วัดได้และคงfailed827ไว้สำหรับregression ห้ามขยายdeadlineเพื่อกลบปัญหา Pilot/ผู้ทดลอง/performance/sustained/releaseยังเปิด
+
 **อัปเดตรับช่วง 5 ตุลาคม 2026:** [PR #1](https://github.com/lenulk/FlowAtlas/pull/1) branch `fix/fa15-fixture-cleanup`, commit `8b1e270` แก้ teardown gapแล้ว ก่อนแก้ WindowsNode24.19.0/Edge reproduce native3221226505 (`10-23-44-212Z`); หลังแก้ deliberatefaultยังfailedตามตั้งใจแต่ERR_ASSERTION/stackครบและclose/lock/knownportsยืนยัน (`10-25-48-947Z`). Boundary5/normalSDK2/failureharness1/main123ผ่านในเครื่อง; CIรุ่นแรก3749c99พบboundarydisposalcancelledบนNode22ทั้งสองOS แก้refhandleในtestก่อนรอcloseแล้ว [run37298050345](https://github.com/lenulk/FlowAtlas/actions/runs/37298050345) ของ8b1e270ผ่านทั้ง4jobs/ทุกstep ตรวจAPIสดแล้ว ไม่ประกาศว่าสาเหตุภายในNodeหรือnativefaultทุกแบบปิดแล้ว รายละเอียดด้านล่างเป็นสภาพก่อนแก้สำหรับทำซ้ำเทียบ
 
 คำสั่ง regression ที่ติดตามใน Git ใหม่: `node scripts/run-tests.mjs scripts/otel-failure-check.mjs` (กำหนด Playwright package/browser channel ที่มีจริง). Outer test ต้องผ่านเฉพาะเมื่อ inner test ยังคง assertion failureพร้อมรายละเอียดและcleanupครบ Raw inner TAP อยู่ `reports/browser/otel-runtime-fault-*/assertion-fault.tap` และถูกเก็บในCIartifact รอบถัดไปวัดperformanceด้วยworkloadเดิม/วิเคราะห์ต้นทุน ก่อนเลือกrepairหนึ่งประเด็น ผู้ใช้ยืนยันยังไม่มีแอปธุรกิจสำหรับpilot ให้เตรียมฐานต่อก่อน

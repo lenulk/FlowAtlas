@@ -30,24 +30,24 @@ function validPair({ baseline, traced }, measuredRequests) {
     && baseline.requestIdDigest === traced.requestIdDigest;
 }
 
-export function comparePairPerformance(pair, { measuredRequests = 1000, profiled = false } = {}) {
-  if (profiled || !validPair(pair, measuredRequests)) {
+export function comparePairPerformance(pair, { measuredRequests = 1000, profiled = false, diagnostic = false } = {}) {
+  if (profiled || diagnostic || !validPair(pair, measuredRequests)) {
     const result = comparePerformance(null, null);
-    result.acceptance.reason = profiled ? 'profiled_run' : 'incomplete_or_invalid_pairs';
+    result.acceptance.reason = profiled ? 'profiled_run' : diagnostic ? 'diagnostic_run' : 'incomplete_or_invalid_pairs';
     return result;
   }
   return comparePerformance(pair.baseline.measurement.p95Ms, pair.traced.measurement.p95Ms);
 }
 
-export function aggregatePerformance(rounds, { expectedRounds = 3, measuredRequests = 1000, profiled = false } = {}) {
+export function aggregatePerformance(rounds, { expectedRounds = 3, measuredRequests = 1000, profiled = false, diagnostic = false } = {}) {
   const completedPairs = rounds.filter((round) => validPair(round, measuredRequests)).length;
   const sameWorkload = rounds.every((round) => round.baseline?.workloadDigest === rounds[0]?.baseline?.workloadDigest
     && round.baseline?.requestIdDigest === rounds[0]?.baseline?.requestIdDigest);
-  const assessable = !profiled && rounds.length === expectedRounds && completedPairs === expectedRounds && sameWorkload;
+  const assessable = !profiled && !diagnostic && rounds.length === expectedRounds && completedPairs === expectedRounds && sameWorkload;
   const baseline = assessable ? percentile(rounds.map((round) => round.baseline.measurement.p95Ms), 0.5) : null;
   const traced = assessable ? percentile(rounds.map((round) => round.traced.measurement.p95Ms), 0.5) : null;
   const comparison = comparePerformance(baseline, traced);
-  return { ...comparison.acceptance, reason: profiled ? 'profiled_run' : comparison.acceptance.reason,
+  return { ...comparison.acceptance, reason: profiled ? 'profiled_run' : diagnostic ? 'diagnostic_run' : comparison.acceptance.reason,
     completedPairs, expectedPairs: expectedRounds, aggregateMethod: 'ratio_or_difference_of_condition_medians',
     aggregateDeltaP95Ms: comparison.deltaMs, aggregateRelativeP95OverheadPercent: comparison.relativePercent,
     medianBaselineP95Ms: baseline, medianTracedP95Ms: traced,

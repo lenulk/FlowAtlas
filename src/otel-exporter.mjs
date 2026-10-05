@@ -1,5 +1,6 @@
 import { context } from '@opentelemetry/api';
 import { suppressTracing } from '@opentelemetry/core';
+import { performance } from 'node:perf_hooks';
 import { cleanHttpSpan, httpMethods, validSpanId } from './http-span-contract.mjs';
 
 const millis = ([seconds, nanos]) => seconds * 1000 + nanos / 1e6;
@@ -19,7 +20,7 @@ export function normalizeSdkHttpSpan(span) {
 }
 
 export class LocalHttpSpanExporter {
-  constructor({ collectorUrl, projectId, codeDigest, sessionToken, capacity = 2048, timeoutMs = 1000, onDrop = () => {} }) {
+  constructor({ collectorUrl, projectId, codeDigest, sessionToken, capacity = 2048, timeoutMs = 1000, onDrop = () => {}, timing = false }) {
     const url = new URL(collectorUrl);
     if (url.protocol !== 'http:' || !['127.0.0.1', 'localhost', '[::1]'].includes(url.hostname)
       || url.href !== url.origin + '/' || !/^[a-z][a-z0-9_-]{0,63}$/.test(projectId ?? '')
@@ -35,7 +36,11 @@ export class LocalHttpSpanExporter {
     this.batches = 0; this.submittedSpans = 0; this.smallBatches = 0; this.peakRequests = 0;
     this.dropReasons = { overflow: 0, invalid: 0, rejected: 0, timeout: 0, transport: 0, shutdown: 0 };
     this.rejectedStatuses = { '400': 0, '401': 0, '403': 0, '409': 0, '413': 0, '503': 0, other: 0 };
+    this.timing = timing === true ? { batches: 0, acknowledgedBatches: 0, batchTotalMs: 0, batchMaxMs: 0,
+      firstBatchMs: 0, shutdownQueued: 0, shutdownInFlight: 0, shutdownDelivered: 0, shutdownMs: 0,
+      deadlineFired: 0, deadlineLateMs: 0 } : null;
   }
+  timingHealth() { return this.timing ? Object.freeze({ ...this.timing }) : null; }
   summary() {
     return Object.freeze({ httpSpans: this.httpSpans, invalidSpans: this.invalidSpans, delivered: this.delivered,
       dropped: this.dropped, queued: this.queue.length, inFlight: this.inFlight });
@@ -88,6 +93,8 @@ export class LocalHttpSpanExporter {
     return Promise.all([...this.active]);
   }
   async sendBatch() {
+    const started = this.timing ? performance.now() : null;
+    const first = this.batches === 0;
     const batch = this.queue.splice(0, 32);
     this.inFlight += batch.length;
     const controller = new AbortController(); this.controllers.add(controller);
@@ -104,9 +111,17 @@ export class LocalHttpSpanExporter {
         this.rejectedStatuses[Object.hasOwn(this.rejectedStatuses, response.status) ? response.status : 'other'] += batch.length;
         this.drop(batch.length, 'rejected');
       }
-      else this.delivered += batch.length;
+      else { this.delivered += batch.length; if (this.timing) this.timing.acknowledgedBatches++; }
     } catch { this.drop(batch.length, ['timeout', 'shutdown'].includes(controller.signal.reason) ? controller.signal.reason : 'transport'); }
-    finally { clearTimeout(timer); this.inFlight -= batch.length; this.controllers.delete(controller); }
+    finally {
+      clearTimeout(timer); this.inFlight -= batch.length; this.controllers.delete(controller);
+      if (this.timing) {
+        const elapsed = performance.now() - started;
+        this.timing.batches++; this.timing.batchTotalMs += elapsed;
+        this.timing.batchMaxMs = Math.max(this.timing.batchMaxMs, elapsed);
+        if (first) this.timing.firstBatchMs = elapsed;
+      }
+    }
   }
   async forceFlush() {
     this.flushing++;
@@ -115,11 +130,17 @@ export class LocalHttpSpanExporter {
     finally { this.flushing--; this.schedule(); }
   }
   async shutdown() {
+    const started = this.timing ? performance.now() : null, delivered = this.delivered;
+    if (this.timing) { this.timing.shutdownQueued = this.queue.length; this.timing.shutdownInFlight = this.inFlight; }
     this.closed = true;
     const timer = setTimeout(() => {
+      if (this.timing) { this.timing.deadlineFired++; this.timing.deadlineLateMs = Math.max(0, performance.now() - started - 900); }
       const queued = this.queue.length; this.queue = []; if (queued) this.drop(queued, 'shutdown');
       for (const controller of this.controllers) controller.abort('shutdown');
     }, 900);
-    try { await this.forceFlush(); } finally { clearTimeout(timer); }
+    try { await this.forceFlush(); } finally {
+      clearTimeout(timer);
+      if (this.timing) { this.timing.shutdownMs = performance.now() - started; this.timing.shutdownDelivered = this.delivered - delivered; }
+    }
   }
 }

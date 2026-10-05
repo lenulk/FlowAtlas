@@ -117,6 +117,7 @@ async function runInspector(args = process.argv.slice(2)) {
   const dataDir = flags['--data-dir'] ?? 'data/actions';
   const credential = sessionToken(process.env.FLOWATLAS_SESSION_TOKEN);
   const servers = await startServers({ port: Number(process.env.FLOWATLAS_COLLECTOR_PORT ?? 4173),
+    traceTiming: process.env.FLOWATLAS_TRACE_TIMING === '1',
     inventoryPort: Number(process.env.FLOWATLAS_INVENTORY_PORT ?? 4174), dataDir, projects: config, workspace: root, sessionToken: credential });
   const collectorUrl = `http://127.0.0.1:${servers.port}`;
   let target, input;
@@ -124,7 +125,11 @@ async function runInspector(args = process.argv.slice(2)) {
   const stop = () => stopping ??= (async () => {
     input?.close();
     process.stdin.destroy();
-    try { await stopTarget(target); } finally { await servers.close(); }
+    try { await stopTarget(target); } finally {
+      await servers.close();
+      const timing = servers.atlas.store?.timingHealth();
+      if (timing) { try { console.error(`FlowAtlas storage timing: ${JSON.stringify(timing)}`); } catch { /* Optional diagnostics do not change shutdown. */ } }
+    }
   })();
   const onSignal = () => stop().catch((error) => { console.error(error); process.exitCode = 1; });
   const onOwnerMessage = (message) => { if (message === 'flowatlas:owner-stop') onSignal(); };

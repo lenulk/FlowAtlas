@@ -54,3 +54,10 @@ test('profiled timings retain samples but cannot certify ordinary performance ac
   assert.equal(result.assessable, false); assert.equal(result.met, null); assert.equal(result.reason, 'profiled_run');
   assert.equal(comparePairPerformance(pair(10, 9), { profiled: true }).acceptance.met, null);
 });
+
+test('opt-in numeric diagnostics cannot certify ordinary performance acceptance', () => {
+  const rounds = [pair(10, 9), pair(10, 9), pair(10, 9)];
+  const result = aggregatePerformance(rounds, { diagnostic: true });
+  assert.equal(result.assessable, false); assert.equal(result.met, null); assert.equal(result.reason, 'diagnostic_run');
+  assert.equal(comparePairPerformance(rounds[0], { diagnostic: true }).acceptance.met, null);
+});

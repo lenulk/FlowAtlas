@@ -9,6 +9,7 @@ import { Agent, request } from 'node:http';
 import { performance } from 'node:perf_hooks';
 import { release } from 'node:os';
 import { percentile, comparePairPerformance, aggregatePerformance } from './benchmark-statistics.mjs';
+import { parseTiming, exporterTimingFields, storageTimingFields } from './trace-timing-report.mjs';
 
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
 const storageRoot = join(root, 'reports', 'storage');
@@ -19,6 +20,7 @@ const measuredCount = 1000;
 const concurrency = 8;
 const expectedRequests = warmupCount + measuredCount;
 const expectedTraceSpans = expectedRequests + 1;
+const diagnosticTiming = process.env.FLOWATLAS_BENCHMARK_TIMING === '1';
 const appSource = `import { createServer } from 'node:http';
 import { cpuUsage, memoryUsage } from 'node:process';
 const started = cpuUsage();
@@ -257,6 +259,8 @@ async function runCondition(condition, runIndex, manifest, profileDirectory = nu
   const childEnv = { ...process.env, FLOWATLAS_SESSION_TOKEN: sessionToken,
     FLOWATLAS_COLLECTOR_PORT: '0', FLOWATLAS_INVENTORY_PORT: '0', FLOWATLAS_APP_PORT: '0', FLOWATLAS_EXTERNAL_PORT: '0' };
   delete childEnv.FLOWATLAS_TRACED_TOOL_ROOT;
+  delete childEnv.FLOWATLAS_TRACE_TIMING;
+  if (diagnosticTiming) childEnv.FLOWATLAS_TRACE_TIMING = '1';
   delete childEnv.NODE_OPTIONS;
   delete childEnv.FLOWATLAS_BENCHMARK_TARGET_PROFILE;
   if (profileScope === 'target') childEnv.FLOWATLAS_BENCHMARK_TARGET_PROFILE = join(profileDirectory, `round-${runIndex}-${condition}.cpuprofile`);
@@ -333,6 +337,11 @@ async function runCondition(condition, runIndex, manifest, profileDirectory = nu
     }
     result.processCleanupConfirmed = result.gracefulShutdown;
     result.storageDiagnostics = storageDiagnostics(outputRef.value);
+    result.timing = diagnosticTiming ? {
+      storage: parseTiming(outputRef.value, 'FlowAtlas storage timing: ', storageTimingFields),
+      exporter: condition === 'traced' ? parseTiming(outputRef.value, 'FlowAtlas trace timing: ', exporterTimingFields) : null,
+    } : null;
+    if (diagnosticTiming && (!result.timing.storage || (condition === 'traced' && !result.timing.exporter))) result.failure ??= 'timing_diagnostics_missing';
     if (condition === 'traced') {
       result.trace = parseTraceSummary(outputRef.value); result.dropReasons = parseDropReasons(outputRef.value);
       result.rejectionStatuses = parseRejections(outputRef.value);
@@ -392,6 +401,7 @@ test('explicit local HTTP trace overhead benchmark (not in default suite)', { ti
   const manifest = workloadManifest();
   const report = { id, startedAt: new Date().toISOString(), finishedAt: null, sourceCommit: sourceCommit(),
     sourceDirty: sourceDirty(), sourceDigest: digestSources(), runtime: { node: process.version, platform: process.platform, arch: process.arch, osRelease: release() },
+    diagnosticTiming,
     profiling: profileDirectory ? { scope: profileScope === 'collector' ? 'collector inspect process only; direct entry omits CLI wrapper'
       : 'fixture target workload only; public CLI; diagnostic fixture includes local inspector Session', fixtureDigest: hash(fixtureSource(profileScope)), directory: relative(root, profileDirectory).replaceAll('\\', '/'),
       comparableWithUnprofiledResults: false } : null,
@@ -408,7 +418,7 @@ test('explicit local HTTP trace overhead benchmark (not in default suite)', { ti
         const outcome = await runCondition(condition, round + 1, manifest, profileDirectory, profileScope);
         outcomes[condition] = outcome;
       }
-      const comparison = comparePairPerformance(outcomes, { measuredRequests: measuredCount, profiled: Boolean(profileScope) });
+      const comparison = comparePairPerformance(outcomes, { measuredRequests: measuredCount, profiled: Boolean(profileScope), diagnostic: diagnosticTiming });
       report.rounds.push({ round: round + 1, order, baseline: outcomes.baseline, traced: outcomes.traced,
         deltaP95Ms: comparison.deltaMs, relativeP95OverheadPercent: comparison.relativePercent,
         performanceAcceptance: comparison.acceptance });
@@ -425,7 +435,7 @@ test('explicit local HTTP trace overhead benchmark (not in default suite)', { ti
     report.acceptance = { allResponsesCorrectAndCountsReconciled: workloadCorrect,
       captureCompleteWithoutDrops: captureComplete,
       performanceAcceptance: aggregatePerformance(report.rounds,
-        { expectedRounds: roundsCount, measuredRequests: measuredCount, profiled: Boolean(profileScope) }),
+        { expectedRounds: roundsCount, measuredRequests: measuredCount, profiled: Boolean(profileScope), diagnostic: diagnosticTiming }),
       performanceTargetMissDoesNotFailMeasurement: true,
       note: 'Fixture-local measurements only; performance thresholds are reported, not enforced as a test failure.' };
     if (!workloadCorrect || !captureComplete) testFailure ??= new Error('Benchmark workload/capture acceptance failed; all completed rounds are in the report.');

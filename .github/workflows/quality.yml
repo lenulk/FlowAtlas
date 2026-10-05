@@ -77,6 +77,12 @@ jobs:
         env:
           FLOWATLAS_TEST_PURPOSE: CI paired fixture load responses and capture accounting
         run: node scripts/run-tests.mjs scripts/benchmark-http-trace.mjs
+      - name: Opt-in flush and storage timing (diagnostic run only)
+        if: ${{ !cancelled() }}
+        env:
+          FLOWATLAS_TEST_PURPOSE: CI opt-in numeric flush storage timing diagnostics
+          FLOWATLAS_BENCHMARK_TIMING: '1'
+        run: node scripts/run-tests.mjs scripts/benchmark-http-trace.mjs
       - name: Pack and install in disposable workspace
         id: package_install
         if: ${{ !cancelled() }}

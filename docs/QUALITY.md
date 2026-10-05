@@ -1,5 +1,29 @@
 # รอบทดสอบและปรับปรุง FlowAtlas
 
+### รอบ62 — opt-in numeric shutdown/storage timing
+
+**ผล exact สุดท้าย b554312:** [PR37331499111](https://github.com/lenulk/FlowAtlas/actions/runs/37331499111) และ [push37331409424](https://github.com/lenulk/FlowAtlas/actions/runs/37331409424)success4/4ทั้งสอง บนWindows2025/Ubuntu24.04×Node22.23.3/24.21.0. Artifactaudit `15-24-40-537Z`/`15-25-15-003Z`1/1แต่ละชุด:88runnerreports/77filesตรงGitb554312ทุกชุดแม้PRcheckoutmerged5bf4dc8; main132ทุกช่อง, 11gatesต่อช่องexit0/failed0/skipped0, innerERR_ASSERTION/cleanupครบ, normal+diagnosticcapture3153ack0dropsทุกช่อง และdiagnostics met=null/sanitizedfieldsครบ
+
+OrdinaryperformanceFAILEDทุกช่อง: PR Ubuntu22+79.465%,Ubuntu24+179.015%,Windows22+160.818%,Windows24+178.947%; push +87.981%,+128.014%,+181.433%,+214.799%ตามลำดับ. ไม่claimlatencyimprovementจากค่าที่ต่างbaseline. DiagnosticdeadlineFired0ทุกpair; shutdownส่วนใหญ่2.669–8.887msยกเว้นPRUbuntu24pairแรก297.307msพร้อมsaveMax684.922/syncMax589.189ms. ยังไม่reproduceprior827loss จึงเปิดstablecapture/rootcauseไว้; nextrepairเลือกvalidation/serializationต้นทุนที่วัดได้ก่อนหรือออกADRdurablejournalหากต้องเปลี่ยนbackend ไม่ลดfsync/ackguarantee
+
+ArtifactdownloadWindowspushครั้งแรกTLS handshake timeout; retryเฉพาะdownloadสำเร็จและauditครบ ไม่มีrerunsoftware. Commitบันทึกผลหลังb554312เป็นdocs-only programsourceไม่เปลี่ยนไม่ใช้CIที่อาจกำลังทำงานรับรองโดยปริยาย Pilot/sustainedload/releaseยังไม่มีacceptance
+
+Partialhostedfinding: PRUbuntu24diagnostic firstpair saveMax684.922msโดยsyncMax589.189ms (storage stage clock); shutdown297.307msและcaptureครบ. PRUbuntu22/shutdown4.09–4.20ms, pushUbuntu22/24 3.89–6.36ms. พิสูจน์fsyncpauseเฉพาะrunนี้ ไม่พิสูจน์rootcauseของprior827 เพราะต่างrun/ยังไม่มีsynchronizedtimingหรือfailedrepro. ห้ามลดfsync/ย้ายack/ขยายdeadlineเพียงเพราะเจอpause; nextdesignต้องมีdurability/rollbackADRและrecoveryproofหากเปลี่ยนbackend
+
+Final local isolatedsource `15-13-03-524Z`1/1, actualCJS/ESM+Edge+deliberatefailure `15-13-15-089Z`3/3ผ่าน; ordinaryload `15-13-37-316Z`1/1 capture3153ack0dropsแต่performanceFAILED194.036% (4.628→13.608ms). Normalreporttiming=nullทุกcondition; localinventoryaudit `15-14-39-309Z`1/1ยืนยันmain/source/browser/diagnostic/ordinaryบนsourceเดียวกันและperformanceแยกscopeถูกต้อง. ยังไม่ใช้ผลlocalแทนexactCIหรือรับรองshutdown827แก้แล้ว
+
+Localdiagnostic `15-11-01-004Z`1/1 capture3153ack0drops, met=null/diagnostic_run. Storage36/36/37saves total390.753/187.037/200.295ms, max24.616/10.587/15.953ms; cumulativevalidation127.022/57.870/59.967ms, fsync89.029/31.633/38.371ms. Exporterfirstbatch72.398/56.745/64.906ms; shutdownqueued7/20/2, inflight0, shutdown12–17ms/deadlineFired0. ไม่reproduce827lossและไม่พิสูจน์causeจากpassingdiagnostic. Finalmain `15-11-40-340Z`132/132ผ่าน; isolatedsource/SDK/browser/uninstrumentedload/exactCIยังตรวจต่อ
+
+Workflowเพิ่มdiagnosticloadอีกหนึ่งgateหลังordinaryload (11runnerreportsต่อช่อง) คงcaptureassertionsและordinaryperformanceแยกเดิม. Patchreviewพบemptyduplicate nameชั่วคราว ลบก่อนทดสอบ/commit; docsbenchmarkheaderpatchครั้งแรกไม่ตรงและไม่แก้ไฟล์ แก้ตามheadingจริง ผลtoolfailuresไม่ใช่softwareacceptance
+
+เริ่มจากclean cb82561บนbranchใหม่diag/shutdown-timing; fetch/pullup-to-date และ finaldocsCI37303441188/37303435380successแล้ว แต่ไม่ลบPR8eff7e2shutdown827failure. อ่านexporter/preload/storage/inspectorและrawround61: queueถูกทิ้งตอน900msdeadline ไม่มีเวลาระบุstageที่ช้า จึงเพิ่มdiagnosticsหนึ่งประเด็น คงpolicy/backend/fsync/deadline/queue/workload
+
+ก่อน implementation `15-00-24-101Z`11/13ผ่าน: สองregressionsล้มเพราะtimingHealthไม่มีเดิม ไม่ใช่capturefaultใหม่. After `15-03-35-900Z`30/31: teststorageใช้ชื่อactionที่APIไม่รองรับจึง400แทน201 แก้fixtureเป็นview-productและimportJsonActionStore; `15-04-10-420Z`31/31ผ่าน. ผลล้มเหลวเก็บครบ ไม่เปลี่ยนAPIvalidationเพื่อให้testผ่าน
+
+ตัววัดปิดโดยปริยาย: clocksเฉพาะเมื่อเปิด เก็บnumericaggregatesและstage maxima ไม่มีspan/path/token/body/errorstringหรือarrayสะสม; successful/failedsaveคงatomicstateและdiagnosticไม่เปลี่ยนack/dropdecision. Benchmarkเปิดด้วยFLOWATLAS_BENCHMARK_TIMING=1และsanitizeผ่านallowlist; performancescope diagnostic_run/met=null ไม่ใช้รับรอง10%budget. ระยะbatchรวมทับซ้อนกันได้เพราะสองslots ไม่ใช่walltime; firstBatchMsรวมfetch/collector/response ไม่แยกnetworkจากfsyncได้โดยลำพัง
+
+Toolchecks: rg guessed http-spans moduleพบไฟล์แต่ไม่มีdiagnosticmatch(exit1) ใช้จริงotel-exporter/preload; stage-max patchครั้งแรกheaderQUALITYไม่ตรงและไม่แก้ไฟล์ ตรวจแล้วแก้headingตามจริงก่อนดำเนินต่อ
+
 ## เกณฑ์ผ่านของต้นแบบปัจจุบัน
 
 1. actions ของ demo และแอปแยกโปรเซสให้กราฟตรงกับผลสำเร็จ/ความล้มเหลว
