@@ -1,5 +1,21 @@
 # รอบทดสอบและปรับปรุง FlowAtlas
 
+### รอบ65 — controlled slow-fsync reproduction
+
+**Exact6d08a53:** [PR37343310494](https://github.com/lenulk/FlowAtlas/actions/runs/37343310494)success4/4; [push37343288536](https://github.com/lenulk/FlowAtlas/actions/runs/37343288536)fail3/4เพราะLinux24uninstrumenteddiskcomponentround1ack192/shutdown859. Store8saves1150.097ms/sync1138.121ms/maxsync215.827ms, deadlineFired1/shutdown902.340ms ไม่มีotherdrop. Otherordinarycomponentconditions/503guardผ่าน. เก็บfailureและartifactแยก ไม่rerunกลบหรืออ้างQAfaultทำให้ordinaryrunfailed.
+
+Audit16-52-49-069Z/16-52-55-491Z1/1แต่ละชุดตรวจ112runnerreports/81filesตรงGit6d08a53ทุกชุดแม้PRmerge338d34fd; main134ทุก8jobs, ordinaryHTTP+timingcapture3153ack0dropsทุกช่อง, FA15innerassertion/cleanupครบ, controlledscope/fault2/2ทุก8jobsกับ24injectedrealfsync/descriptor0/diskreloadexact/innercaptureยังfailed. Controlleddiskloss827หรือ859ทุก24conditions; แค่countตรง827เดิมไม่พิสูจน์historicalcause. Auditผ่านคือevidenceconsistencyไม่ใช่stablecapture. OrdinaryperformanceFAILEDทุก8channels; diagnosticmet=nullไม่รับรองperformance. PR#7stackedbasePR6 ยังไม่merge; commitบันทึกหลัง6d08a53documentation-only ไม่เปลี่ยนsourceที่auditแล้ว. รอบ66comparisonก่อนjournal/storage/drainrepairตามADR, SDK-onlycost/pilot/users/sustained/releaseยังค้าง.
+
+Ordinaryperformance relativeoverhead PRLinux22/24/Windows22/24 +95.725/+167.838/+147.930/+184.471%; push+89.737/+164.634/+225.856/+159.336%, criterion10%เดิมทุกช่อง. ไม่อ้างว่าQA-onlypatchทำperformanceดีขึ้นเมื่อไม่มีproductioncodechangeหรือcontrolledmatchedmeasurement.
+
+ต่อจากcleanff8b972/fetchpullup-to-date บนbranchdiag/slow-fsync-reproduction. เพิ่มexplicitQApreloadหน่วง120msก่อนrealfsyncเฉพาะcanonicalownedcomponentstatetempfiles; productionexporter/store/collector/SDKcodeไม่เปลี่ยน. Scopeprobeใช้realwrite/syncสองไฟล์และยืนยันdelayเฉพาะownedstatetemp1ครั้ง, descriptor0หลังclose. Controlledinnercaptureต้องfailedและretainworkspace ขณะที่outerตรวจcontrols/counts/durablereloadจึงผ่าน ไม่ใช่captureacceptance ดู[ADR](adr-durable-drain.md)สำหรับข้อจำกัด/ทางเลือกก่อนrepair.
+
+Beforeinjection16-35-36-830Z0/1เพราะinnerexit0; envlabelลำพังไม่สร้างfailure. หลังexplicitpreload16-36-25-719Z1/1 ทั้ง3diskroundack192/shutdown859,reloadตรง, realfsync24callsรวม. Finalscoped/labeledserial16-42-28-528Z2/2: diskack96/160/192, shutdown955/891/859, injection18callsตรงsumstoresaves, sync663.877/838.599/1099.520ms, zerootherdrop/deadlineFired1ทุกdisk; transport/memorycomplete. ไม่บังคับexactackcountหรือรวมsync≥900เพราะdeadlineนับnetwork/scheduling/validationด้วย; ตรวจsync≥requested120ms×savesและactualaccountingแทน. Timingsเป็นfaultsimulationไม่actualdiskspeed/applicationp95/pilot และไม่พิสูจน์827เดิมsamecause.
+
+Main16-39-30-578Z134/134ผ่าน; finalQA-onlyreportlabelเปลี่ยนหลังmainจึงต้องexacthostedCIทั้งbundleก่อนสรุป. Scope/fault16-39-18-248Z2/2มีช่วงmainเริ่มซ้อนท้าย ไม่ใช้เป็นisolatedsample; serial16-40-49-511Z2/2และcontrol16-41-34-748Z1/1แยกตามTEST-RUNS. GHreadครั้งแรกsandboxconfigdenied บันทึกแล้วescalatedreadสำเร็จ. No productionpolicy/deadline/backend/schemachange, no new migration guarantee.
+
+ฐานเอกสารff8b972พบPR37341212751fail3/4อีกครั้ง: Ubuntu22ordinarypair2ack288/shutdown763 (otherpairs1051), allotherdrop0/workspaceretained/processcleanupconfirmed; push37341204494ผ่าน4/4. Artifactfailedjobเก็บreports/releases/ci-ff8b972-pr ไม่rerunกลบ; นี้เกิดก่อนpreloadรอบ65และordinaryscriptไม่เรียกpreload จึงห้ามระบุว่าQAfaultสร้างhistoricalfailure. ยังต้องแก้stablecapture/performance/sustained/pilot/users/release. เพิ่มCIcontrolledreproduction1gateเป็น14reportsต่อchannel; ordinary/503gatesยังคงassertionเดิม. ผลExactรอบ65อยู่ต้นหัวข้อนี้.
+
 ### รอบ64 — collector component replay diagnostics
 
 **Exact ceddc0f:** [PR37339435370](https://github.com/lenulk/FlowAtlas/actions/runs/37339435370)ผ่าน2/4 (Windowsทั้งสอง); [push37339368441](https://github.com/lenulk/FlowAtlas/actions/runs/37339368441)ผ่าน4/4. Audit `16-26-18-933Z`/`16-26-24-944Z`1/1แต่ละชุด ตรวจ104runnerreports/79filesตรงGitทุกชุด, main134ทุก8jobs, ordinaryและtiming HTTP capture3153ack0dropsทุกช่อง และFA-15 innerassertion/cleanupครบ. Auditผ่านหมายถึงfailed evidenceสอดคล้อง ไม่ใช่component captureผ่านหรือstable capture.
