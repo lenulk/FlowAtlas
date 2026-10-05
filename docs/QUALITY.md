@@ -653,3 +653,7 @@ Baseline `2026-10-05T10-34-07-673Z` บน3749c99 WindowsNode24.19.0: measuremen
 - เตรียม [pilot protocol](pilot.md) ตามPLAN: app/businesscases/knownanswers/privacy/rollback/performance/sustainedloadและusertrial ยังไม่มีแอปหรือผู้ทดลอง ไม่ปิดR4/R5จากเอกสาร
 
 - FinalSDK/Edge+failuregate `10-44-53-329Z`3/3ผ่านบนvalidatorใหม่ failed/skipped0; normalgraphsมี6ack0drop/exactreloadและsyntheticgeometryแยกเดิม. ตรวจdiffแล้วไม่มีproductionqueue/deadline/storagepolicyเปลี่ยน ยังรอexactCIของoptimization ไม่ใช้FA-15CI8b1e270รับรองsourceที่เปลี่ยนนี้
+
+- Exact44151a5 PRrun37299083948ผ่าน4/4ทุกstepแล้ว: sourceaudit `2026-10-05T10-57-17-148Z`1/1ตรวจartifacts4ชุด/40runnerreports/inventory74ไฟล์ตรงGitทุกชุด, main124/124ทุกช่อง exit0 failed/skipped0 และinnerassertionยังfailedพร้อมERR_ASSERTION/cleanupครบ. Capture3153ack0dropsแต่performanceFAILED Ubuntu22+71.129%,Ubuntu24+117.530%,Windows22+196.786%,Windows24+303.755%. ไม่ใช้relativeoverheadที่ต่างbaselineอ้างHTTPimprovement; sustainedload/realpilot/users/releaseยังเปิด
+- Base8b1e270audit `10-52-37-063Z`1/1: main123ทุกช่อง/40reports/74exactfiles, failuregateครบ/capture3153ack0drops, performanceFAILED Ubuntu22+95.963%,Ubuntu24+177.016%,Windows22+256.427%,Windows24+193.342%. เก็บartifactแยกreports/releases/ci-8b1e270และci-44151a5ไม่มีการนำrawmetadataข้ามรุ่นมาใช้รับรอง
+- Finaldocsreview: HANDOFF/PLAN/QUALITY/TEST-RUNS/pilotชี้รุ่น/PRbase/หลักฐานจริงครบ ยังไม่มีการmerge; remote masterc9563bdไม่มีงานใหม่ที่ต้องทับ Documentation-onlyrecordไม่เปลี่ยนprogramsourceที่CIตรวจแล้ว

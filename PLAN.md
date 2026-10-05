@@ -95,7 +95,7 @@ P0 คือข้อมูลสูญหาย/รั่วหรือกา�
 
 ## แอปจริงและจุดตัดสินใจ
 
-อัปเดต5ต.ค.2026: ผู้ใช้ยืนยันยังไม่มีแอปธุรกิจ ให้พัฒนาฐาน/เตรียมpilotต่อ มี [protocolและแบบบันทึก](docs/pilot.md) ตามเกณฑ์เดิมแล้ว ไม่มีreal-app/usertrialresult รอบ60ลดต้นทุนnodeindexในvalidationเฉพาะส่วนที่วัด แต่HTTPbenchmarkยังFAILED+479.671% จึงไม่ผ่านperformance/FA-07/FA-08/sustainedloadจากrepairนี้
+อัปเดต5ต.ค.2026: ผู้ใช้ยืนยันยังไม่มีแอปธุรกิจ ให้พัฒนาฐาน/เตรียมpilotต่อ มี [protocolและแบบบันทึก](docs/pilot.md) ตามเกณฑ์เดิมแล้ว ไม่มีreal-app/usertrialresult รอบ60ลดต้นทุนnodeindexในvalidationเฉพาะส่วนที่วัด `44151a5`CIrun37299083948ผ่าน4/4/main124ทุกช่อง/sourceinventoriesตรงGit แต่HTTPperformanceยังFAILEDทุกช่อง(+71.129%ถึง+303.755%; ในเครื่อง+479.671%) จึงไม่ผ่านperformance/FA-07/FA-08/sustainedloadจากrepairนี้ PR#1และstackedPR#2ยังไม่merge รายละเอียด/งานต่ออยู่HANDOFF
 
 ตอนนี้ผู้ใช้ยังไม่มีแอปงานจริงให้ทดลอง พัฒนา R0–R3 และเตรียม reference app ที่มี business flow, data store และบริการปลายทางได้ โดยแยก repository ภายในโครงการ ก่อนรับรอง R4 ต้องหาแอปที่เจ้าของยอมให้ทดสอบและไม่ได้ถูกสร้างเพื่อรองรับ FlowAtlas โดยเฉพาะ หากยังไม่มีให้รายงานว่า Alpha สำหรับ fixtures เท่านั้น; Beta/v1 ยังไม่ผ่าน
 
