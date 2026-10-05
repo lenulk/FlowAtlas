@@ -36,7 +36,7 @@ export function getCodeVersion(root) {
   } catch {
     // A file digest still identifies the running code before the first commit.
   }
-  return { commit, dirty, digest, files };
+  return { commit, dirty, digest, files: Object.freeze(files) };
 }
 
 export function sourceRef(version, file, symbol) {

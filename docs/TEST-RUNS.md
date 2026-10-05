@@ -1,5 +1,9 @@
 # บันทึกการรันทดสอบ
 
+Manual round61 artifact tool failures: repeated Windows downloads into existing ci-8eff7e2-push refused extraction because files already existed (both22/24); initial whole-run download had completed those artifacts. Kept originals and audited all files rather than deleting/overwriting evidence. rg on guessed preload/exporter names found no files; corrected via rg --files to src/otel-preload.mjs/src/otel-exporter.mjs. These are tool failures, not software test outcomes.
+
+Manual round61 hosted verification: PR3/run37302472603 Ubuntu22 load failed (`11-23-19-860Z`, captureCompleteWithoutDrops=false); main/source/browser/installed journeys passed. Ubuntu24 passed, Windows pending at inspection. First traced pair delivered224/dropped827 with reason shutdown827, no overflow/timeout/transport; remaining pairs1051 each zero drops. Retained raw artifacts under reports/releases/ci-8eff7e2-pr; no rerun erased failure. Push run37302444123 on same head had both Ubuntu jobs pass, requiring inventory comparison before a cause claim. Tool failures: gh run view --log-failed refused while run in progress; job logs API refused terminal escape sequences. Raw TAP/JSON provides evidence instead. Initial documentation patch heading mismatch was corrected without source change.
+
 ## Linux VM preparation — 2026-09-30
 
 - ผู้ใช้ระบุให้ทดสอบผ่าน SSH บน VM; เชื่อมต่อสำเร็จเป็น Debian GNU/Linux 12 / kernel 6.1.0-53-amd64 / x86_64 ไม่มี Node.js/Git ใน PATH และไม่มี project shared folder ที่ตรวจพบ
@@ -2355,3 +2359,79 @@ First matched3×1000 measurement: all6000 measured business responses pluswarmup
 - หลักฐาน: `reports/tests/2026-10-05T10-57-17-148Z.tap` และ `.json`
 - FinalRound59/60 hosted artifact audits10-52-37-063Zและ10-57-17-148Z1/1ทั้งคู่: 4artifacts/40runnerreportsต่อรุ่น, all74fileinventoriesตรงGit8b1e270/44151a5, main123/124ทุกช่อง ไม่มีfailed/skippedหรือexitnonzero; deliberateinnerfaultERR_ASSERTION+cleanupครบ. Performance44151a5FAILED Ubuntu22+71.129%,Ubuntu24+117.530%,Windows22+196.786%,Windows24+303.755%; capture3153ack0dropsทุกช่อง. ไม่มีrealpilot/sustainedload/usertrialรับรอง
 - Finalmanualhandoffreview: fetchedorigin master...origin/master0/0ที่c9563bd, PR1base masterและPR2base fix/fa15-fixture-cleanupยังOPEN; docs-onlyfinalrecordไม่เปลี่ยนprogramfilesที่auditแล้ว ไม่ทดสอบsoftwareซ้ำโดยไม่มีsourcechange
+- เริ่มรอบ61: fetch/pull--ff-only branchเดิมไม่มีupdateและcheckoutสะอาด; APIยืนยัน4b5c2ec PRrun37300068626 success4ช่อง PR1/2ยังOPEN. เลือกลดSHAงานซ้ำเฉพาะimmutable file hashes ไม่cachegraphvalidation ไม่เปลี่ยนstorageformat/queue/deadline/workload/threshold
+
+## 2026-10-05T11-11-43-564Z
+
+- จุดประสงค์: Round61 before repair immutable snapshot and repeated hash cost regression
+- ผล: ไม่ผ่าน — 1/3; failed 2; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 4b5c2ec84c2c40bd1cc4e119f95c0b5f8c4c6f19; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T11-11-43-564Z.tap` และ `.json`
+- ไม่ผ่าน: captured tool and project file hashes cannot be edited in place
+- ไม่ผ่าน: repeated saves hash an immutable snapshot once while checking every asserted digest
+
+## 2026-10-05T11-12-28-291Z
+
+- จุดประสงค์: Round61 immutable snapshot digest cache guards and affected source storage contracts
+- ผล: ผ่าน — 26/26; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 4b5c2ec84c2c40bd1cc4e119f95c0b5f8c4c6f19; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T11-12-28-291Z.tap` และ `.json`
+- Round61 archivebaselinecommand11-13-32-238Zไม่เริ่มtest: runnerเปลี่ยนcwdเป็นarchive root จึงต้องส่งscripts/benchmark-http-trace.mjsแทนpathจากcheckoutหลัก ผลล้มเหลวrawอยู่reports/storage/round61-baseline/reports/tests ไม่ใช่softwarefailure
+
+## 2026-10-05T11-14-07-368Z
+
+- จุดประสงค์: Round61 after immutable snapshot digest cache unchanged paired fixture
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 4b5c2ec84c2c40bd1cc4e119f95c0b5f8c4c6f19; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T11-14-07-368Z.tap` และ `.json`
+
+## 2026-10-05T11-14-42-347Z
+
+- จุดประสงค์: Round61 default main immutable source hashes and unchanged graph storage validation
+- ผล: ผ่าน — 127/127; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 4b5c2ec84c2c40bd1cc4e119f95c0b5f8c4c6f19; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T11-14-42-347Z.tap` และ `.json`
+
+## 2026-10-05T11-16-48-033Z
+
+- จุดประสงค์: Round61 isolated source identity changed deleted snapshot restart
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 4b5c2ec84c2c40bd1cc4e119f95c0b5f8c4c6f19; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T11-16-48-033Z.tap` และ `.json`
+
+## 2026-10-05T11-16-48-895Z
+
+- จุดประสงค์: Round61 actual SDK CJS ESM Edge immutable hashes and original failure regression
+- ผล: ผ่าน — 3/3; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 4b5c2ec84c2c40bd1cc4e119f95c0b5f8c4c6f19; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T11-16-48-895Z.tap` และ `.json`
+
+## 2026-10-05T11-20-19-776Z
+
+- จุดประสงค์: Round61 baseline Git inventory and final local evidence audit
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 4b5c2ec84c2c40bd1cc4e119f95c0b5f8c4c6f19; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T11-20-19-776Z.tap` และ `.json`
+
+## 2026-10-05T11-28-37-802Z
+
+- จุดประสงค์: Round61 exact PR CI audit preserving shutdown827 failure
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 8eff7e225fea1992d47a7b5143d598b2c57c577a; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T11-28-37-802Z.tap` และ `.json`
+
+## 2026-10-05T11-28-58-335Z
+
+- จุดประสงค์: Round61 exact push CI inventories and capture audit separate from failed PR run
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 8eff7e225fea1992d47a7b5143d598b2c57c577a; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T11-28-58-335Z.tap` และ `.json`

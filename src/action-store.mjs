@@ -14,6 +14,21 @@ const filesystemCodes = new Set(['EACCES', 'EPERM', 'EIO', 'EROFS', 'EBADF', 'EI
   'ENOMEM', 'EXDEV', 'ENAMETOOLONG', 'ELOOP']);
 const renamePauses = [5, 10, 20, 40];
 const renameWait = new Int32Array(new SharedArrayBuffer(4));
+const immutableFileDigests = new WeakMap();
+
+function fileDigest(files) {
+  const previous = immutableFileDigests.get(files);
+  if (previous !== undefined) return previous;
+  const digest = createHash('sha256').update(Object.keys(files).sort()
+    .map((file) => `${file}\0${files[file]}`).join('\n')).digest('hex');
+  // Only frozen own string data is immutable. A frozen getter can still change.
+  if (files && typeof files === 'object' && !Array.isArray(files) && Object.isFrozen(files)
+    && [Object.prototype, null].includes(Object.getPrototypeOf(files))
+    && Object.values(Object.getOwnPropertyDescriptors(files)).every((entry) => typeof entry.value === 'string')) {
+    immutableFileDigests.set(files, digest);
+  }
+  return digest;
+}
 
 export function replaceStateFile(source, destination, { platform = process.platform, rename = renameSync,
   pause = (milliseconds) => Atomics.wait(renameWait, 0, 0, milliseconds) } = {}) {
@@ -62,8 +77,7 @@ function validateSavedAction(action) {
         || file.split('/').some((part) => !part || part === '.' || part === '..')
         || !/^[a-f0-9]{64}$/.test(hash)) issues.push('invalid source path or hash');
     }
-    const digest = createHash('sha256').update(Object.keys(files).sort()
-      .map((file) => `${file}\0${files[file]}`).join('\n')).digest('hex');
+    const digest = fileDigest(files);
     if (digest !== action.codeVersion.digest) issues.push('invalid snapshot digest');
   }
   return issues;

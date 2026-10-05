@@ -38,6 +38,8 @@ UI และ `/flowatlas/status` แสดง mode ตามจริง ค่�
 
 ## ข้อจำกัด
 
+รอบ61: รายการfile hashesที่captureใหม่เป็นreadonly เก็บcomputedSHA-256ซ้ำได้เฉพาะfrozenstringdataผ่านWeakMap ส่วนmutable/getter snapshotsและclaimed digestยังตรวจทุกครั้ง ไม่มีgraphvalidationcache/การเปลี่ยนsavedJSONหรือfsync ดู [การตัดสินใจและrollback](adr-snapshot-digest.md) การลดงานSHAไม่หมายถึงperformanceผ่าน
+
 ยังไม่ทดสอบไฟดับ, disk เต็มจริง, บังคับ kill ระหว่าง rename, lock recovery แบบอัตโนมัติ หรือ OneDrive บนหลายเครื่อง การเขียนเป็น synchronous และ serialize state ทั้งชุดจึงต้องวัด overhead ก่อนเพิ่มโหลด production ไม่มีการเข้ารหัสหรือ authentication เพิ่มจาก filesystem ของเครื่อง และยังไม่มี archive ระยะยาว/schema migration
 
 ## Bounded Windows replacement recovery
