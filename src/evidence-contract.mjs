@@ -144,8 +144,10 @@ export function validateGraph(graph) {
     for (const span of Array.isArray(graph.trace?.spans) ? graph.trace.spans : []) {
       try {
         const clean = cleanHttpSpan(span);
-        if (JSON.stringify(span) !== JSON.stringify(clean) || traceSpans.has(span.spanId)) issues.push('invalid or duplicate trace span');
-        traceSpans.set(span.spanId, clean);
+        const inputJson = JSON.stringify(span), cleanJson = JSON.stringify(clean);
+        if (inputJson !== cleanJson || traceSpans.has(span.spanId)) issues.push('invalid or duplicate trace span');
+        // Reuse only within this call; node input is still serialized independently.
+        traceSpans.set(span.spanId, cleanJson);
       } catch { issues.push('invalid trace span'); }
     }
   } else if (graph.trace !== undefined || graph.nodes.some((node) => ['http-span', 'http-trace'].includes(node?.type))) {
@@ -157,7 +159,7 @@ export function validateGraph(graph) {
     if (nodeIds.has(node.id)) issues.push(`duplicate node ${node.id}`);
     nodeIds.add(node.id);
     if (node.type === 'http-span' && (node.id !== `span:${node.span?.spanId}`
-      || JSON.stringify(node.span) !== JSON.stringify(traceSpans.get(node.span?.spanId)))) issues.push('span node does not match trace metadata');
+      || JSON.stringify(node.span) !== traceSpans.get(node.span?.spanId))) issues.push('span node does not match trace metadata');
     if (node.source) issues.push(...validateSource(node.source, graph.codeVersion, `node ${node.id}`));
   }
   if (graph.schemaVersion === '0.2' && (graph.nodes.filter((node) => node?.type === 'http-span').length !== traceSpans.size
