@@ -16,6 +16,30 @@ const filesystemCodes = new Set(['EACCES', 'EPERM', 'EIO', 'EROFS', 'EBADF', 'EI
 const renamePauses = [5, 10, 20, 40];
 const renameWait = new Int32Array(new SharedArrayBuffer(4));
 const immutableFileDigests = new WeakMap();
+const immutableFilePaths = new WeakMap();
+
+function cacheableFiles(files) {
+  return files && typeof files === 'object' && !Array.isArray(files) && Object.isFrozen(files)
+    && [Object.prototype, null].includes(Object.getPrototypeOf(files))
+    && Object.values(Object.getOwnPropertyDescriptors(files)).every((entry) => typeof entry.value === 'string');
+}
+
+function filePathIssues(files, projectScoped) {
+  let scopes = immutableFilePaths.get(files);
+  if (scopes?.has(projectScoped)) return scopes.get(projectScoped);
+  const issues = [];
+  for (const [file, hash] of Object.entries(files)) {
+    if ((projectScoped ? !validSourcePath(file) : !/^(src|public|examples)\//.test(file)) || /[\\:\x00]/.test(file)
+      || file.split('/').some((part) => !part || part === '.' || part === '..')
+      || !/^[a-f0-9]{64}$/.test(hash)) issues.push('invalid source path or hash');
+  }
+  if (cacheableFiles(files)) {
+    scopes ??= new Map();
+    scopes.set(projectScoped, Object.freeze(issues));
+    immutableFilePaths.set(files, scopes);
+  }
+  return issues;
+}
 
 function fileDigest(files) {
   const previous = immutableFileDigests.get(files);
@@ -23,9 +47,7 @@ function fileDigest(files) {
   const digest = createHash('sha256').update(Object.keys(files).sort()
     .map((file) => `${file}\0${files[file]}`).join('\n')).digest('hex');
   // Only frozen own string data is immutable. A frozen getter can still change.
-  if (files && typeof files === 'object' && !Array.isArray(files) && Object.isFrozen(files)
-    && [Object.prototype, null].includes(Object.getPrototypeOf(files))
-    && Object.values(Object.getOwnPropertyDescriptors(files)).every((entry) => typeof entry.value === 'string')) {
+  if (cacheableFiles(files)) {
     immutableFileDigests.set(files, digest);
   }
   return digest;
@@ -73,11 +95,7 @@ function validateSavedAction(action) {
   if (projectId !== undefined && (typeof projectId !== 'string' || !/^[a-z][a-z0-9_-]{0,63}$/.test(projectId))) issues.push('invalid project ID');
   if (!files || Array.isArray(files) || Object.keys(files).length > 2048) issues.push('invalid source snapshot');
   else {
-    for (const [file, hash] of Object.entries(files)) {
-      if ((projectId === undefined ? !/^(src|public|examples)\//.test(file) : !validSourcePath(file)) || /[\\:\x00]/.test(file)
-        || file.split('/').some((part) => !part || part === '.' || part === '..')
-        || !/^[a-f0-9]{64}$/.test(hash)) issues.push('invalid source path or hash');
-    }
+    issues.push(...filePathIssues(files, projectId !== undefined));
     const digest = fileDigest(files);
     if (digest !== action.codeVersion.digest) issues.push('invalid snapshot digest');
   }

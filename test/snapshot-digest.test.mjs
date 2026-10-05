@@ -81,3 +81,42 @@ test('mutable and accessor snapshots are rechecked and graph validation never us
     assert.equal(readFileSync(store.file, 'utf8'), before);
   } finally { store.close(); }
 });
+
+test('repeated immutable source path checks scan once per scope without caching graph or claimed metadata', (t) => {
+  const root=workspace(t),store=new JsonActionStore(root),files=Object.freeze({'app.mjs':'a'.repeat(64)});
+  const action=graph(files); const original=Object.entries; let scans=0;
+  const mocked=t.mock.method(Object,'entries',(...args)=>{if(args[0]===files)scans++;return Reflect.apply(original,Object,args);});
+  try {
+    store.save([action]);store.save([action]);store.save([action]);
+    assert.equal(scans,1,'Immutable file metadata must not be rescanned for every graph/save');
+    const before=readFileSync(store.file,'utf8');
+    delete action.codeVersion.projectId;
+    assert.throws(()=>store.save([action]),/Unable to persist/,'Tool scope must still reject a project-only path');
+    assert.equal(readFileSync(store.file,'utf8'),before);
+    action.codeVersion.projectId='INVALID';
+    assert.throws(()=>store.save([action]),/Unable to persist/,'Cached paths do not validate the current project ID');
+    action.codeVersion.projectId='snapshot';action.codeVersion.digest='b'.repeat(64);
+    assert.throws(()=>store.save([action]),/Unable to persist/);
+    action.codeVersion.digest=digest(files);action.nodes[0].label='';
+    assert.throws(()=>store.save([action]),/Unable to persist/);
+    assert.equal(readFileSync(store.file,'utf8'),before);
+  } finally {mocked.mock.restore();store.close();}
+});
+
+test('source path optimization never caches mutable accessor or custom-prototype snapshots', (t) => {
+  const root=workspace(t),store=new JsonActionStore(root);
+  try {
+    for(const kind of ['mutable','accessor','prototype']) {
+      let hash='a'.repeat(64);
+      const files=kind==='accessor'?Object.freeze(Object.defineProperty({},'app.mjs',{enumerable:true,get:()=>hash})):
+        kind==='prototype'?Object.freeze(Object.assign(Object.create({untrusted:true}),{'app.mjs':hash})):{'app.mjs':hash};
+      const action=graph(files),original=Object.entries;let scans=0;
+      const mocked=t.mock.method(Object,'entries',(...args)=>{if(args[0]===files)scans++;return Reflect.apply(original,Object,args);});
+      try{store.save([action]);store.save([action]);assert.equal(scans,2,kind);}finally{mocked.mock.restore();}
+      const before=readFileSync(store.file,'utf8');
+      if(kind==='mutable'){files['../escape.mjs']=hash;action.codeVersion.digest=digest(files);}
+      if(kind==='accessor')hash='invalid';
+      if(kind!=='prototype') {assert.throws(()=>store.save([action]),/Unable to persist/);assert.equal(readFileSync(store.file,'utf8'),before);}
+    }
+  }finally{store.close();}
+});

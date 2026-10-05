@@ -1,5 +1,19 @@
 # รอบทดสอบและปรับปรุง FlowAtlas
 
+### รอบ67 — immutable source path metadata reuse
+
+**Localfinalcode08e4435/[PR#9](https://github.com/lenulk/FlowAtlas/pull/9):** inventoryaudit20-26-06-594Z1/1ตรวจ84filesตรงGitทุก6finalgates:main136/equivalence1(76cases)/paired1/source1/SDK+Edge+fault3/ordinaryHTTP1; failed/skipped0. Reportedlocaldirtybaselinecommitsไม่ใช้เป็นsourceidentityแทนactualfilehash. HostedPR37369500705/push37369485398ยังqueuedณAPIล่าสุด ไม่มีhostedgate/artifactหลักฐาน ยังไม่auditmatrix; documentation-onlycommitส่งต่อหลัง08e4435ไม่เปลี่ยนprogrambytesและrefconcurrencyอาจยกเลิกqueuedoldrun ต้องตรวจlatestheadCIใหม่จริง. ไม่skipCI/ไม่rerunกลบpreviousfailure. PR8sourcecode47472a6locallyverifiedมีlocalCLI failureตามหัวข้อก่อนหน้าและreplacement5ab910dCIยังqueued. ผลนี้ไม่ใช่projectreadiness.
+
+Ownbranchperf/immutable-source-path-checksต่อจาก5ab910d/PR8. [ADR](adr-immutable-source-paths.md): privateWeakMapreuseเฉพาะfrozenplain/nullprototypeownstringfilemapและแยกtool/projectscope. ย้ายpath/hashformatloopเดิมโดยคงdiagnostics; projectID/filecount/claimed digest/graph/source declarationsตรวจfreshทุกsave/load. Mutable/accessor/customprototypeไม่cache; parsedJSONfallbackfresh. ProductionJSON/fsync/replace/ack/deadline/queue/backend/APIไม่เปลี่ยน. ไม่ใช้wholegraphvaliditycache.
+
+Before20-13-23-681Z4/5: immutablepathscans3แทน1; afterfocused20-14-25-784Z26/26. Fullmain20-17-53-120Z136/136ผ่านรวมfreshprojectIDnegativeเพิ่มเติม. Equivalence20-18-51-639Z1/1:76accept/reject/sourcepolicy/hash/bounds/nullprototype/scope/digest/graphmutationcasesและsavedbytesตรงoriginal5ab910d. Originalround66CLIreadinessfailureยังไม่ปิดจากmainpassรุ่นนี้.
+
+Pairedidenticaldata20-16-40-033Z1/1ตรวจbaselineoriginalGitbytes/loadedSHA/dependenciesunchanged, samefixturefrozenmap/35saves/sync35/beforeafteralternating5pairs each1/64files/exactreload. 64filevalidationmedian213.155→40.801ms,total418.062→259.741ms;1filevalidation45.112→40.848msแต่total156.249→159.963msไม่ดีขึ้น. เป็นisolatedstorecost/met=null ไม่claimHTTPspeed/rootcause/10%criterion/realpilot. ActualSDKCJS/ESM+Edge+deliberateassertion20-19-36-126Z3/3ผ่าน; actualfanout/privacy/reload/cleanupครบ,synthviewerfixturesแยกเดิม.
+
+Round66CI47472a6cancelledก่อนjobstartหลังdocpush(workflowrefgroup/cancel-in-progress=true); replacement5ab910dPR37368387270/push37368382200ยังqueuedalljobs. ไม่อ้างhostedverified/ไม่rerunลบfailure; actualround67needsownexactCI. Performance/stablecapture/sustained/CLIstartup/rootcause/pilot/users/releaseยังเปิด.
+
+OrdinaryHTTP20-20-14-027Z1/1responsecounts/capture3153ack0dropsครบ แต่performanceFAILED+280.412% (baseline5.248/traced19.964ms;10%criterionเดิม). ไม่มีmatchedordinarybaselinebeforecodechange จึงไม่อ้างcausalHTTPimprovement/declineจากต่างrun. Localmicrobenchmark64fileผลดีไม่แทนHTTPacceptance และ1filetotalไม่ได้ดีขึ้น.
+
 ### รอบ66 — isolated snapshot/journal write comparison
 
 Branchdiag/durable-write-comparisonต่อจากclean54bd2b4/fetchpullup-to-date. QA-only[comparison](durable-write-comparison.md)ใช้synthetic1051HTTPtraces+64CLIENTupdates/35commits/history100/sourcehash1หรือ64files,3rotatedrounds×3conditions=18. Production-snapshotใช้actualJsonActionStore.save; rawsnapshot/journalใช้preencodedbytes/realfsync35ครั้งทุกcondition; rawjournalไม่รวมvalidation/framing/locking/compaction/migration/recoveryและไม่เป็นproductionbackend. Source/SDK/exporter/ack/deadline/fsync/schemaเดิม ไม่subtractจากapplicationp95/met=null.
