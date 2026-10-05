@@ -18,6 +18,8 @@ Do not remove fsync, acknowledge before persistence or silently extend shutdown 
 
 ## Alternatives and next experiment
 
+Round66 adds an [isolated comparison](durable-write-comparison.md). Corrected local fixtures show delta records write about one-third the bytes of snapshots but still perform35syncs and leave a log about9–10.5times the final snapshot size. Raw append timings exclude validation/encoding/locking/compaction/recovery and therefore cannot establish a production backend improvement. Do not adopt the QA format as a store. The existing full-save validation stage is substantial for the64-file synthetic source case; next isolate repeated immutable source-map path/hash checks and consider a bounded optimization that retains fresh graph/claimed-version validation before undertaking a migration. This choice does not claim to fix arbitraryfsync latency or existing shutdown losses. A journal proposal remains conditional on all adoption requirements below.
+
 - Keep snapshot storage: simpler existing recovery and rollback, but every request rewrites and syncs retained history. Capture can remain incomplete during slow writes.
 - Append a bounded durable journal: potentially reduces serialization and rewritten bytes, but still incurs sync latency. Requires a measured comparison, batch framing/checksum, atomic visibility and crash recovery before adoption.
 - Group commits: potentially reduces fsync calls; cannot acknowledge a group before durable completion. Needs explicit async request coordination, bounded buffering, orderly close and failure propagation. Current two exporter slots limit available coalescing.

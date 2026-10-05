@@ -98,6 +98,16 @@ jobs:
         env:
           FLOWATLAS_TEST_PURPOSE: CI controlled slow fsync preserves deadline failure and durable reload
         run: node scripts/run-tests.mjs scripts/slow-fsync-check.mjs
+      - name: Experimental journal format guards
+        if: ${{ !cancelled() }}
+        env:
+          FLOWATLAS_TEST_PURPOSE: CI experimental journal framing corruption and retention guards
+        run: node scripts/run-tests.mjs scripts/durable-write-format-check.mjs
+      - name: Isolated durable write comparison
+        if: ${{ !cancelled() }}
+        env:
+          FLOWATLAS_TEST_PURPOSE: CI isolated synthetic snapshot journal writes and exact replay
+        run: node scripts/run-tests.mjs scripts/benchmark-durable-write.mjs
       - name: Pack and install in disposable workspace
         id: package_install
         if: ${{ !cancelled() }}

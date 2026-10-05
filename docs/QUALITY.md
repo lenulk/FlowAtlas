@@ -1,5 +1,15 @@
 # รอบทดสอบและปรับปรุง FlowAtlas
 
+### รอบ66 — isolated snapshot/journal write comparison
+
+Branchdiag/durable-write-comparisonต่อจากclean54bd2b4/fetchpullup-to-date. QA-only[comparison](durable-write-comparison.md)ใช้synthetic1051HTTPtraces+64CLIENTupdates/35commits/history100/sourcehash1หรือ64files,3rotatedrounds×3conditions=18. Production-snapshotใช้actualJsonActionStore.save; rawsnapshot/journalใช้preencodedbytes/realfsync35ครั้งทุกcondition; rawjournalไม่รวมvalidation/framing/locking/compaction/migration/recoveryและไม่เป็นproductionbackend. Source/SDK/exporter/ack/deadline/fsync/schemaเดิม ไม่subtractจากapplicationp95/met=null.
+
+Initial17-01-57-321Z1/1ไม่ใช้เป็นหลักฐาน: fixtureเก็บlivegraphreferencesแล้วupdatesย้อนเปลี่ยนhistory; regression17-02-51-134Z0/1ยืนยันupserts0แทน32. RepaircaptureJSONณแต่ละcommitและคืนsharedfrozenfilemapidentity; finalasserts initialhistory0updated/next32/final64, exact35frame-replay/sourceidentity. Finalcomparison20-05-10-833Z1/1ทุก18conditions/reload/byteequality/cleanupครบ. Formatguards20-03-30-019Z2/2ทุกtruncatedprefix/corruption/size/sequence/order/evictionผ่าน; parserchecksไม่ใช่fullgraphsourcevalidation/crashrecovery. Patchverificationfailedหนึ่งครั้งแก้เฉพาะintendedhunksและเก็บtoolerrorแล้ว.
+
+Finallocalbytes1file snapshot6,371,360/journal2,181,529;64files25,359,776/8,423,299. Finaljournalfileใหญ่กว่าสnapshot:2,181,529vs241,908และ8,423,299vs801,708;fsync35เท่าเดิมทุกcondition. Medianslocalproduction/rawsnapshot/rawjournal1file232.064/117.323/36.742ms,64file586.204/252.595/75.495ms. Scopeต่างกัน จึงไม่อ้างjournalproductionเร็วขึ้นหรือcapturedeadlineแก้แล้ว. Productionvalidationmedian51.581/229.746ms; inspectsourceพบimmutablemap paths/hashmetadataถูกตรวจซ้ำทุกgraph/save จัดลำดับisolateงานนี้เป็นรอบ67ก่อนmigration แต่ยังไม่พิสูจน์เฉพาะส่วนนี้รับผิดwholevalidationtime. Journalยังไม่มีboundedcompaction/lock/crash/migration/rollbackprotection ไม่adoptQAformat.
+
+Main20-05-18-750Z133/134failed CLIowner-killSDKreadiness12000ms/cleanupunconfirmed/workspacecli-owner-bWOl5sretained;ไม่เกี่ยวกับparallelcomparisonซึ่งจบก่อนแล้ว. Focused20-06-51-061Z9/9ผ่านไม่ปิดrootcause; manualreadlockพบหายแล้วภายหลังและGetProcessnullไม่มีtarget/ไม่มีkill. เก็บfailedfixtureไม่ลบทิ้ง/ไม่อ้างservicescloseครบจากlockหายอย่างเดียว. Missingguessedfixturepath/lockreadsและpatcherrorเก็บTEST-RUNS. Base54bd2b4PR/pushCI4/4ผ่าน(APIonly,notartifactaudit)ไม่ลบ6d08a53shutdownfailure. Exactรอบ66CIpending16gates/channel;pilot/users/performance/stablecapture/sustained/releaseยังเปิด.
+
 ### รอบ65 — controlled slow-fsync reproduction
 
 **Exact6d08a53:** [PR37343310494](https://github.com/lenulk/FlowAtlas/actions/runs/37343310494)success4/4; [push37343288536](https://github.com/lenulk/FlowAtlas/actions/runs/37343288536)fail3/4เพราะLinux24uninstrumenteddiskcomponentround1ack192/shutdown859. Store8saves1150.097ms/sync1138.121ms/maxsync215.827ms, deadlineFired1/shutdown902.340ms ไม่มีotherdrop. Otherordinarycomponentconditions/503guardผ่าน. เก็บfailureและartifactแยก ไม่rerunกลบหรืออ้างQAfaultทำให้ordinaryrunfailed.
