@@ -2,6 +2,8 @@
 
 ### รอบ67 — immutable source path metadata reuse
 
+**Localfinalcode08e4435/[PR#9](https://github.com/lenulk/FlowAtlas/pull/9):** inventoryaudit20-26-06-594Z1/1ตรวจ84filesตรงGitทุก6finalgates:main136/equivalence1(76cases)/paired1/source1/SDK+Edge+fault3/ordinaryHTTP1; failed/skipped0. Reportedlocaldirtybaselinecommitsไม่ใช้เป็นsourceidentityแทนactualfilehash. HostedPR37369500705/push37369485398ยังqueuedณAPIล่าสุด ไม่มีhostedgate/artifactหลักฐาน ยังไม่auditmatrix; documentation-onlycommitส่งต่อหลัง08e4435ไม่เปลี่ยนprogrambytesและrefconcurrencyอาจยกเลิกqueuedoldrun ต้องตรวจlatestheadCIใหม่จริง. ไม่skipCI/ไม่rerunกลบpreviousfailure. PR8sourcecode47472a6locallyverifiedมีlocalCLI failureตามหัวข้อก่อนหน้าและreplacement5ab910dCIยังqueued. ผลนี้ไม่ใช่projectreadiness.
+
 Ownbranchperf/immutable-source-path-checksต่อจาก5ab910d/PR8. [ADR](adr-immutable-source-paths.md): privateWeakMapreuseเฉพาะfrozenplain/nullprototypeownstringfilemapและแยกtool/projectscope. ย้ายpath/hashformatloopเดิมโดยคงdiagnostics; projectID/filecount/claimed digest/graph/source declarationsตรวจfreshทุกsave/load. Mutable/accessor/customprototypeไม่cache; parsedJSONfallbackfresh. ProductionJSON/fsync/replace/ack/deadline/queue/backend/APIไม่เปลี่ยน. ไม่ใช้wholegraphvaliditycache.
 
 Before20-13-23-681Z4/5: immutablepathscans3แทน1; afterfocused20-14-25-784Z26/26. Fullmain20-17-53-120Z136/136ผ่านรวมfreshprojectIDnegativeเพิ่มเติม. Equivalence20-18-51-639Z1/1:76accept/reject/sourcepolicy/hash/bounds/nullprototype/scope/digest/graphmutationcasesและsavedbytesตรงoriginal5ab910d. Originalround66CLIreadinessfailureยังไม่ปิดจากmainpassรุ่นนี้.
