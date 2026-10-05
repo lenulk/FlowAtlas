@@ -10,6 +10,8 @@ Repository: https://github.com/lenulk/FlowAtlas; branch หลัก `master` �
 
 ## สถานะที่ตรวจแล้ว
 
+**งานรอบ65ที่กำลังตรวจ:** branch`diag/slow-fsync-reproduction`ต่อจากff8b972/PR6. Controlled120ms pre-fsync QA reproduction+scopeguardผ่าน2/2, main134ผ่าน; productionpolicy/sourceเดิม. ดูQUALITYและ[ADRdurabledrain](adr-durable-drain.md). CIใหม่14reports/channelยังต้องauditexactrevision ไม่ใช้localpassรับรองbundle. ขั้นถัดไปisolatedjournal-vs-snapshotwrite/synccomparisonก่อนstorage/drainrepairหนึ่งประเด็น; ไม่เปลี่ยนackก่อนdurablecompletion/ขยายdeadlineเพื่อให้ผ่าน. ผลฐานff8b972PRCI3/4เพราะordinaryshutdowndrop763เก็บแยกแล้ว ยังไม่พิสูจน์samecauseกับ827เดิม. Pilot/usersยังไม่มี.
+
 **สถานะปัจจุบันบนbranchของงานต่อ:** [PR#6](https://github.com/lenulk/FlowAtlas/pull/6) `diag/trace-cost-isolation`, โค้ดceddc0f; PR CI37339435370ผ่าน2/4เพราะsimulated disk burstชนshutdown900msในLinuxทั้งสอง, push37339368441ผ่าน4/4แต่ไม่ปิดfailure. Main134ทุกช่อง/79filesตรงGit/104runnerreportsauditครบ. ดูQUALITYรอบ64สำหรับfsync915/944/860msและackloss635/891/795. PR#1–#6ยังOPENstacked ไม่merge/forcepush; เอกสารบันทึกหลังceddc0fไม่เปลี่ยนโค้ดที่auditแล้ว. รอบ65เริ่มcontrolled slow-fsync regression+ADRdurable drainก่อนrepairหนึ่งประเด็น; SDK-onlycostยังต้องวัดแยก. Performance/sustained/pilot/users/releaseยังไม่ผ่าน. ย่อหน้ารอบ58ด้านล่างเป็นประวัติฐาน ไม่ใช่รุ่นล่าสุดของbranchนี้.
 
 - Functional code ล่าสุดที่ส่งขึ้น GitHub: `4ab1c61d6f5d2267a3c9ad37ff6830797988147d` รอบ 58 แก้เส้นแผนที่ไม่ให้พาดผ่านกล่องอื่น เพิ่มหัวลูกศร/title และระบุว่าตำแหน่งกล่องไม่ใช่เวลา ยังเรียงกล่องเป็นแถวเดิม เส้นต่าง edge ยังตัดกันหรือมีช่วงร่วมกันใน gutter ได้ ไม่ใช่ layered graph ที่เสร็จแล้ว

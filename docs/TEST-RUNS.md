@@ -2781,3 +2781,96 @@ First matched3×1000 measurement: all6000 measured business responses pluswarmup
 - Unexpecteddisk measured sync915.331/944.152/860.015ms, total935.270/954.990/880.782ms for Node22normal/Node24normal/Node22negative. Nofsync errors; deadline abort may race with server persistence, so ackloss does not establish all spans absent on disk. Transport/memorycomplete; prior827cause still not proven.
 - Existingperformancecriterion:7/8ordinary reports FAILED; PRWindows24 tinybaseline0.975ms selectsabsolute delta3.214ms≤5ms PASS. No criteria changed; not projectperformance readiness. Full details in QUALITY/HANDOFF/PLAN.
 - Final documentation records afterceddc0f are documentation-only. No productionpolicy/workload/backend/source change; allsix stacked PRs remain OPEN. Next round controlled slow-fsync regression and durable drain ADR, SDK-onlycost still pending, no realbusinesspilot/users.
+
+## 2026-10-05T16-35-36-830Z
+
+- จุดประสงค์: Round65 before controlled slow-fsync injection reproduction
+- ผล: ไม่ผ่าน — 0/1; failed 1; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: ff8b9723c67ecb45cddc0a9905b328114662e5af; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T16-35-36-830Z.tap` และ `.json`
+- ไม่ผ่าน: controlled slow durable sync reproduces bounded shutdown losses and preserves failed evidence
+
+## Round65 initial review and reproduction development
+
+- Clean ff8b972, own branch diag/slow-fsync-reproduction, fetch/pull up-to-date. Read AGENTS/HANDOFF/PLAN/QUALITY/TEST-RUNS and actual exporter/store/collector code and prior artifact evidence. Memory registry search FlowAtlas had no hits (rg exit1, not repository failure).
+- Before injection16-35-36-830Z0/1: ordinary simulated component child passed exit0, but outer slow-sync reproduction required exit1. Raw TAP retained; this baseline demonstrates that an env label alone cannot create the failure. Add explicit QA-only built-in-fs preload, scoped to canonical owned component state temporary files; still call actualfsync and leave production code unchanged.
+
+## 2026-10-05T16-36-25-719Z
+
+- จุดประสงค์: Round65 controlled120ms fsync delay reproduction with real persistence
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: ff8b9723c67ecb45cddc0a9905b328114662e5af; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T16-36-25-719Z.tap` และ `.json`
+
+## 2026-10-05T16-38-08-608Z
+
+- จุดประสงค์: Round65 final scoped slow-fsync accounting guard
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: ff8b9723c67ecb45cddc0a9905b328114662e5af; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T16-38-08-608Z.tap` และ `.json`
+
+## 2026-10-05T16-39-18-248Z
+
+- จุดประสงค์: Round65 preload scope and controlled shutdown accounting final
+- ผล: ผ่าน — 2/2; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: ff8b9723c67ecb45cddc0a9905b328114662e5af; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T16-39-18-248Z.tap` และ `.json`
+
+## 2026-10-05T16-39-30-578Z
+
+- จุดประสงค์: Round65 main regression production source unchanged
+- ผล: ผ่าน — 134/134; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: ff8b9723c67ecb45cddc0a9905b328114662e5af; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T16-39-30-578Z.tap` และ `.json`
+
+- Manual gh pr view6 in sandbox failed with GitHub CLI config access denied; no remote mutation occurred. Retry using the established authorized escalation for GitHub reads. Slow-sync scope/fault run16-39-18-248Z passed2/2; a main regression started before this diagnostic process finished, so this result is not an isolated timing sample. Serial verification follows after main completes; do not infer actual disk speed from injected timings.
+
+## 2026-10-05T16-40-49-511Z
+
+- จุดประสงค์: Round65 serial final scoped slow-fsync fault guard
+- ผล: ผ่าน — 2/2; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: ff8b9723c67ecb45cddc0a9905b328114662e5af; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T16-40-49-511Z.tap` และ `.json`
+
+## 2026-10-05T16-41-34-748Z
+
+- จุดประสงค์: Round65 ordinary component control without preload
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: ff8b9723c67ecb45cddc0a9905b328114662e5af; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T16-41-34-748Z.tap` และ `.json`
+
+## 2026-10-05T16-42-28-528Z
+
+- จุดประสงค์: Round65 final explicitly labeled controlled sync and scope guard
+- ผล: ผ่าน — 2/2; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: ff8b9723c67ecb45cddc0a9905b328114662e5af; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T16-42-28-528Z.tap` และ `.json`
+
+- Remote base ff8b972 PRCI37341212751 failed3/4: Ubuntu22 ordinary fixture-load capture gate failed (other jobs succeeded); push37341204494 passed4/4. Failed-job artifact download succeeded into reports/releases/ci-ff8b972-pr. Ordinary pair2 ack288/drop763, other pairs ack1051 each. This is a new observed failure on unchanged production code; preserve it separately and do not claim the controlled preload caused or fixed this historical run.
+- Serial uninstrumented component control16-41-34-748Z1/1 all9conditionsack1051/no drops/diskreload. This does not erase hosted losses. Serial scope/fault16-40-49-511Z2/2 ack192/shutdown859 eachdiskround,24realfsync calls with120ms requestedpause and descriptor count0; controlscomplete. Changed only report label to identify inner slow-sync files explicitly before final verification.
+
+## 2026-10-05T16-44-16-361Z
+
+- จุดประสงค์: Round65 existing503 failure guard after diagnostic labels
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: ff8b9723c67ecb45cddc0a9905b328114662e5af; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T16-44-16-361Z.tap` และ `.json`
+
+## 2026-10-05T16-44-24-388Z
+
+- จุดประสงค์: Round65 ordinary component after explicit slow-sync report labels
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: ff8b9723c67ecb45cddc0a9905b328114662e5af; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T16-44-24-388Z.tap` และ `.json`
+
+- Final QA labels verification16-42-28-528Z2/2: explicit innercollector-cost-slow-sync JSON, actual injection counters and hashes correlated, innercapturefailure retained; nootherdrop. Existing503guard16-44-16-361Z1/1 and ordinarycomponent16-44-24-388Z1/1 both passed serially after labelchange, allcontrolscomplete/reopenexact. Finaldiffcheck and review verify src/public/examples/test/package/lock unchanged; QAscripts/workflow/docs only. Exacthosted bundle is stillpending.

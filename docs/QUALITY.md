@@ -1,5 +1,15 @@
 # รอบทดสอบและปรับปรุง FlowAtlas
 
+### รอบ65 — controlled slow-fsync reproduction
+
+ต่อจากcleanff8b972/fetchpullup-to-date บนbranchdiag/slow-fsync-reproduction. เพิ่มexplicitQApreloadหน่วง120msก่อนrealfsyncเฉพาะcanonicalownedcomponentstatetempfiles; productionexporter/store/collector/SDKcodeไม่เปลี่ยน. Scopeprobeใช้realwrite/syncสองไฟล์และยืนยันdelayเฉพาะownedstatetemp1ครั้ง, descriptor0หลังclose. Controlledinnercaptureต้องfailedและretainworkspace ขณะที่outerตรวจcontrols/counts/durablereloadจึงผ่าน ไม่ใช่captureacceptance ดู[ADR](adr-durable-drain.md)สำหรับข้อจำกัด/ทางเลือกก่อนrepair.
+
+Beforeinjection16-35-36-830Z0/1เพราะinnerexit0; envlabelลำพังไม่สร้างfailure. หลังexplicitpreload16-36-25-719Z1/1 ทั้ง3diskroundack192/shutdown859,reloadตรง, realfsync24callsรวม. Finalscoped/labeledserial16-42-28-528Z2/2: diskack96/160/192, shutdown955/891/859, injection18callsตรงsumstoresaves, sync663.877/838.599/1099.520ms, zerootherdrop/deadlineFired1ทุกdisk; transport/memorycomplete. ไม่บังคับexactackcountหรือรวมsync≥900เพราะdeadlineนับnetwork/scheduling/validationด้วย; ตรวจsync≥requested120ms×savesและactualaccountingแทน. Timingsเป็นfaultsimulationไม่actualdiskspeed/applicationp95/pilot และไม่พิสูจน์827เดิมsamecause.
+
+Main16-39-30-578Z134/134ผ่าน; finalQA-onlyreportlabelเปลี่ยนหลังmainจึงต้องexacthostedCIทั้งbundleก่อนสรุป. Scope/fault16-39-18-248Z2/2มีช่วงmainเริ่มซ้อนท้าย ไม่ใช้เป็นisolatedsample; serial16-40-49-511Z2/2และcontrol16-41-34-748Z1/1แยกตามTEST-RUNS. GHreadครั้งแรกsandboxconfigdenied บันทึกแล้วescalatedreadสำเร็จ. No productionpolicy/deadline/backend/schemachange, no new migration guarantee.
+
+ฐานเอกสารff8b972พบPR37341212751fail3/4อีกครั้ง: Ubuntu22ordinarypair2ack288/shutdown763 (otherpairs1051), allotherdrop0/workspaceretained/processcleanupconfirmed; push37341204494ผ่าน4/4. Artifactfailedjobเก็บreports/releases/ci-ff8b972-pr ไม่rerunกลบ; นี้เกิดก่อนpreloadรอบ65และordinaryscriptไม่เรียกpreload จึงห้ามระบุว่าQAfaultสร้างhistoricalfailure. ยังต้องแก้stablecapture/performance/sustained/pilot/users/release. เพิ่มCIcontrolledreproduction1gateเป็น14reportsต่อchannel; ordinary/503gatesยังคงassertionเดิม. Exactรอบ65CIpending.
+
 ### รอบ64 — collector component replay diagnostics
 
 **Exact ceddc0f:** [PR37339435370](https://github.com/lenulk/FlowAtlas/actions/runs/37339435370)ผ่าน2/4 (Windowsทั้งสอง); [push37339368441](https://github.com/lenulk/FlowAtlas/actions/runs/37339368441)ผ่าน4/4. Audit `16-26-18-933Z`/`16-26-24-944Z`1/1แต่ละชุด ตรวจ104runnerreports/79filesตรงGitทุกชุด, main134ทุก8jobs, ordinaryและtiming HTTP capture3153ack0dropsทุกช่อง และFA-15 innerassertion/cleanupครบ. Auditผ่านหมายถึงfailed evidenceสอดคล้อง ไม่ใช่component captureผ่านหรือstable capture.

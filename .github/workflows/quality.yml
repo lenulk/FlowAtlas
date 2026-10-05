@@ -93,6 +93,11 @@ jobs:
         env:
           FLOWATLAS_TEST_PURPOSE: CI controlled rejected replay reports failure and retains evidence
         run: node scripts/run-tests.mjs scripts/collector-cost-failure-check.mjs
+      - name: Controlled slow fsync shutdown reproduction
+        if: ${{ !cancelled() }}
+        env:
+          FLOWATLAS_TEST_PURPOSE: CI controlled slow fsync preserves deadline failure and durable reload
+        run: node scripts/run-tests.mjs scripts/slow-fsync-check.mjs
       - name: Pack and install in disposable workspace
         id: package_install
         if: ${{ !cancelled() }}

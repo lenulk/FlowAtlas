@@ -14,6 +14,7 @@ import { getCodeVersion } from '../src/flowatlas.mjs';
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
 const count = 1051;
 const controlledFault = process.env.FLOWATLAS_COLLECTOR_COST_FAULT === 'transport-reject';
+const controlledSync = process.env.FLOWATLAS_SLOW_FSYNC_QA === '1';
 const workerSource = `import { LocalHttpSpanExporter } from ${JSON.stringify(pathToFileURL(join(root, 'src/otel-exporter.mjs')).href)};
 import { performance } from 'node:perf_hooks';
 process.once('message', async (config) => {
@@ -159,12 +160,13 @@ test('component collector cost diagnostic uses simulated replay, never performan
     evidenceKind: 'component diagnostic with simulated normalized HTTP spans; not application/SDK workload or pilot',
     workload: { spans: count, rounds: 3, burst: true, exporterCapacity: 2048, uploadTimeoutMs: 1000, shutdownDeadlineMs: 900, slots: 2, batchLimit: 32 },
     controlledFault: controlledFault ? 'transport-reject' : null,
+    controlledSync: controlledSync ? { requestedDelayMs: 120, scope: 'QA preload requested; actual injection verified separately by outer guard' } : null,
     performanceAcceptance: { assessable: false, met: null, reason: 'component_diagnostic' }, conditions: [] };
   for (let round = 0; round < 3; round++) {
     const modes = ['transport', 'memory', 'disk']; const order = modes.slice(round).concat(modes.slice(0, round));
     for (const mode of order) report.conditions.push(await condition(mode, round + 1));
   }
-  writeFileSync(join(directory, `collector-cost-${controlledFault ? 'fault-' : ''}${id}.json`), JSON.stringify(report, null, 2) + '\n', { flag: 'wx' });
+  writeFileSync(join(directory, `collector-cost-${controlledFault ? 'fault-' : controlledSync ? 'slow-sync-' : ''}${id}.json`), JSON.stringify(report, null, 2) + '\n', { flag: 'wx' });
   console.log(JSON.stringify(report.conditions.map(value => ({ mode: value.mode, round: value.round, complete: value.complete,
     elapsedMs: value.worker?.elapsedMs, delivered: value.worker?.summary.delivered, dropped: value.worker?.summary.dropped,
     storageTiming: value.storageTiming, reloadVerified: value.reloadVerified, failure: value.failure }))));
