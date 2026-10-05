@@ -2903,3 +2903,103 @@ First matched3×1000 measurement: all6000 measured business responses pluswarmup
 - Newcontrolledscope/reproduction2/2 all8jobs, scopeinjectiononeownedfile only,24injectedrealfsync calls/zero trackeddescriptors,24diskconditions failedinnercapture/loss827or859/reloadexact, transport/memorycontrolscomplete. Matching827count is not historicalcauseproof. Reports explicitlyrequestedpreloadlabels/actualwrapperstats+hashes/met=null. Auditpass does not turn unexpectedordinarycomponentloss intoacceptance.
 - OrdinaryperformanceFAILED all8unchangedrelative10%criterions: PRLinux22/24/Windows22/24 +95.725/+167.838/+147.930/+184.471%; push+89.737/+164.634/+225.856/+159.336%. No productioncodechange orcausalimprovementclaim.
 - FinalreviewupdatesHANDOFF/QUALITY/PLAN/ADR with exactCI and failedrawscope. Documentation-only record after6d08a53 leaves testedsource unchanged; PR7stackedbasePR6 stillOPEN. Nextisolatedjournal-vs-snapshot comparison beforedurablebackend/drainrepair; SDK-onlycost/sustainedload/realpilot/users/release stillpending.
+
+## 2026-10-05T17-01-37-627Z
+
+- จุดประสงค์: Round66 experimental frame truncation corruption order and retention guards
+- ผล: ผ่าน — 2/2; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 54bd2b45d0e0cdd79da34b089375d352feba70db; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T17-01-37-627Z.tap` และ `.json`
+
+## Round66 initial review and experiment
+
+- Clean54bd2b4 on ownbranchdiag/durable-write-comparison; fetch/pullup-to-date. ReadAGENTS/HANDOFF/PLAN/QUALITY/TEST-RUNS/ADRdurabledrain and actualstore/collector/ingestcode. MemoryregistryFlowAtlas had nohits (rgexit1, notsoftwarefailure). Base54bd2b4CI37344630813/37344624517stillinprogress atinitialread, no assumption itpassed.
+- QAexperimentalframeguards17-01-37-627Z2/2 passed: truncatedprefix,checksumcorruption,overlength,sequencegap/duplicate, updateorder,eviction/retention/ambiguouschanges. This is experimentparseronly, notproductionstorage/migration/crashrecovery acceptance. Syntheticpayloads areexplicitlyunvalidatedbythisparser.
+
+## 2026-10-05T17-01-57-321Z
+
+- จุดประสงค์: Round66 isolated same-data snapshot versus delta journal real fsync comparison
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 54bd2b45d0e0cdd79da34b089375d352feba70db; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T17-01-57-321Z.tap` และ `.json`
+
+## 2026-10-05T17-02-51-134Z
+
+- จุดประสงค์: Round66 newly found fixture history mutation regression before repair
+- ผล: ไม่ผ่าน — 0/1; failed 1; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 54bd2b45d0e0cdd79da34b089375d352feba70db; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T17-02-51-134Z.tap` และ `.json`
+- ไม่ผ่าน: isolated durable write comparison keeps real sync and exact replay without backend acceptance
+
+- Initialcomparison17-01-57-321Z1/1 wrote/reopened allconditions, but postrunreview discovered fixture retainedlivegraphreferences: laterupdates rewrote priorcapturedstates. Newregression17-02-51-134Z0/1 proves updatecommits produced0upserts instead32. InitialcomparisonJSON/TAPretained but invalidworkload; exclude allits timings/bytes from backenddecision. Also normalizedfilemaps lost livefrozenidentity and would overstateproductiondigests. Repairfixturecapture at eachcommit and preserve one sharedfrozen source map; no productioncodechanged.
+
+## 2026-10-05T17-03-39-895Z
+
+- จุดประสงค์: Round66 repaired point-in-time fixture update and shared immutable source identity comparison
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 54bd2b45d0e0cdd79da34b089375d352feba70db; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T17-03-39-895Z.tap` และ `.json`
+
+- QA review patch failed verification due to a stale/unnecessary hunk targeting directory initialization; no production mutation. Inspect appliedfile state and reapply only the intended history/sourceidentity and truncatedprefix assertions. This is a tool failure, not evidence of production failure.
+
+## 2026-10-05T20-03-00-577Z
+
+- จุดประสงค์: Round66 final corruption every truncated prefix and frame size checks
+- ผล: ผ่าน — 2/2; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 54bd2b45d0e0cdd79da34b089375d352feba70db; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T20-03-00-577Z.tap` และ `.json`
+
+## 2026-10-05T20-03-04-020Z
+
+- จุดประสงค์: Round66 final captured history immutable identity and durable write comparison
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 54bd2b45d0e0cdd79da34b089375d352feba70db; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T20-03-04-020Z.tap` และ `.json`
+
+## 2026-10-05T20-03-30-019Z
+
+- จุดประสงค์: Round66 applied every truncated prefix and oversized frame regression
+- ผล: ผ่าน — 2/2; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 54bd2b45d0e0cdd79da34b089375d352feba70db; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T20-03-30-019Z.tap` และ `.json`
+
+- Reviewsearch used nonexistenttest/storage.test.mjs (rg/Get-Content error); no mutation, use rg --files for actualstorage tests. Source review/finalstage medians stillreadcorrectly. Correctedframeassertions applied20-03-30-019Z2/2; previous20-03-00-577Z2/2 was oldguard after atomicpatchrejection, not evidence allprefixguard existed then. Beforecorrectedguard allraws preserved.
+- Repairedfixture17-03-39-895Z1/1 and strengthenedhistory/sourceidentity20-03-04-020Z1/1 complete18conditions/exactreopen. This validcomparison differs from invalidinitialreport; use latestexplicitdigest. Finalreview marksproduction stagesnull (actualstoreTimingseparate), verifies finalsnapshotbytes/35replayedframes, labelsproductionbytecount expectedencodedvsrawactualwritecounts and checks canonicalreportpath. Source/productionpolicy unchanged.
+- Base54bd2b4 PR37344630813/push37344624517 nowcompleted success4/4 each(API); noartifactaudit inthisround, doesnoterase prior6d08a53/ff8b972failedruns. NewexperimentCI adds2gates(16runnerreports/channel), nochangeexistingassertions.
+
+## 2026-10-05T20-05-10-833Z
+
+- จุดประสงค์: Round66 final byte accounting exact snapshot and frame replay diagnostic
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 54bd2b45d0e0cdd79da34b089375d352feba70db; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T20-05-10-833Z.tap` และ `.json`
+
+## 2026-10-05T20-05-18-750Z
+
+- จุดประสงค์: Round66 main regression production source unchanged
+- ผล: ไม่ผ่าน — 133/134; failed 1; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 54bd2b45d0e0cdd79da34b089375d352feba70db; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T20-05-18-750Z.tap` และ `.json`
+- ไม่ผ่าน: CLI owner-kill closes owned services and lock (HTTP SDK flush)
+
+- Main20-05-18-750Zfailed133/134: CLIowner-kill HTTPSDKfixture didnotreachreadiness within12000ms atcli-owner.test.mjs:56; cleanupunconfirmed, ownedworkspace reports/storage/cli-owner-bWOl5s retained. This was aftercomparison completed, not parallelwithit. NoQAproductioncodechange orprovenrootcause; inspectretainedlock/processstate beforefocuseddiagnosis. Do not reportmainpassed ordelete/killunidentifiedprocesses. A separateGet-Content for guessedtest/fixtures/cli-owner.mjs failedmissing; actualfixture generatedinsideexistingtest, nofilemodified.
+
+## 2026-10-05T20-06-51-061Z
+
+- จุดประสงค์: Round66 focused CLI owner readiness diagnosis after retained main failure
+- ผล: ผ่าน — 9/9; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 54bd2b45d0e0cdd79da34b089375d352feba70db; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T20-06-51-061Z.tap` และ `.json`
+
+- FocusedCLI20-06-51-061Z9/9passed; originalmainfailure retained/unresolved. Lockreadonretainedcli-owner-bWOl5s returnedENOENT byinspectiontime; subsequentGetProcessnull causedargumenterror, noPIDtarget/killing/deletion. Lockabsentlater doesnotprovetargetclosedorrootcausefixed.
+- Finalcomparison20-05-10-833Z1/1:18conditions/35realfsync each/exactfinalsnapshotbytes/35journalframes/reopengraphs/ownedcleanup. Validfixtureupdatecounts0→32→64/sharedfrozenmap. Format20-03-30-019Z2/2 allincompleteprefixesandoversizebound. Finalbytes1file6,371,360snapshot/2,181,529journal;64files25,359,776/8,423,299. Journalretains2,181,529/8,423,299bytes versusfinalsnapshot241,908/801,708. Rawtimingsexcludevalidation/encoding/locking/compaction/recovery; no backendadoption/productionperformanceclaim. Newdocs/ADRdetail constraints and nextisolate repeatedimmutablemetadatawork. src/public/examples/test/package/lock unchanged.
