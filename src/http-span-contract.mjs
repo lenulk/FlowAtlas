@@ -3,7 +3,7 @@ const idPatterns = new Map([[16, /^[a-f0-9]{16}$/], [32, /^[a-f0-9]{32}$/]]);
 export const validSpanId = (value, size) => typeof value === 'string'
   && (idPatterns.get(size) ?? new RegExp(`^[a-f0-9]{${size}}$`)).test(value) && !/^0+$/.test(value);
 const timestamp = (value) => typeof value === 'string' && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/.test(value)
-  ? Date.parse(value) : NaN;
+  ? parseEvidenceTime(value) : NaN;
 
 export function cleanHttpSpan(value) {
   const start = timestamp(value?.startedAt), end = timestamp(value?.endedAt);
@@ -20,3 +20,4 @@ export function cleanHttpSpan(value) {
   return { spanId: value.spanId, parentSpanId: value.parentSpanId, kind: value.kind, method: value.method,
     startedAt: value.startedAt, endedAt: value.endedAt, durationMs: value.durationMs, httpStatus: value.httpStatus, error: value.error };
 }
+import { parseEvidenceTime } from './evidence-time.mjs';

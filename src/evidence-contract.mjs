@@ -1,4 +1,5 @@
 import { cleanHttpSpan } from './http-span-contract.mjs';
+import { parseEvidenceTime } from './evidence-time.mjs';
 
 const statusForType = Object.freeze({
   'client-report-and-http-inbound': 'observed',
@@ -14,7 +15,7 @@ function isText(value) {
 }
 
 function isTime(value) {
-  return isText(value) && !Number.isNaN(Date.parse(value));
+  return isText(value) && !Number.isNaN(parseEvidenceTime(value));
 }
 
 function validateSource(source, version, location) {

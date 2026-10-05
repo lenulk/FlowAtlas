@@ -148,7 +148,7 @@ test('actual SDK HTTP count-only and production exporter sink costs remain diagn
   const report = { id: new Date().toISOString().replace(/[:.]/g, '-'), sourceCommit: execFileSync('git', ['rev-parse', 'HEAD']).toString().trim(),
     runtime: { node: process.version, platform: process.platform, osRelease: release() },
     sourceDirty: Boolean(execFileSync('git', ['status', '--porcelain', '--', 'src', 'scripts', 'package.json', 'npm-shrinkwrap.json']).toString().trim()),
-    runtimeDigests: Object.fromEntries(['src/otel-preload.mjs', 'src/otel-exporter.mjs', 'scripts/http-benchmark-fixture.mjs',
+    runtimeDigests: Object.fromEntries(['src/otel-preload.mjs', 'src/otel-exporter.mjs', 'src/http-span-contract.mjs', 'src/evidence-time.mjs', 'scripts/http-benchmark-fixture.mjs',
       'scripts/sdk-http-count-preload.mjs', 'scripts/benchmark-statistics.mjs', 'package.json', 'npm-shrinkwrap.json']
       .map(file => [file, hash(readFileSync(join(root, file)))])),
     scriptDigest: hash(readFileSync(fileURLToPath(import.meta.url))), preloadDigest: hash(readFileSync(join(root, 'scripts/sdk-http-count-preload.mjs'))),

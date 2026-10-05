@@ -14,6 +14,8 @@ Node.js เป็น integration ที่กำลังพัฒนาแล�
 
 ## สถานะเริ่มต้น
 
+รอบ71ลดtimestampparseซ้ำเฉพาะ2048UTCstrings/nativeDate.parseที่เดิม ไม่cachegraphvalidity; localmain148/SDK+Edge+fault3/source1passed. Syntheticvalidatorcost142.644→113.647ms แต่ordinaryperformance200.909%FAILED. Nativeรอบ70PRCI4/4/push2/4withgenuineQA/componentfailures ต้องแก้แยกและเก็บหลักฐาน. ถัดไปbrowsermetadataattemptvsadmission/receipt-order/drain/resourcechecksก่อนpilot; realbusinessapp/usersยังไม่มี/ไม่ปิดv1
+
 รอบ70ownednativeHTTPtransport แก้connectionownership/complete2xxackพร้อมlazyimportหลบCJSduplicate-spanregression:main143/actualSDK+Edge+failure3/source1passedlocal. ไม่พิสูจน์performancegain;ordinary560.428%FAILED และbaselineCIมี443/923shutdowndrops. ต้องexacthostedCIและstoragecostrepair/retention/bounds/negativeguardsต่อ; sustained30min/pilot/usersยังไม่ผ่าน
 
 รอบ69เพิ่มactualSDKHTTPcomponentdiagnostic/controlledsink/parity/503guardบนsharedordinaryfixtureแล้ว ค่าmet=null/capturecountsครบไม่แทนperformance/pilot. Main140ผ่าน แต่ordinaryp95+506.817%ยังไม่ผ่าน10%. ถัดไปทดลองnativeHTTPtransportตามcostevidence พร้อมconformance/cleanup/abort/privacyและexactCI; startuprootcause/stablecapture/sustained/realpilot/usertrial/releaseยังไม่ผ่าน
