@@ -2,14 +2,14 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createServer } from 'node:http';
 import { spawn } from 'node:child_process';
-import { once } from 'node:events';
 import { randomBytes } from 'node:crypto';
-import { mkdirSync, mkdtempSync, writeFileSync, rmSync, existsSync, readFileSync, realpathSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, writeFileSync, existsSync, readFileSync, realpathSync } from 'node:fs';
 import { dirname, join, relative, isAbsolute } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { JsonActionStore } from '../src/action-store.mjs';
 import { createRequire } from 'node:module';
 import { validateGraph } from '../src/evidence-contract.mjs';
+import { cleanupOwnedFixture } from '../scripts/qa-fixture-cleanup.mjs';
 
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
 const parent = join(root, 'reports/storage');
@@ -63,6 +63,7 @@ async function auditMap(page, graph, evidence, name) {
 }
 for (const extension of ['cjs', 'mjs']) test(`real OTel preload captures ${extension} HTTP/Undici fan-out and isolates concurrent requests`, { timeout: 25000 }, async (t) => {
   mkdirSync(parent, { recursive: true }); const workspace = mkdtempSync(join(parent, 'otel-runtime-'));
+  const canonical = realpathSync(workspace);
   const app = join(workspace, 'app'); mkdirSync(app); const entry = `server.${extension}`;
   const contexts = [];
   const upstream = createServer((req, res) => { contexts.push(req.headers.traceparent); res.end('real-upstream'); });
@@ -87,6 +88,10 @@ process.stdin.resume();
     { cwd: root, env: { ...process.env, FLOWATLAS_SESSION_TOKEN: token, FLOWATLAS_COLLECTOR_PORT: '0', FLOWATLAS_INVENTORY_PORT: '0',
       OTEL_EXPORTER_OTLP_ENDPOINT: 'http://127.0.0.1:9/canary-exporter', OTEL_SERVICE_NAME: 'canary-resource' }, stdio: ['pipe', 'pipe', 'pipe'] });
   let output = ''; child.stdout.on('data', (part) => { output += part; }); child.stderr.on('data', (part) => { output += part; });
+  const closed = new Promise((resolve) => child.once('close', (...args) => resolve(args)));
+  // Handle early process/pipe failures without losing the original assertion in finally.
+  child.stdin.on('error', () => {});
+  let failed = false;
   const read = (url) => fetch(url, { headers: { authorization: `Bearer ${token}` } });
   try {
     const ready = await waitFor(() => {
@@ -159,7 +164,11 @@ process.stdin.resume();
         }
       } finally { await browser.close(); }
     }
-    const done = once(child, 'close'); child.stdin.write('stop\n'); assert.equal((await done)[0], 0);
+    child.stdin.end('stop\n');
+    let closeTimer;
+    try { assert.equal((await Promise.race([closed, new Promise((_, reject) => {
+      closeTimer = setTimeout(() => reject(new Error('Traced fixture did not close after stop')), 8000);
+    })]))[0], 0); } finally { clearTimeout(closeTimer); }
     const summaries = [...output.matchAll(/FlowAtlas trace summary: (\{[^\n]+\})/g)];
     assert.equal(summaries.length, 1, 'Shutdown reports one sanitized capture summary');
     const summary = JSON.parse(summaries[0][1]);
@@ -182,10 +191,22 @@ process.stdin.resume();
     const restored = new JsonActionStore(join(workspace, 'data/actions'));
     try { assert.deepEqual(restored.load(100), graphs.reverse(), 'Schema 0.2 graphs reload exactly after stop'); }
     finally { restored.close(); }
+  } catch (error) {
+    failed = true;
+    throw error;
   } finally {
-    if (child.exitCode === null && child.signalCode === null) { const exited = once(child, 'exit'); child.kill('SIGKILL'); await exited; }
-    upstream.closeAllConnections(); await new Promise((resolve) => upstream.close(resolve));
-    const path = relative(parent, workspace); assert.ok(path && !path.startsWith('..') && !isAbsolute(path));
-    rmSync(workspace, { recursive: true, force: true });
+    try {
+      upstream.closeAllConnections(); await new Promise((resolve) => upstream.close(resolve));
+      const origins = [...output.matchAll(/(?:FlowAtlas|App): (http:\/\/127\.0\.0\.1:\d+)/g)].map((match) => match[1]);
+      const cleanup = await cleanupOwnedFixture({ child, closed, parent, workspace, canonical, origins });
+      t.diagnostic(`Traced fixture cleanup: ${JSON.stringify(cleanup)}`);
+      if (!cleanup.removed) t.diagnostic(`Unconfirmed fixture retained: ${relative(root, workspace)}`);
+      if (!failed) assert.equal(cleanup.removed, true, 'Traced fixture cleanup must be confirmed');
+    } catch (error) {
+      t.diagnostic(`Traced fixture cleanup failed; workspace retained (${error.code ?? error.name})`);
+      child.unref();
+      for (const stream of [child.stdin, child.stdout, child.stderr]) stream?.unref?.();
+      if (!failed) throw error;
+    }
   }
 });

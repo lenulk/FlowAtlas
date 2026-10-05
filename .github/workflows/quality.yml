@@ -67,6 +67,11 @@ jobs:
           FLOWATLAS_TEST_PURPOSE: CI real HTTP traces and paired Chromium viewer
           FLOWATLAS_OTEL_BROWSER_CHECK: '1'
         run: node scripts/run-tests.mjs test/otel-runtime.test.mjs
+      - name: Failed browser assertion report and cleanup
+        if: ${{ !cancelled() }}
+        env:
+          FLOWATLAS_TEST_PURPOSE: CI deliberate assertion reporting and owned fixture cleanup
+        run: node scripts/run-tests.mjs scripts/otel-failure-check.mjs
       - name: Fixture load capture accounting (performance reported separately)
         if: ${{ !cancelled() }}
         env:

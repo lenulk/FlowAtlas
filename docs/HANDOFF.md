@@ -19,6 +19,10 @@ Repository: https://github.com/lenulk/FlowAtlas; branch หลัก `master` �
 
 ## งานค้างแรก: รอบ 59 / FA-15
 
+**อัปเดตรับช่วง 5 ตุลาคม 2026:** branch `fix/fa15-fixture-cleanup` แก้ teardown gap แล้วบน Windows Node24.19.0/Edge: ก่อนแก้ reproduce native3221226505 (`10-23-44-212Z`); หลังแก้ deliberatefault ยัง failedตามตั้งใจแต่ ERR_ASSERTION/stackครบและ close/lock/knownportsยืนยัน (`10-25-48-947Z`). Boundary5/5, normal actualSDK+Edge2/2, separate failure harness1/1 และ main123/123 ผ่าน ดู QUALITY/TEST-RUNS สำหรับรุ่นและขอบเขต; ยังรอ CI ของ branch นี้ ไม่ประกาศว่าสาเหตุภายใน Node หรือ nativefaultทุกแบบปิดแล้ว รายละเอียดด้านล่างเป็นสภาพก่อนแก้สำหรับทำซ้ำเทียบ
+
+คำสั่ง regression ที่ติดตามใน Git ใหม่: `node scripts/run-tests.mjs scripts/otel-failure-check.mjs` (กำหนด Playwright package/browser channel ที่มีจริง). Outer test ต้องผ่านเฉพาะเมื่อ inner test ยังคง assertion failureพร้อมรายละเอียดและcleanupครบ Raw inner TAP อยู่ `reports/browser/otel-runtime-fault-*/assertion-fault.tap` และถูกเก็บในCIartifact รอบถัดไปวัดperformanceด้วยworkloadเดิม/วิเคราะห์ต้นทุน ก่อนเลือกrepairหนึ่งประเด็น ผู้ใช้ยืนยันยังไม่มีแอปธุรกิจสำหรับpilot ให้เตรียมฐานต่อก่อน
+
 ยังไม่ได้แก้โค้ดรอบ 59 พบ Windows Node v24.18.0 native exit3221226505 เมื่อ browser geometry assertion ล้มเหลว สองรอบแรกเก็บ geometry4crossingsได้ และทดลอง deliberate assertion fault ซ้ำได้เป็นรอบที่สาม (2026-10-01T19-03-31-498Z0/1) การทดลองนี้ตั้งใจให้ assertion ล้มเหลว ไม่ใช่ผล acceptance
 
 `test/otel-runtime.test.mjs` ใน finally ปัจจุบัน forcekill CLI wrapper และรอ `exit` แล้วลบ workspace การ exit ของ wrapper ไม่ยืนยันว่า managed inspector/target ปิดเสร็จหรือปล่อย writer lock เพราะ inspector บน Windows แยกจาก parent job จุดนี้เป็น teardown gap ที่ตรวจจาก source ได้ แต่ยังไม่พิสูจน์สาเหตุภายใน Node ของ native exit
