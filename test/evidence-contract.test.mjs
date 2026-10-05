@@ -49,3 +49,21 @@ test('wrong correlation and source snapshot are rejected', () => {
   atlas.node(action, { id: 'code', type: 'code', label: 'handler', source: { ...source, sha256: 'b'.repeat(64) } });
   assert.ok(validateGraph(action).some((issue) => issue.includes('source hash does not match')));
 });
+
+test('validation reads the current nodes and preserves first-match diagnostics for duplicates', () => {
+  const atlas = new FlowAtlas(version);
+  const action = atlas.start('action-index', 'example');
+  atlas.node(action, { id: 'api', type: 'api', label: 'GET /api/example' });
+  atlas.edge(action, 'action', 'api', 'observed', {
+    type: 'client-report-and-http-inbound', method: 'GET', path: '/api/example', correlationId: action.id,
+  });
+  assert.deepEqual(validateGraph(action), []);
+  action.nodes.push({ ...action.nodes[0], origin: 'unverified' });
+  assert.deepEqual(validateGraph(action), ['duplicate node action']);
+  action.nodes[0].origin = 'unverified';
+  assert.deepEqual(validateGraph(action), ['duplicate node action', 'edge e1: no client-reported action exists']);
+  action.nodes.splice(0, 1); action.nodes[1].origin = 'client-reported';
+  assert.deepEqual(validateGraph(action), []);
+  action.nodes[0].label = 'POST /wrong';
+  assert.deepEqual(validateGraph(action), ['edge e1: HTTP evidence does not match the API node']);
+});

@@ -2295,3 +2295,45 @@ First matched3×1000 measurement: all6000 measured business responses pluswarmup
 - commit: 3749c992c64f1c8064b319def01948810504c412; dirty: true
 - หลักฐาน: `reports/tests/2026-10-05T10-38-56-938Z.tap` และ `.json`
 - Boundarydisposalrepair focused10-38-56-938Z6/6ผ่าน Windows24.19/Edge ยืนยันfaultเดิมและretentionguards ไม่รับรองLinux22จนCIcommitใหม่ผ่าน
+
+## 2026-10-05T10-42-10-284Z
+
+- จุดประสงค์: Round60 per-call node index equivalent diagnostics and HTTP storage contracts
+- ผล: ผ่าน — 23/23; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 8b1e27006e6841e7476916c99da44a37744fe2ef; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T10-42-10-284Z.tap` และ `.json`
+
+## 2026-10-05T10-42-31-580Z
+
+- จุดประสงค์: Round60 unchanged paired fixture after per-call graph validation index
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 8b1e27006e6841e7476916c99da44a37744fe2ef; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T10-42-31-580Z.tap` และ `.json`
+
+## 2026-10-05T10-43-00-150Z
+
+- จุดประสงค์: Round60 default main validation indexing with unchanged evidence contract
+- ผล: ผ่าน — 125/125; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 8b1e27006e6841e7476916c99da44a37744fe2ef; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T10-43-00-150Z.tap` และ `.json`
+- Round60 main รวม diagnostic ที่ Git ignore: comparator ชื่อ .test.mjs ถูก Node default discovery รวมด้วย จึงผ่าน125กรณี (core124+equivalence1); เปลี่ยนชื่อ ignored comparator เป็น validator-equivalence.mjs เพื่อให้เรียกเฉพาะ manual gate ไม่แก้ runner หรือ source ผล core124 ผ่านบนไฟล์ source ชุดเดียวกัน
+
+## 2026-10-05T10-44-18-877Z
+
+- จุดประสงค์: Round60 isolated old new validator cost captured fixture and synthetic dense graph no HTTP acceptance
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 8b1e27006e6841e7476916c99da44a37744fe2ef; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T10-44-18-877Z.tap` และ `.json`
+
+## 2026-10-05T10-44-53-329Z
+
+- จุดประสงค์: Round60 actual SDK CJS ESM Edge graph validation and retained assertion regression
+- ผล: ผ่าน — 3/3; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 8b1e27006e6841e7476916c99da44a37744fe2ef; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T10-44-53-329Z.tap` และ `.json`
+- Round60 manual verification: validator SHA ของรายงาน focused23/benchmark1/main125/SDK3 ตรงไฟล์ปัจจุบันทุกชุด; ตรวจไฟล์ลิงก์ pilot/HANDOFF/PLAN แล้วมีครบ; ตรวจ diff ว่าคง first-match และสร้าง index ใหม่ต่อการเรียก ไม่มีการเปลี่ยน queue/deadline/storage policy

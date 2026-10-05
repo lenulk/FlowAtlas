@@ -19,9 +19,15 @@ Repository: https://github.com/lenulk/FlowAtlas; branch หลัก `master` �
 
 ## งานค้างแรก: รอบ 59 / FA-15
 
-**อัปเดตรับช่วง 5 ตุลาคม 2026:** branch `fix/fa15-fixture-cleanup` แก้ teardown gap แล้วบน Windows Node24.19.0/Edge: ก่อนแก้ reproduce native3221226505 (`10-23-44-212Z`); หลังแก้ deliberatefault ยัง failedตามตั้งใจแต่ ERR_ASSERTION/stackครบและ close/lock/knownportsยืนยัน (`10-25-48-947Z`). Boundary5/5, normal actualSDK+Edge2/2, separate failure harness1/1 และ main123/123 ผ่าน ดู QUALITY/TEST-RUNS สำหรับรุ่นและขอบเขต; ยังรอ CI ของ branch นี้ ไม่ประกาศว่าสาเหตุภายใน Node หรือ nativefaultทุกแบบปิดแล้ว รายละเอียดด้านล่างเป็นสภาพก่อนแก้สำหรับทำซ้ำเทียบ
+**อัปเดตรับช่วง 5 ตุลาคม 2026:** [PR #1](https://github.com/lenulk/FlowAtlas/pull/1) branch `fix/fa15-fixture-cleanup`, commit `8b1e270` แก้ teardown gapแล้ว ก่อนแก้ WindowsNode24.19.0/Edge reproduce native3221226505 (`10-23-44-212Z`); หลังแก้ deliberatefaultยังfailedตามตั้งใจแต่ERR_ASSERTION/stackครบและclose/lock/knownportsยืนยัน (`10-25-48-947Z`). Boundary5/normalSDK2/failureharness1/main123ผ่านในเครื่อง; CIรุ่นแรก3749c99พบboundarydisposalcancelledบนNode22ทั้งสองOS แก้refhandleในtestก่อนรอcloseแล้ว [run37298050345](https://github.com/lenulk/FlowAtlas/actions/runs/37298050345) ของ8b1e270ผ่านทั้ง4jobs/ทุกstep ตรวจAPIสดแล้ว ไม่ประกาศว่าสาเหตุภายในNodeหรือnativefaultทุกแบบปิดแล้ว รายละเอียดด้านล่างเป็นสภาพก่อนแก้สำหรับทำซ้ำเทียบ
 
 คำสั่ง regression ที่ติดตามใน Git ใหม่: `node scripts/run-tests.mjs scripts/otel-failure-check.mjs` (กำหนด Playwright package/browser channel ที่มีจริง). Outer test ต้องผ่านเฉพาะเมื่อ inner test ยังคง assertion failureพร้อมรายละเอียดและcleanupครบ Raw inner TAP อยู่ `reports/browser/otel-runtime-fault-*/assertion-fault.tap` และถูกเก็บในCIartifact รอบถัดไปวัดperformanceด้วยworkloadเดิม/วิเคราะห์ต้นทุน ก่อนเลือกrepairหนึ่งประเด็น ผู้ใช้ยืนยันยังไม่มีแอปธุรกิจสำหรับpilot ให้เตรียมฐานต่อก่อน
+
+### งานรับช่วงรอบ 60 บน branch แยก
+
+`perf/graph-validation-index` ต่อจาก8b1e270 เป็นstackedPRให้reviewเฉพาะoptimization หลังรวมPR#1จึงเปลี่ยนbaseเป็นmasterได้ ลดnodeindexที่เคยสร้าง/ค้นซ้ำทุกedgeให้สร้างใหม่ครั้งเดียวต่อvalidateGraph ไม่ใช้mutablecache คงfirst-matchและdiagnosticsเดิม Equivalence/HTTP/storage23ผ่าน, main125ผ่าน(core124+ignoreddiagnostic1), SDK+Edge+deliberatefailure3ผ่านบนsourceเดียวกัน ดูQUALITY/TEST-RUNS. Rawcost/profilesอยู่reports/benchmarksซึ่งGitignore เครื่องใหม่ต้องสร้างใหม่
+
+PerformanceยังFAILED: baseline+386.389%, after+479.671% aggregatep95ทั้งสองcaptureครบ3153ack0drops ไม่อ้างHTTPดีขึ้น Isolatedvalidatorcostลดเฉพาะส่วนที่วัดและsyntheticdensegraph ไม่แทนrealpilot. เตรียม [pilot protocol](pilot.md) แล้วแต่ยังไม่มีแอป/ผู้ทดลอง ขั้นถัดไปอ่านexactCI/benchmarkartifactsของoptimization, วัดต้นทุนvalidation/storageที่เหลือก่อนเลือกrepair; sustained20actions×30นาที, persistedcompleteness/export/migration, browser→SDKและUX/realpilotยังเปิด ไม่ลดเกณฑ์
 
 ยังไม่ได้แก้โค้ดรอบ 59 พบ Windows Node v24.18.0 native exit3221226505 เมื่อ browser geometry assertion ล้มเหลว สองรอบแรกเก็บ geometry4crossingsได้ และทดลอง deliberate assertion fault ซ้ำได้เป็นรอบที่สาม (2026-10-01T19-03-31-498Z0/1) การทดลองนี้ตั้งใจให้ assertion ล้มเหลว ไม่ใช่ผล acceptance
 
