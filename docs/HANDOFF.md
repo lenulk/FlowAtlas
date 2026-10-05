@@ -1,0 +1,62 @@
+# ส่งต่องาน FlowAtlas
+
+ตรวจสถานะสำหรับส่งต่องานวันที่ 5 ตุลาคม 2026 เอกสารนี้เป็นจุดเริ่มอ่านงานต่อ ต้องตรวจโค้ด Git และผล CI ปัจจุบันอีกครั้งก่อนเปลี่ยนไฟล์
+
+## เป้าหมายของเจ้าของโปรเจกต์
+
+พัฒนา FlowAtlas จนใช้งานได้จริง เป็นเครื่องมือที่เรียกใช้เพื่อเห็นการทำงานของแอปและความสัมพันธ์ระหว่างส่วนต่าง ๆ พร้อมหลักฐานและรุ่นโค้ด แยก observed / inferred / unknown ให้ชัด ปัจจุบันมี CLI และ viewer ในเครื่อง พร้อม Node HTTP/Undici tracing และ browser/Node adapter เป้าหมายยังต้องผ่านเกณฑ์ใน [PLAN.md](../PLAN.md) ไม่ลดเกณฑ์เพื่อให้ต้นแบบดูเสร็จ
+
+Repository: https://github.com/lenulk/FlowAtlas; branch หลัก `master` ไม่จำเป็นต้องใช้พาธของเครื่องเดิมบนเครื่องใหม่ อ่าน [AGENTS.md](../AGENTS.md), [PLAN.md](../PLAN.md), [QUALITY.md](QUALITY.md), [TEST-RUNS.md](TEST-RUNS.md), [install.md](install.md), [linux-vm.md](linux-vm.md) ก่อนเริ่ม
+
+## สถานะที่ตรวจแล้ว
+
+- Functional code ล่าสุดที่ส่งขึ้น GitHub: `4ab1c61d6f5d2267a3c9ad37ff6830797988147d` รอบ 58 แก้เส้นแผนที่ไม่ให้พาดผ่านกล่องอื่น เพิ่มหัวลูกศร/title และระบุว่าตำแหน่งกล่องไม่ใช่เวลา ยังเรียงกล่องเป็นแถวเดิม เส้นต่าง edge ยังตัดกันหรือมีช่วงร่วมกันใน gutter ได้ ไม่ใช่ layered graph ที่เสร็จแล้ว
+- ตรวจ GitHub API วันที่ส่งต่องาน: [run 36910555723](https://github.com/lenulk/FlowAtlas/actions/runs/36910555723) ของ SHA นี้ completed/success ทั้ง 4 jobs: Windows 2025 และ Ubuntu 24.04 กับ Node 22.23.3 / 24.21.0 ไม่มี failed step ผลนี้ไม่ได้รับรอง performance; ยังไม่ได้อ่าน benchmark artifacts ของ run นี้
+- รุ่นก่อน `0e49f48` ผ่าน CI 4/4 และ main118/118 ทุกช่อง รวม browser/offline package/reinstall; Linux VM main118/source1/SDK+Chromium2/load1 ผ่าน Capture fixture3153 spans acknowledged ไม่มี drops แต่ p95 overhead ไม่ผ่าน: VM +199.569%; CI Windows22 +229.851%, Windows24 +224.212%, Ubuntu22 +161.766%, Ubuntu24 +144.292%
+- รอบ 58 บน Windows: source1/1, browser journeys2/2, actual SDK+Edge2/2 ผ่าน บน Linux VM สำเนา exact4ab1c61: source1/1, actual SDK+Chromium2/2, browser journeys2/2 ผ่าน มี geometry checks สำหรับ HTTP fan-out จริง และ viewer fixture จำลอง cycle/self-edge/disconnected/200edges แยกหลักฐานสองประเภทนี้เสมอ
+- Linux round58 source inventory71ไฟล์ตรง Git; Windows70 program files ตรง Git และ package.json ต่างเฉพาะ newline ซึ่งตรวจ JSON/LF equivalence แล้ว raw digest จึงต่างกัน ดู linux-vm.md
+- Raw TAP/JSON/screenshots/archives อยู่ใน `reports/` ที่ Git ignore เครื่องใหม่จะไม่ได้ไฟล์เหล่านี้จาก clone ให้สร้างหลักฐานใหม่หรือขอเจ้าของส่งไฟล์เมื่อจำเป็น ห้ามอ้างว่าอ่าน raw artifact แล้วจากบันทึกอย่างเดียว
+
+## งานค้างแรก: รอบ 59 / FA-15
+
+ยังไม่ได้แก้โค้ดรอบ 59 พบ Windows Node v24.18.0 native exit3221226505 เมื่อ browser geometry assertion ล้มเหลว สองรอบแรกเก็บ geometry4crossingsได้ และทดลอง deliberate assertion fault ซ้ำได้เป็นรอบที่สาม (2026-10-01T19-03-31-498Z0/1) การทดลองนี้ตั้งใจให้ assertion ล้มเหลว ไม่ใช่ผล acceptance
+
+`test/otel-runtime.test.mjs` ใน finally ปัจจุบัน forcekill CLI wrapper และรอ `exit` แล้วลบ workspace การ exit ของ wrapper ไม่ยืนยันว่า managed inspector/target ปิดเสร็จหรือปล่อย writer lock เพราะ inspector บน Windows แยกจาก parent job จุดนี้เป็น teardown gap ที่ตรวจจาก source ได้ แต่ยังไม่พิสูจน์สาเหตุภายใน Node ของ native exit
+
+แนวทางตรวจต่อ: reproduce ด้วย test-only assertion driver ก่อนแก้; ขอหยุด fixture ผ่าน `stop\n` ตามปกติ รอ `close` แบบมีเพดาน ตรวจ writer lock และพอร์ตที่ทราบจาก fixture ก่อนลบ ถ้ายืนยัน cleanup ไม่ได้ให้เก็บ workspace ห้ามลบล็อก/ฆ่าโปรเซสจาก PID ที่คาดเดา เกณฑ์ผ่านคือ deliberate fault ยังรายงาน assertion เดิมได้ครบและ cleanup ยืนยันได้ จากนั้นรัน actual SDK CJS/ESM + browser แบบไม่มี fault ให้ผ่าน อย่าอ้างว่า native fault ทุกแบบแก้แล้วจากการเทียบครั้งเดียว
+
+Driver ที่ใช้เป็นไฟล์ QA ในเครื่องเดิมและไม่อยู่ใน Git สร้างใหม่ภายใต้ reports/ ได้ตามนี้ โดยโหลดเฉพาะ test process:
+
+```js
+import assert from 'node:assert/strict';
+const original = assert.deepEqual;
+assert.deepEqual = function (...args) {
+  if (args[2] === 'Relationship paths must stay outside all card interiors') {
+    return original([1], [], 'FA15 deliberate assertion fault to inspect failed fixture cleanup');
+  }
+  return Reflect.apply(original, this, args);
+};
+```
+
+ใช้ runner ของโปรเจกต์ และกำหนด Playwright package / browser channel ที่มีจริงบนเครื่อง ตั้ง `FLOWATLAS_OTEL_BROWSER_CHECK=1` สำหรับ browser gate ตัวอย่าง diagnostic:
+
+```text
+node scripts/run-tests.mjs --test-name-pattern=cjs --import ./reports/vm/assertion-fault-driver.mjs test/otel-runtime.test.mjs
+```
+
+ผล diagnostic นี้ต้องยังเป็น failed assertion เพราะตั้งใจ inject fault ให้เปรียบเทียบรูปแบบการรายงานและ cleanup ไม่เปลี่ยน expectation ให้ผ่าน
+
+## งานต่อเพื่อใช้งานจริง
+
+1. ประสิทธิภาพ/ต้นทุนการบันทึกและ sustained capture: ยังไม่ผ่าน acceptance, acknowledgement pause และ Windows filesystem lock owner ยังไม่รู้สาเหตุ ห้ามเพิ่ม timeout/queue/retry หรือเปลี่ยน workload/threshold เพื่อกลบผล ต้องบันทึก policy change พร้อม tradeoff หากมีเหตุผลและหลักฐานใหม่
+2. Browser→SDK correlation, route/source mapping, existing SDK/attach/startup/TypeScript ต้องตรวจตาม integration ที่จะประกาศรองรับ HTTP spans อย่างเดียวไม่ยืนยัน user click หรือฟังก์ชันภายใน
+3. Persisted completeness, export/history/schema migration/recovery และ FA-10 layered layout/filter/keyboard navigation ยังเปิด
+4. ไม่มีแอปธุรกิจจริงของเจ้าของให้ลอง และไม่มี user trial ต้องเตรียม pilot และขอข้อมูลเมื่อถึงขั้นที่ต้องใช้แอป/ผู้ทดลองจริง ห้ามใช้ fixture แทน real-app/user-value gate
+5. Release/license/support/upgrade/rollback ตาม PLAN ยังไม่ครบ จึงยังไม่ใช่ v1 หรือ production-ready
+
+## วิธีทำงานร่วมกันผ่าน GitHub
+
+- ตรวจสถานะและ pull ก่อนเริ่มแต่ละรอบ รักษางานค้างของผู้อื่น ใช้ branch ของตัวเองเมื่อทำพร้อมอีกเครื่อง และส่ง PR เพื่อรวมเข้า master
+- ทดสอบด้วย `node scripts/run-tests.mjs ...` เท่านั้น ตั้งชื่อ purpose ของแต่ละรอบ บันทึก failure และวิเคราะห์ใน QUALITY.md แก้ทีละประเด็น ตรวจ source-check แยกจาก snapshot tests ตาม AGENTS.md
+- เก็บไฟล์ของโปรเจกต์ใน checkout และเก็บรายงานใน reports/ ตรวจ diff และทดสอบที่ตรงกับความเสี่ยงก่อน commit/push ไม่ forcepush ไม่ทับงานอีกเครื่อง และไม่ส่งข้อมูลลับลง Git
+- รายงานแยก source inspection / simulation / automated fixture / VM / CI / real pilot ไม่ประกาศสมบูรณ์จากเทสต์ผ่านเพียงอย่างเดียว
