@@ -24,4 +24,6 @@ Archive4b5c2ecก่อนแก้และcheckoutใหม่หลังแ�
 
 ผลกระทบที่ตั้งใจ: ผู้ใช้moduleที่เคยแก้version.filesในหน่วยความจำจะพบreadonly/TypeErrorในstrictmode ให้สร้างsnapshotใหม่แทน ไม่มีการเปลี่ยนHTTPprotocolหรือsavedJSON นี่เป็นการคงตัวตนของevidence ไม่ใช่การรองรับsourcehistoryใหม่ Performance/sustainedload/rootcauseของpause/realpilotยังเปิด ต้องตรวจexactCIรุ่นนี้ต่อ
 
+Exact8eff7e2: pushCI4/4 แต่ PRCI3/4เพราะUbuntu22shutdown827drops; inventories75filesตรงGitและmain127ทุกช่อง PerformanceFAILEDทุกช่องทั้งสองruns ดูQUALITY/HANDOFF. ไม่รับรองstablecaptureจากpassingpush และไม่ระบุcacheเป็นสาเหตุของshutdownโดยไม่มีtimeline
+
 Rollback: คืนการhashทุกครั้งในJsonActionStoreและคืนmutablefilesในสองcapturefunctionsได้โดยไม่migrateข้อมูล เพราะรูปแบบ/digestalgorithmไม่เปลี่ยน แต่จะเสียimmutableidentityguardและงานSHAซ้ำกลับมา

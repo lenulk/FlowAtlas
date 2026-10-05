@@ -660,6 +660,12 @@ Baseline `2026-10-05T10-34-07-673Z` บน3749c99 WindowsNode24.19.0: measuremen
 
 ### รอบ61 — digest ของ immutable source hashes
 
+ผล exact สุดท้ายของ8eff7e2: [push37302444123](https://github.com/lenulk/FlowAtlas/actions/runs/37302444123)4/4ผ่าน แต่ [PR37302472603](https://github.com/lenulk/FlowAtlas/actions/runs/37302472603)3/4เพราะshutdown827ข้างล่าง ไม่ rerun กลบfailure. Audit `11-28-37-802Z`/`11-28-58-335Z`1/1แต่ละชุด ตรวจ80runnerreportsรวม/75ไฟล์ตรงGit8eff7e2แม้PRcheckoutmergeee70c034; main127ทุกช่อง, failuregateERR_ASSERTION/cleanupครบ, failedbenchmarkตรงกรณีที่บันทึกและไม่มีunexpectedskip/failure. Auditผ่านหมายถึงหลักฐานสอดคล้อง ไม่ใช่captureacceptanceของfailedrun
+
+Pushทั้ง4capture3153ack0drops แต่performanceFAILED Ubuntu22+133.576%,Ubuntu24+176.376%,Windows22+314.663%,Windows24+172.715%. PRcapture3153ใน3ช่อง/Ubuntu22รวม2326ack827drops; performanceFAILEDทั้ง4(+64.143%,+229.425%,+189.705%,+242.006%ตามลำดับ). ไม่มีหลักฐานcausalHTTPimprovementหรือshutdownrootcause; priorityรอบ62คือวัดtimeline exporter flush/collector storageด้วยworkloadเดิมก่อนrepairหนึ่งประเด็น ไม่ขยายshutdowndeadline/retries/threshold
+
+Exact PR run37302472603 พบ Ubuntu22 capture gate failed: first pair delivered224/dropped827, reason shutdown827 ไม่มีoverflow/timeout/transport, remaining pairsครบ1051แต่ละpair; performanceFAILED64.143%. Main127/source/browser/failuregate/install/reinstallผ่าน. Ubuntu24ผ่าน; Windowsกำลังทำงาน ณการตรวจนี้ Push run37302444123 headเดียวกัน Ubuntuทั้งสองผ่าน ไม่พิสูจน์สาเหตุหรือปิดปัญหาจากpassingrun. อาการอยู่ใน bounded shutdown drain ที่ยังต้องวิเคราะห์ runtime/storage timing; ห้ามขยาย900ms shutdown หรือเปลี่ยนack/queueเพื่อกลบfailure. Rawartifactsเก็บก่อนทดสอบซ้ำ
+
 ตรวจfetch/pullและcheckoutสะอาดบน4b5c2ec; APIยืนยันรุ่นเอกสารนี้CI4/4แล้ว PR1/2ยังOPEN. เลือกลดSHAที่ทำซ้ำในstorageเฉพาะsourcefilemapที่immutabilityพิสูจน์ได้ ไม่cachegraphvalidation ไม่เปลี่ยนJSONbackendหรือackpolicy
 
 - Regressionก่อนแก้ `2026-10-05T11-11-43-564Z`1/3: filesจากcaptureยังแก้ได้ และsaveimmutablemap3ครั้งเรียกSHA3ครั้ง การตรวจmutable/getter/graphmutationผ่านอยู่แล้ว ไม่ใช่หลักฐานว่าHTTPproductionรับผิดversion

@@ -1,5 +1,9 @@
 # บันทึกการรันทดสอบ
 
+Manual round61 artifact tool failures: repeated Windows downloads into existing ci-8eff7e2-push refused extraction because files already existed (both22/24); initial whole-run download had completed those artifacts. Kept originals and audited all files rather than deleting/overwriting evidence. rg on guessed preload/exporter names found no files; corrected via rg --files to src/otel-preload.mjs/src/otel-exporter.mjs. These are tool failures, not software test outcomes.
+
+Manual round61 hosted verification: PR3/run37302472603 Ubuntu22 load failed (`11-23-19-860Z`, captureCompleteWithoutDrops=false); main/source/browser/installed journeys passed. Ubuntu24 passed, Windows pending at inspection. First traced pair delivered224/dropped827 with reason shutdown827, no overflow/timeout/transport; remaining pairs1051 each zero drops. Retained raw artifacts under reports/releases/ci-8eff7e2-pr; no rerun erased failure. Push run37302444123 on same head had both Ubuntu jobs pass, requiring inventory comparison before a cause claim. Tool failures: gh run view --log-failed refused while run in progress; job logs API refused terminal escape sequences. Raw TAP/JSON provides evidence instead. Initial documentation patch heading mismatch was corrected without source change.
+
 ## Linux VM preparation — 2026-09-30
 
 - ผู้ใช้ระบุให้ทดสอบผ่าน SSH บน VM; เชื่อมต่อสำเร็จเป็น Debian GNU/Linux 12 / kernel 6.1.0-53-amd64 / x86_64 ไม่มี Node.js/Git ใน PATH และไม่มี project shared folder ที่ตรวจพบ
@@ -2415,3 +2419,19 @@ First matched3×1000 measurement: all6000 measured business responses pluswarmup
 - Environment: win32/x64; OS 10.0.26200; Node v24.19.0
 - commit: 4b5c2ec84c2c40bd1cc4e119f95c0b5f8c4c6f19; dirty: true
 - หลักฐาน: `reports/tests/2026-10-05T11-20-19-776Z.tap` และ `.json`
+
+## 2026-10-05T11-28-37-802Z
+
+- จุดประสงค์: Round61 exact PR CI audit preserving shutdown827 failure
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 8eff7e225fea1992d47a7b5143d598b2c57c577a; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T11-28-37-802Z.tap` และ `.json`
+
+## 2026-10-05T11-28-58-335Z
+
+- จุดประสงค์: Round61 exact push CI inventories and capture audit separate from failed PR run
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 8eff7e225fea1992d47a7b5143d598b2c57c577a; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T11-28-58-335Z.tap` และ `.json`

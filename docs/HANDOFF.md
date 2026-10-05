@@ -25,9 +25,13 @@ Repository: https://github.com/lenulk/FlowAtlas; branch หลัก `master` �
 
 ### งานรับช่วงรอบ 61 บน branch แยก
 
+**ผลที่ตรวจแล้ว:** [PR#3](https://github.com/lenulk/FlowAtlas/pull/3), โค้ด8eff7e2. PushCI37302444123ผ่าน4/4 แต่ PRCI37302472603ผ่าน3/4 Ubuntu22loadpairแรกshutdowndrop827 (224ack); อีก2pairsครบและothergatesผ่าน ไม่มีrootcauseที่พิสูจน์ ไม่ถือว่าcaptureเสถียรจากpushpassingrun. Auditทั้งสองartifactsยืนยัน75filesตรงGitทุก80reports/main127ทุกช่อง/innerfailureครบ; ดูQUALITYสำหรับตัวเลขperformanceที่ยังFAILEDทุกช่อง
+
+PR3stackedbase perf/graph-validation-index; PR1/2/3ยังไม่merge. Commitบันทึกผลถัดจาก8eff7e2เป็นdocumentation-only ไม่เปลี่ยนprogramsourceที่auditแล้ว รอบ62ให้เพิ่มbounded numeric timelineของflush/storageเพื่อแยกqueuewait/write/fsync/ack/shutdowntimeบนworkloadเดิมก่อนเลือกrepair ห้ามใช้passingrerunลบfailed827หรือขยาย900msdeadlineโดยไม่มีADR/หลักฐาน. Pilot/ผู้ทดลองยังไม่มี
+
 Branch `perf/immutable-snapshot-digest` ต่อจาก4b5c2ec สำหรับ stacked PR base `perf/graph-validation-index`. ลด SHA ของ source file hashes ที่ใช้ร่วมกันใน history ด้วย WeakMap เฉพาะ frozen own string data; capture คืน readonly files และทุก save ยังตรวจ graph/path/hash/claimed digest. ดู [ADR](adr-snapshot-digest.md) สำหรับผลกระทบต่อ module callers และ rollback ไม่เปลี่ยน schema/backend/fsync/ack policy
 
-ก่อนแก้ regression1/3 (immutable identity/hash repetition), หลังแก้ focused26/26/main127/127/source1/1/actualSDK+Edge+deliberatefailure3/3 ผ่าน. Local inventory audit11-20-19-776Z ยืนยัน final gates บน source เดียวกันและ archived baseline ตรง4b5c2ec. Before/after load capture3153ack0dropsแต่ performance FAILED +347.753%/+254.808%; traced p95 หลังสูงกว่า จึงไม่อ้าง HTTP improvement. รอ exact CI ของ branch นี้ก่อนรับรอง Windows/Linux
+ก่อนแก้ regression1/3 (immutable identity/hash repetition), หลังแก้ focused26/26/main127/127/source1/1/actualSDK+Edge+deliberatefailure3/3 ผ่าน. Local inventory audit11-20-19-776Z ยืนยัน final gates บน source เดียวกันและ archived baseline ตรง4b5c2ec. Before/after load capture3153ack0dropsแต่ performance FAILED +347.753%/+254.808%; traced p95 หลังสูงกว่า จึงไม่อ้าง HTTP improvement. ผล exact CI อยู่ย่อหน้าแรก ไม่รับรอง stable captureจากlocalผ่านเพียงอย่างเดียว
 
 ผู้ใช้ยังไม่มีแอปธุรกิจ/ผู้ทดลอง: pilot protocol เป็นการเตรียมงานเท่านั้น ยังเปิด performance≤10%, sustained20actions×30นาที, persisted completeness/export/migration, browser→SDK/UX/pilot/usertrial/release. ขั้นถัดไปวัดต้นทุน storage/serialization/validation ที่ยังเหลือด้วย workload เดิมและเลือกหนึ่งประเด็นโดยไม่ลดเกณฑ์
 
