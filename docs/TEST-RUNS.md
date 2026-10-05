@@ -3162,3 +3162,75 @@ First matched3×1000 measurement: all6000 measured business responses pluswarmup
 - หลักฐาน: `reports/tests/2026-10-05T20-50-56-500Z.tap` และ `.json`
 
 - Round68 final manual inventory verification: main20-46-56-844Z140/140 and isolatedsource20-50-56-500Z1/1 have all86 program file SHA256 equal final current bytes; exit0/failed-skipped0. reports/releases/round68-local-inventory.json retained. git diff --check passed (normal TEST-RUNS CRLF warning only). Old cli-owner-bWOl5s exists, untouched. Documentation patch retry succeeded. No production source files changed; new observer module is QA-only and normal CLI does not import it. Exact hosted round68 gates remain pending.
+
+- Round69 preflight: fetched origin/no branch update/local clean on b60ea05; PR10/push CI37372382537/37372376237 stillqueued. New branch diag/sdk-http-cost. Extract ordinary appSource literal to shared QA fixture without altering its contents; new SDK isolation will use the exact same generated app/50warmup+1000measured/concurrency8, with diagnostic met=null. No production runtime/exporter change yet.
+
+## 2026-10-05T20-58-00-186Z
+
+- จุดประสงค์: Round69 actual SDK count-only and production exporter controlled sink diagnostic
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: b60ea05c889463fda6b55d6d37735d173450b8b0; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T20-58-00-186Z.tap` และ `.json`
+
+## 2026-10-05T20-59-45-406Z
+
+- จุดประสงค์: Controlled SDK HTTP sink rejection must fail measurement
+- ผล: ไม่ผ่าน — 0/1; failed 1; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: b60ea05c889463fda6b55d6d37735d173450b8b0; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T20-59-45-406Z.tap` และ `.json`
+- ไม่ผ่าน: actual SDK HTTP count-only and production exporter sink costs remain diagnostic
+
+## 2026-10-05T20-59-44-951Z
+
+- จุดประสงค์: Round69 SDK rejected sink negative evidence guard and shared configuration parity
+- ผล: ผ่าน — 2/2; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: b60ea05c889463fda6b55d6d37735d173450b8b0; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T20-59-44-951Z.tap` และ `.json`
+
+- Round69 manual source comparison: shared appSource evaluates byte-for-byte equal to original b60ea05 fixture via trusted Git literal. Parity/503guard20-59-44-951Z2/2 passed; inner20-59-45-406Z0/1 expected failed SDKsink ack0/drop1051, retained workspace, other8 conditionscomplete. Original startuprootcause/performance remain open.
+
+## 2026-10-05T21-01-41-578Z
+
+- จุดประสงค์: Controlled SDK HTTP sink rejection must fail measurement
+- ผล: ไม่ผ่าน — 0/1; failed 1; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: b60ea05c889463fda6b55d6d37735d173450b8b0; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T21-01-41-578Z.tap` และ `.json`
+- ไม่ผ่าน: actual SDK HTTP count-only and production exporter sink costs remain diagnostic
+
+## 2026-10-05T21-01-41-103Z
+
+- จุดประสงค์: Round69 final actual SDK HTTP component cost and rejection guard with complete runtime digests
+- ผล: ผ่าน — 3/3; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: b60ea05c889463fda6b55d6d37735d173450b8b0; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T21-01-41-103Z.tap` และ `.json`
+
+- Round69 workflow review caught and removed a duplicate empty package-step header immediately before running CI; no workflow dispatched with it. Combined final SDK/negative/parity invocation runs benchmark files concurrently: accounting/guards valid but latency samples are not used for cost comparisons. Run the ordinary workload and isolated normal SDK diagnostic sequentially for final measurements.
+
+## 2026-10-05T21-02-26-560Z
+
+- จุดประสงค์: Round69 isolated final SDK diagnostic alone with full runtime source digests
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: b60ea05c889463fda6b55d6d37735d173450b8b0; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T21-02-26-560Z.tap` และ `.json`
+
+## 2026-10-05T21-02-33-117Z
+
+- จุดประสงค์: Round69 ordinary HTTP workload after byte-identical fixture extraction unchanged acceptance
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: b60ea05c889463fda6b55d6d37735d173450b8b0; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T21-02-33-117Z.tap` และ `.json`
+
+## 2026-10-05T21-02-42-936Z
+
+- จุดประสงค์: Round69 main regression final shared SDK fixture diagnostic source
+- ผล: ผ่าน — 140/140; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: b60ea05c889463fda6b55d6d37735d173450b8b0; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T21-02-42-936Z.tap` และ `.json`

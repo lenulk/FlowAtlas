@@ -1,5 +1,11 @@
 # รอบทดสอบและปรับปรุง FlowAtlas
 
+### รอบ69 — actual SDK HTTP component isolation
+
+[วิธีและขอบเขต](sdk-http-cost.md): sharedappSource byte-identicalกับb60ea05 literalตรวจจริง; baseline/actualSDKcount-only/productionSDKexporter-controlledsink3rotated roundsบน1050requests+metrics1. ไม่มีdurablecollector/businessapp. Count-onlyนับSDKspansไม่ใช่ack, SDKoptionsparityตรวจเทียบsourceconstructor. Whole-sourceinventory+runtimefiledigests/fixtureSHAเก็บแยก ค่าmet=nullไม่เป็นperformancegate
+
+Finalisolated21-02-26-560Z1/1 all9complete/removed; medians2.486/2.864/4.138msเป็นเหตุผลเลือกtransportexperiment ไม่ใช้subtractเป็นpurecost. Parity+503guard20-59-44-951Z2/2; inner20-59-45-406Z0/1 ack0/drop1051/retainedจริง/other8complete. Finalcombined21-01-41-103Z3/3 includesfullmetadata/guard; inner21-01-41-578Z0/1 preserved. Combinedbenchmarksconcurrent:timingsไม่ใช้เป็นcomparison. Ordinary21-02-33-117Z1/1 allresponses/capture3153ack0drops แต่performanceFAILED506.817%(baseline2.083/traced12.640ms). Main21-02-42-936Z140/140 passed. Workflowmanualreviewcaughtduplicateemptystepและremoveก่อนdispatch; finalstructurereview/diffcheckpassed. Source/SDKpolicy/backend/fsync/900msshutdown/1000msupload/defaultsunchanged. NextoneprincipalrepairownednativeHTTPtransportโดยคงackหลังdurablecompletion/redirectrefusal/abort/rejectionprivacy/boundsพร้อมbefore-afterevidence; priorfsync/CLI/pilotfailuresremainopen
+
 ### รอบ68 — หลักฐาน startup failure ก่อนแก้ root cause
 
 Branch `diag/cli-startup-evidence` ต่อจากc12b978/PR9. ตรวจfailedTAPรอบ66 `20-05-18-750Z`: traced owner-kill timeout12050ms ไม่มี startup state และ cleanupยืนยันไม่ได้ เก็บ `reports/storage/cli-owner-bWOl5s` ไว้เหมือนเดิม ไม่สามารถย้อนบอกว่าสาเหตุมาจาก SDK/fsync/target จาก TAP นี้
