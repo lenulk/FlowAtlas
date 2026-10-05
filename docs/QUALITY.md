@@ -1,5 +1,17 @@
 # รอบทดสอบและปรับปรุง FlowAtlas
 
+### รอบ68 — หลักฐาน startup failure ก่อนแก้ root cause
+
+Branch `diag/cli-startup-evidence` ต่อจากc12b978/PR9. ตรวจfailedTAPรอบ66 `20-05-18-750Z`: traced owner-kill timeout12050ms ไม่มี startup state และ cleanupยืนยันไม่ได้ เก็บ `reports/storage/cli-owner-bWOl5s` ไว้เหมือนเดิม ไม่สามารถย้อนบอกว่าสาเหตุมาจาก SDK/fsync/target จาก TAP นี้
+
+เพิ่ม QA observer+[readiness wrapper](cli-startup-diagnostics.md) ในowner lifecycle test: รายงานfixed lifecycle/readiness markers/byte counts/allowlisted error+signal/lock presenceเฉพาะfailure, bounded private128char tail/no raw token/output/path/PID, stderrไม่ประกาศreadiness. Catchรายงานแล้วthroworiginalแม้reporterthrow, finallydisposeไม่มีtimer/IPC/cleanupใหม่. ไม่เปลี่ยนproduction/readiness12s/25stestdeadline/SDK/fsync/ack. Markerไม่พิสูจน์portreachable, lockunknown=null และ snapshotไม่พิสูจน์cleanup/rootcause
+
+Initialfocused20-45-43-006Z12/12ผ่านก่อนเพิ่มwrapperpreservation; finalmain20-46-56-844Z140/140ผ่าน4guards(splitmarkers/privacy/disposal, stderrspoof+lockreaderror, actualownedNodeexit23/originalfailure, reportingsinkthrows/successdisposal) รวมCLI9cases. ControlledNodechildไม่ใช่ actualCLIstartup failure reproduction. Passingmainไม่ปิดoldtimeout ต้องรอ failureใหม่ที่มีdiagnosticหรือcontrolledCLIreproductionก่อนrepair. งานSDK-onlycost/performance/stablecapture/sustained/realpilot/users/releaseยังเปิด
+
+**Hosted artifacts รอบ66–67ตรวจจริงรอบ68:** 5ab910d PR37368387270success3/cancelledUbuntu22no steps; push37368382200successWindows22/cancelledอีก3no steps. c12b978 PR37369888985success3/cancelledWindows24no steps; push37369885285success3/cancelledUbuntu24no steps. Top-levelfailureเกิดพร้อมcancelledjobs ไม่พบfailedteststepในcompletedjobs ไม่เดาเหตุ cancellation และไม่ใช้ชุดที่ขาดแทน4/4. Audits20-46-33-403Z/20-48-08-667Z/20-48-33-928Z/20-48-56-737Zแต่ละ1/1 ตรวจ10artifactsets/160runnerreports/84filesตรงGit47472a6(=5abprogram)หรือ08e4435(=c12program) แม้PRmergeSHAsต่าง. main134/136ทุกcompletedchannel/failed-skipped0, 16gates/channel, journal18conditions/reloadexact+frameguardsผ่าน, failuregateassertionยังfailedตามตั้งใจ+cleanupconfirmed, controlledslow-fsync3disklossconditions/channelยังอยู่และdurablereloadexact
+
+Ordinarycapture3153ack0dropsทุก10completedchannels แต่performanceFAILEDทั้งหมด: รอบ66 PRUbuntu24+202.027%,Windows22+181.690%,Windows24+288.227%; pushWindows22+223.612%. รอบ67 PRUbuntu22+97.891%,Ubuntu24+147.711%,Windows22+191.100%; pushUbuntu22+89.902%,Windows22+119.344%,Windows24+222.083%. ไม่มีmatchedbefore/afterworkload จึงไม่claimcausalHTTPimprovement. ผลนี้ไม่ปิดเก่า827shutdownloss/fsyncstalls. Rawartifact/summariesใต้reports/releases/ci-5ab910d-{pr,push},ci-c12b978-{pr,push}; audit scriptsเป็นignoredQA ไม่รับรองmissingchannelsหรือround68source
+
 ### รอบ67 — immutable source path metadata reuse
 
 **Localfinalcode08e4435/[PR#9](https://github.com/lenulk/FlowAtlas/pull/9):** inventoryaudit20-26-06-594Z1/1ตรวจ84filesตรงGitทุก6finalgates:main136/equivalence1(76cases)/paired1/source1/SDK+Edge+fault3/ordinaryHTTP1; failed/skipped0. Reportedlocaldirtybaselinecommitsไม่ใช้เป็นsourceidentityแทนactualfilehash. HostedPR37369500705/push37369485398ยังqueuedณAPIล่าสุด ไม่มีhostedgate/artifactหลักฐาน ยังไม่auditmatrix; documentation-onlycommitส่งต่อหลัง08e4435ไม่เปลี่ยนprogrambytesและrefconcurrencyอาจยกเลิกqueuedoldrun ต้องตรวจlatestheadCIใหม่จริง. ไม่skipCI/ไม่rerunกลบpreviousfailure. PR8sourcecode47472a6locallyverifiedมีlocalCLI failureตามหัวข้อก่อนหน้าและreplacement5ab910dCIยังqueued. ผลนี้ไม่ใช่projectreadiness.

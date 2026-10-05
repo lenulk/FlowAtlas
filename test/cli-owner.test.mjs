@@ -8,6 +8,7 @@ import { randomBytes } from 'node:crypto';
 import { mkdirSync, mkdtempSync, writeFileSync, readFileSync, existsSync, rmSync, realpathSync } from 'node:fs';
 import { dirname, join, relative, isAbsolute } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import { observeOwnedStartup, awaitOwnedReadiness } from '../scripts/cli-owner-startup-diagnostics.mjs';
 
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
 async function waitFor(predicate, milliseconds = 8000) {
@@ -51,13 +52,14 @@ if(message==='test:SIGINT'||message==='test:SIGTERM')process.emit(message.slice(
       FLOWATLAS_COLLECTOR_PORT: '0', FLOWATLAS_INVENTORY_PORT: '0' },
       stdio: stopMode === 'owner-kill' ? ['pipe', 'pipe', 'pipe'] : ['pipe', 'pipe', 'pipe', 'ipc'] });
   let output = ''; child.stdout.on('data', (part) => { output += part; }); child.stderr.on('data', (part) => { output += part; });
+  const startup = observeOwnedStartup(child, () => existsSync(lock));
   let inspectorPid, targetPid, app;
   try {
-    const ready = await waitFor(() => {
+    const ready = await awaitOwnedReadiness(() => waitFor(() => {
       if (child.exitCode !== null) throw new Error('Owned CLI exited before readiness');
       const collector = output.match(/FlowAtlas: (http:\/\/127\.0\.0\.1:\d+)/), target = output.match(/App: (http:\/\/127\.0\.0\.1:\d+)/);
       return collector && target && { collector: collector[1], target: target[1] };
-    }, 12000);
+    }, 12000), startup, (message) => t.diagnostic(message));
     app = ready.target;
     const ownership = JSON.parse(readFileSync(lock, 'utf8'));
     assert.equal(ownership.host, hostname()); inspectorPid = ownership.pid;
@@ -85,6 +87,7 @@ if(message==='test:SIGINT'||message==='test:SIGTERM')process.emit(message.slice(
       assert.deepEqual(JSON.parse(summaries[0][1]), { httpSpans: 1, invalidSpans: 0, delivered: 1, dropped: 0, queued: 0, inFlight: 0 });
     }
   } finally {
+    startup.dispose();
     if (child.exitCode === null && child.signalCode === null) child.stdin.end('stop\n');
     // These identities came only from this generated fixture and its freshly created lock.
     if (targetPid && alive(targetPid)) {

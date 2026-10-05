@@ -14,6 +14,8 @@ Node.js เป็น integration ที่กำลังพัฒนาแล�
 
 ## สถานะเริ่มต้น
 
+อัปเดตรอบ68 (6ตุลาคม2026): เพิ่มQAstartupfailureevidence/original-errorpreservation ไม่ใช่แก้CLIreadinessrootcause; localmain140/140. ตรวจhostedรอบ66–67จริงครบ10completedartifactchannels/160reports/exactsource84files แต่แต่ละrunมีcancelledmissingchannels ไม่มีmatrix4/4. Ordinarycaptureครบ3153/ช่องแต่performanceยังFAILEDทั้งหมด. ขั้นต่อไปexactround68CI + SDK-onlycost/controlledCLIstartupdiagnosticsก่อนrepair; ไม่ขยายtimeout/ลดthresholdและไม่ใช้fixtureแทนpilot. ยังไม่มีแอปธุรกิจหรือผู้ทดลอง ดูHANDOFF/QUALITYสำหรับรุ่นและข้อจำกัด
+
 | ความสามารถ | หลักฐานปัจจุบัน | งานที่เหลือ |
 | --- | --- | --- |
 | เปิด/ปิดเครื่องมือ | รุ่น 0e49f48 ผ่าน owner disconnect, startup lease และ controlled SIGINT/SIGTERM handler บน Windows/Linux VM/CI; SDK flush, offline package/reinstall ผ่าน | สัญญาณจาก console จริง, startup ที่เคยล่าช้า, inspector ถูกบังคับหยุด/โปรเซสหลาน, attach แอปที่เริ่มอยู่แล้ว |
