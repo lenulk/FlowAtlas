@@ -21,6 +21,10 @@ Repository: https://github.com/lenulk/FlowAtlas; branch หลัก `master` �
 
 ### งานรับช่วงรอบ62 — วิเคราะห์ shutdown drain
 
+**รุ่นโค้ดที่ตรวจแล้ว:** b554312, [PR#4](https://github.com/lenulk/FlowAtlas/pull/4), stackedbase diagจากPR3 `perf/immutable-snapshot-digest`. PRCI37331499111และpush37331409424ผ่าน4/4ทั้งสอง; audit88reports/77filesตรงGit, main132ทุกช่อง/11gatesต่อช่อง/normalและdiagnosticcapture3153ack0drops. PerformanceยังFAILEDทุกช่อง ดูQUALITY. Docscommitถัดไปไม่เปลี่ยนprogramsourceนี้ PR1–4ยังOPENไม่merge
+
+**สิ่งที่พบ/งานถัดไป:** DiagnosticPRUbuntu24firstpairfsync589.189ms/save684.922ms/shutdown297.307msแต่captureครบ พิสูจน์pauseเฉพาะrunนี้ ยังไม่พิสูจน์causeของ827dropsรุ่นก่อน; เก็บfailedrun37302472603ไว้. รอบ63วัด/ลดvalidationหรือserializationที่ยังทำซ้ำด้วยnegativeevidenceguardsบนworkloadเดิม; หากเลือกdurablejournal/asyncstorageต้องมีADRdurability/crashrecovery/migration/rollbackก่อนimplementation ไม่เลื่อนackก่อนdurablewrite/ไม่ขยาย900msdeadlineเพื่อให้ผ่าน. Performance≤10%,sustained20actions×30นาที,persisted/export/migration,browser→SDK/pilot/usertrial/releaseยังเปิด
+
 Branch `diag/shutdown-timing` ต่อจากcb82561, stackedbase `perf/immutable-snapshot-digest`. เพิ่มopt-in numericdiagnostics exporter/atomicstorage+benchmarkreport/CIgateแยก ตาม [วิธีรัน](benchmark-http.md). Defaultไม่มีtiminglog/clock; diagnosticsไม่เก็บข้อมูลแอปและไม่เปลี่ยนqueue/slots/900msshutdown/1000msupload/fsync/ack. Diagnosticperformance met=null คงordinaryworkload/thresholdเดิม
 
 Localmain132/source1/SDK+Edge+failure3/audit1ผ่านตรงsourceเดียวกัน; normalและdiagnosticloadcapture3153ack0drops แต่normalperformanceFAILED194.036%. Diagnosticshutdown12–17ms/deadlineFired0ไม่reproduceUbuntu22shutdown827 จึงยังไม่ปิดrootcause/stablecapture. ขั้นต่อไปตรวจexactCI11gatesต่อช่องและtimingถ้าfailed; หากยังไม่reproduceให้เลือกcostrepairจากvalidation/serialization/fsyncที่วัดได้และคงfailed827ไว้สำหรับregression ห้ามขยายdeadlineเพื่อกลบปัญหา Pilot/ผู้ทดลอง/performance/sustained/releaseยังเปิด

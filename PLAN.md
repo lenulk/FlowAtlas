@@ -111,7 +111,7 @@ Release levels: Alpha = ติดตั้งและ trace เส้นทา�
 
 ## แหล่งอ้างอิงและข้อจำกัดทางเทคนิค
 
-รอบ62เพิ่มopt-in flush/storagetimingเพื่อวิเคราะห์shutdown827 โดยคงpolicy/backend/threshold. Localmain132/source1/SDK+Edge+failure3ผ่าน; diagnosticscaptureครบแต่ยังไม่reproducefailedcaseและไม่รับรองperformance (met=null), ordinaryoverhead194.036%ยังFAILED. ExactCIและshutdownrootcauseยังเปิด; realpilot/usersยังไม่มี
+รอบ62เพิ่มopt-in flush/storagetimingเพื่อวิเคราะห์shutdown827 โดยคงpolicy/backend/threshold. Exactb554312 PR/pushCI4/4ทั้งสอง/main132ทุกช่อง/77filesตรงGit/normal+diagnosticcaptureครบ; ordinaryperformanceFAILEDทุกช่อง, diagnosticmet=null. พบfsyncpause589msในPRUbuntu24แต่ไม่reproducefailed827จึงยังเปิดshutdownrootcause/stablecapture. รอบ63ลดvalidation/serializationที่วัดได้ หรือADRdurablejournalก่อนbackendchangeโดยคงdurability/recovery. Sustainedload/realpilot/users/releaseยังไม่ผ่าน
 
 รอบ61 ลดการ hash source snapshot ซ้ำเฉพาะ immutable file map พร้อม [ADR](docs/adr-snapshot-digest.md); local main127/source1/SDK+Edge+failure3 ผ่านและ inventory ตรง source เดียวกัน. Exact8eff7e2 pushCI4/4 แต่ PRCI3/4เพราะUbuntu22shutdowndrop827; main127ทุกช่อง/75filesตรงGit ไม่ปิดstablecapture. FA-07/FA-08 ยังเปิด: performanceFAILEDทุกช่องและไม่ยืนยันHTTPimprovement. รอบ62วัดflush/storage/shutdowntimelineก่อนrepairโดยคงdeadline/queue/threshold. Pilot protocolพร้อมแต่ยังไม่มีแอปหรือผู้ทดลอง จึงยังไม่ผ่านR4/R5หรือพร้อมproduction
 

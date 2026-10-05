@@ -1,5 +1,9 @@
 # บันทึกการรันทดสอบ
 
+Manual round62 artifact transfer failure: push CI Windows artifact download failed TLS handshake timeout from GitHub artifact storage. Kept existing Linux artifacts and retry only Windows download; this is network/tool failure, not a software test. PR CI37331499111 and push37331409424 both completed success at latest API check; raw Windows audit still pending when transfer failed. Do not persist temporary signed artifact URLs.
+
+Manual round62 partial hosted review: downloaded Linux artifacts separately for PR37331499111 and push37331409424 after job completion. Numeric diagnostics capturecomplete=true all4Linux jobs. PRUbuntu24 firstpair saveMax684.922ms/syncMax589.189ms/shutdown297.307ms; other3Linuxjobs shutdown3.89–6.36ms. This proves a measured fsync pause in that run, not the cause of prior shutdown827. Pinned SDK source located via rg --files after sdk-trace-base/build guess failed; actual sdk-trace/build/src/export/SimpleSpanProcessor.js _shutdown directly delegates exporter.shutdown. Windows/exact inventory audit pending at this check.
+
 Manual round62 review: clean cb82561 fetched/pulled, finaldocsCI37303441188/37303435380 both success. Git branch diag/shutdown-timing. Tool failures: nonexistent guessed src/node-http-preload.cjs/span-exporter.mjs from previous investigation corrected to rg --files paths; two documentation patches mismatched headings and made no changes, then applied with actual headings. Temporary duplicate empty workflow step removed during review before commit; no CI submitted with it. Numeric diagnostic local JSON read verified3153ack/0drops and diagnostic_run/met=null; timing output contains fixed numeric fields only. Ordinary capture shutdown827 issue remains open.
 
 Manual round61 artifact tool failures: repeated Windows downloads into existing ci-8eff7e2-push refused extraction because files already existed (both22/24); initial whole-run download had completed those artifacts. Kept originals and audited all files rather than deleting/overwriting evidence. rg on guessed preload/exporter names found no files; corrected via rg --files to src/otel-preload.mjs/src/otel-exporter.mjs. These are tool failures, not software test outcomes.
@@ -2512,3 +2516,19 @@ First matched3×1000 measurement: all6000 measured business responses pluswarmup
 - Environment: win32/x64; OS 10.0.26200; Node v24.19.0
 - commit: cb825619a0f870ce7bdaa6e0a85612aa5029a3d0; dirty: true
 - หลักฐาน: `reports/tests/2026-10-05T15-14-39-309Z.tap` และ `.json`
+
+## 2026-10-05T15-24-40-537Z
+
+- จุดประสงค์: Round62 exact PR CI inventories numeric timing and normal performance scope
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: b5543123cdc528b3e1fda069fb4eeb5b347b69ba; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T15-24-40-537Z.tap` และ `.json`
+
+## 2026-10-05T15-25-15-003Z
+
+- จุดประสงค์: Round62 exact push CI inventories and timing scopes
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: b5543123cdc528b3e1fda069fb4eeb5b347b69ba; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T15-25-15-003Z.tap` และ `.json`
