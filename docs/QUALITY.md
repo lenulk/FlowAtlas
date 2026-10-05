@@ -657,3 +657,14 @@ Baseline `2026-10-05T10-34-07-673Z` บน3749c99 WindowsNode24.19.0: measuremen
 - Exact44151a5 PRrun37299083948ผ่าน4/4ทุกstepแล้ว: sourceaudit `2026-10-05T10-57-17-148Z`1/1ตรวจartifacts4ชุด/40runnerreports/inventory74ไฟล์ตรงGitทุกชุด, main124/124ทุกช่อง exit0 failed/skipped0 และinnerassertionยังfailedพร้อมERR_ASSERTION/cleanupครบ. Capture3153ack0dropsแต่performanceFAILED Ubuntu22+71.129%,Ubuntu24+117.530%,Windows22+196.786%,Windows24+303.755%. ไม่ใช้relativeoverheadที่ต่างbaselineอ้างHTTPimprovement; sustainedload/realpilot/users/releaseยังเปิด
 - Base8b1e270audit `10-52-37-063Z`1/1: main123ทุกช่อง/40reports/74exactfiles, failuregateครบ/capture3153ack0drops, performanceFAILED Ubuntu22+95.963%,Ubuntu24+177.016%,Windows22+256.427%,Windows24+193.342%. เก็บartifactแยกreports/releases/ci-8b1e270และci-44151a5ไม่มีการนำrawmetadataข้ามรุ่นมาใช้รับรอง
 - Finaldocsreview: HANDOFF/PLAN/QUALITY/TEST-RUNS/pilotชี้รุ่น/PRbase/หลักฐานจริงครบ ยังไม่มีการmerge; remote masterc9563bdไม่มีงานใหม่ที่ต้องทับ Documentation-onlyrecordไม่เปลี่ยนprogramsourceที่CIตรวจแล้ว
+
+### รอบ61 — digest ของ immutable source hashes
+
+ตรวจfetch/pullและcheckoutสะอาดบน4b5c2ec; APIยืนยันรุ่นเอกสารนี้CI4/4แล้ว PR1/2ยังOPEN. เลือกลดSHAที่ทำซ้ำในstorageเฉพาะsourcefilemapที่immutabilityพิสูจน์ได้ ไม่cachegraphvalidation ไม่เปลี่ยนJSONbackendหรือackpolicy
+
+- Regressionก่อนแก้ `2026-10-05T11-11-43-564Z`1/3: filesจากcaptureยังแก้ได้ และsaveimmutablemap3ครั้งเรียกSHA3ครั้ง การตรวจmutable/getter/graphmutationผ่านอยู่แล้ว ไม่ใช่หลักฐานว่าHTTPproductionรับผิดversion
+- Capturefilesfreeze; WeakMapcomputed digestรับเฉพาะfrozenplain/nullprototypeownstringdata ไม่รับgetterแม้objectfrozen ยังตรวจgraph/path/hashlimits/claimed digestทุกครั้งและmutablemapsคำนวณใหม่ ดูADR snapshotdigestสำหรับcompatibility/rollback
+- Afterfocused `11-12-28-291Z`26/26ผ่าน sourceidentity/storage/HTTPatomic/idempotency/retention/restart/error/privacyพร้อมnegativeguards SHAซ้ำเหลือ1แต่claimeddigestเปลี่ยนยังถูกปฏิเสธและstateเดิมคงอยู่
+- Baselinearchiveที่สร้างจากGit4b5c2ecไม่รวมtesttreeเพื่อไม่ให้defaultdiscoveryเพิ่มtests; ทุกcodebyteมาจากgitarchive ไม่มีproductiondependencyเปลี่ยน runnerครั้งแรกpathผิดเพราะcwdเปลี่ยน (`11-13-32-238Z`) บันทึกtoolfailureและแก้command ไม่rerunกลบsoftwarefailure Rawreportsอยู่ใต้reports/storage/round61-baseline
+- Baseline `11-13-46-842Z`1/1และafter `11-14-07-368Z`1/1 capture3153ack0dropsทั้งคู่ แต่performanceFAILED +347.753% (2.425→10.858ms) / +254.808% (3.567→12.656ms). ไม่อ้างHTTPเร็วขึ้นจากrelativeที่baselineเปลี่ยน; immutableSHAลดงานโดยตรงเท่านั้น
+- Final local main `11-14-42-347Z`127/127, isolated source `11-16-48-033Z`1/1, actual SDK CJS/ESM+Edge+deliberate assertion `11-16-48-895Z`3/3 ผ่าน failed/skipped0. Inventory audit `11-20-19-776Z`1/1 ยืนยัน baseline files ตรง Git4b5c2ec และทั้งสาม final gates ตรงไฟล์ checkout ปัจจุบันทุกไฟล์ ยังรอ exact hosted CI ไม่ใช้ผลรุ่นก่อนแทน

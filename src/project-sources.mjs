@@ -40,7 +40,7 @@ export function captureProjectVersion(root, files, projectId) {
       dirty = execFileSync('git', ['status', '--porcelain', '--', ...files], { cwd: root, stdio: ['ignore', 'pipe', 'ignore'] }).toString().trim().length > 0;
     }
   } catch { /* Uncommitted projects still have an exact file digest. */ }
-  return { projectId, commit, dirty, digest, files: hashes };
+  return { projectId, commit, dirty, digest, files: Object.freeze(hashes) };
 }
 
 export class ProjectSources {

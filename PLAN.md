@@ -111,6 +111,8 @@ Release levels: Alpha = ติดตั้งและ trace เส้นทา�
 
 ## แหล่งอ้างอิงและข้อจำกัดทางเทคนิค
 
+รอบ61 ลดการ hash source snapshot ซ้ำเฉพาะ immutable file map พร้อม [ADR](docs/adr-snapshot-digest.md); local main127/source1/SDK+Edge+failure3 ผ่านและ inventory ตรง source เดียวกัน. FA-07/FA-08 ยังเปิด: unchanged load captureครบแต่ before/after overhead+347.753%/+254.808% ยังเกิน10%และไม่ยืนยัน HTTP improvement. Exact hosted CI รุ่นใหม่ยังรอ; pilot protocol พร้อมแต่ยังไม่มีแอปหรือผู้ทดลอง จึงยังไม่ผ่าน R4/R5 หรือพร้อม production
+
 - [OpenTelemetry Node.js](https://opentelemetry.io/docs/languages/js/getting-started/nodejs/): instrumentation ต้องเริ่มก่อน app code การรองรับอัตโนมัติขึ้นกับไลบรารีที่ instrument ได้; ไม่ยืนยัน business functions ทุกตัว แผน FA-05 เป็นการออกแบบต่อยอดที่ยังต้องทดสอบ
 - [OpenTelemetry security](https://opentelemetry.io/docs/security/): telemetry อาจมีข้อมูลอ่อนไหวและต้องป้องกันการแก้ไขข้อมูล; ใช้เป็นเหตุผลของ FA-06 และ export policy
 - [Playwright tracing](https://playwright.dev/docs/api/class-tracing): บันทึก browser operations/network และเลือก DOM/screenshots/sources ได้; context tracing ไม่ได้บันทึก test assertions และไม่มีหลักฐานภายในเซิร์ฟเวอร์จากตัวมันเอง

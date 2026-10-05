@@ -2355,3 +2355,63 @@ First matched3×1000 measurement: all6000 measured business responses pluswarmup
 - หลักฐาน: `reports/tests/2026-10-05T10-57-17-148Z.tap` และ `.json`
 - FinalRound59/60 hosted artifact audits10-52-37-063Zและ10-57-17-148Z1/1ทั้งคู่: 4artifacts/40runnerreportsต่อรุ่น, all74fileinventoriesตรงGit8b1e270/44151a5, main123/124ทุกช่อง ไม่มีfailed/skippedหรือexitnonzero; deliberateinnerfaultERR_ASSERTION+cleanupครบ. Performance44151a5FAILED Ubuntu22+71.129%,Ubuntu24+117.530%,Windows22+196.786%,Windows24+303.755%; capture3153ack0dropsทุกช่อง. ไม่มีrealpilot/sustainedload/usertrialรับรอง
 - Finalmanualhandoffreview: fetchedorigin master...origin/master0/0ที่c9563bd, PR1base masterและPR2base fix/fa15-fixture-cleanupยังOPEN; docs-onlyfinalrecordไม่เปลี่ยนprogramfilesที่auditแล้ว ไม่ทดสอบsoftwareซ้ำโดยไม่มีsourcechange
+- เริ่มรอบ61: fetch/pull--ff-only branchเดิมไม่มีupdateและcheckoutสะอาด; APIยืนยัน4b5c2ec PRrun37300068626 success4ช่อง PR1/2ยังOPEN. เลือกลดSHAงานซ้ำเฉพาะimmutable file hashes ไม่cachegraphvalidation ไม่เปลี่ยนstorageformat/queue/deadline/workload/threshold
+
+## 2026-10-05T11-11-43-564Z
+
+- จุดประสงค์: Round61 before repair immutable snapshot and repeated hash cost regression
+- ผล: ไม่ผ่าน — 1/3; failed 2; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 4b5c2ec84c2c40bd1cc4e119f95c0b5f8c4c6f19; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T11-11-43-564Z.tap` และ `.json`
+- ไม่ผ่าน: captured tool and project file hashes cannot be edited in place
+- ไม่ผ่าน: repeated saves hash an immutable snapshot once while checking every asserted digest
+
+## 2026-10-05T11-12-28-291Z
+
+- จุดประสงค์: Round61 immutable snapshot digest cache guards and affected source storage contracts
+- ผล: ผ่าน — 26/26; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 4b5c2ec84c2c40bd1cc4e119f95c0b5f8c4c6f19; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T11-12-28-291Z.tap` และ `.json`
+- Round61 archivebaselinecommand11-13-32-238Zไม่เริ่มtest: runnerเปลี่ยนcwdเป็นarchive root จึงต้องส่งscripts/benchmark-http-trace.mjsแทนpathจากcheckoutหลัก ผลล้มเหลวrawอยู่reports/storage/round61-baseline/reports/tests ไม่ใช่softwarefailure
+
+## 2026-10-05T11-14-07-368Z
+
+- จุดประสงค์: Round61 after immutable snapshot digest cache unchanged paired fixture
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 4b5c2ec84c2c40bd1cc4e119f95c0b5f8c4c6f19; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T11-14-07-368Z.tap` และ `.json`
+
+## 2026-10-05T11-14-42-347Z
+
+- จุดประสงค์: Round61 default main immutable source hashes and unchanged graph storage validation
+- ผล: ผ่าน — 127/127; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 4b5c2ec84c2c40bd1cc4e119f95c0b5f8c4c6f19; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T11-14-42-347Z.tap` และ `.json`
+
+## 2026-10-05T11-16-48-033Z
+
+- จุดประสงค์: Round61 isolated source identity changed deleted snapshot restart
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 4b5c2ec84c2c40bd1cc4e119f95c0b5f8c4c6f19; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T11-16-48-033Z.tap` และ `.json`
+
+## 2026-10-05T11-16-48-895Z
+
+- จุดประสงค์: Round61 actual SDK CJS ESM Edge immutable hashes and original failure regression
+- ผล: ผ่าน — 3/3; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 4b5c2ec84c2c40bd1cc4e119f95c0b5f8c4c6f19; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T11-16-48-895Z.tap` และ `.json`
+
+## 2026-10-05T11-20-19-776Z
+
+- จุดประสงค์: Round61 baseline Git inventory and final local evidence audit
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 4b5c2ec84c2c40bd1cc4e119f95c0b5f8c4c6f19; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T11-20-19-776Z.tap` และ `.json`
