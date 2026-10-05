@@ -19,6 +19,14 @@ Repository: https://github.com/lenulk/FlowAtlas; branch หลัก `master` �
 
 ## งานค้างแรก: รอบ 59 / FA-15
 
+### งานรับช่วงรอบ64 — collector cost isolation
+
+Branch `diag/trace-cost-isolation` ต่อจาก6bac098/PR5 สำหรับstackedPR base perf/span-validation-json. เพิ่ม [component diagnostic](collector-cost.md) และ503negativeguardเป็นQA-only: productionexporterคนละprocessกับcontrolledsink/memory/diskcollector, 3rotatedrounds×1051simulatedspans, disk100graphsexactstore-reopen. Defaultapp/SDK/sourcecode/policyไม่เปลี่ยน; CIเพิ่ม2gatesเป็น13reportsต่อช่อง
+
+Finallocalcomponent1/1และnegativeguard1/1ผ่าน, coremain134ผ่านก่อนfinalQAmetadata-only/envsanitationpatch; ต้องตรวจexacthostedrevisionต่อ. SHAผูกdiagnosticscript/generatedfixtureแยกจากcoresource; privateIPCtokenไม่เข้ารายงาน Faultinnerยังfailed/rejected1051/workspaceretainedและother8conditionscomplete ไม่ใช้passingguardแทนcaptureacceptance. Met=null/component_diagnosticทั้งnormal/fault, SDKcreation/applicationp95ไม่ถูกวัดและห้ามsubtractcrossworkloads. ระหว่างfixturedevelopmentมีค่าจับเวลาเปลี่ยน ไม่claimcausalproductionimprovement
+
+รอบ65ยังต้องแยกNodeSDK-only costด้วยfixtureที่ควบคุมจริงก่อนเลือกระหว่างtransportrepair/journaldesign; ถ้าเปลี่ยนbackendต้องADRatomicity/ackหลังfsync/crash/corruption/bounds/migration/rollback. Prior827shutdownloss,performance/sustained/pilot/usertrial/releaseยังเปิด; ผู้ใช้ยังไม่มีแอปธุรกิจ/ผู้ทดลอง
+
 ### งานรับช่วงรอบ63 — span validation JSON
 
 **โค้ดล่าสุดที่ตรวจแล้ว:**5c6172a [PR#5](https://github.com/lenulk/FlowAtlas/pull/5), stackedbase `diag/shutdown-timing`/PR4. ExactPR37334972757/push37334881014ผ่าน4/4ทั้งสอง; artifactaudit88reports/77filesตรงGit, main134ทุกช่อง/11gatesต่อช่อง, normal+diagnosticcapture3153ack0drops, originalassertionreportครบ. OrdinaryperformanceFAILEDทุกช่อง(71.669–252.867% across bothruns), diagnosticmet=null; ดูQUALITY. Docscommitถัดจาก5c6172aไม่เปลี่ยนprogramsourceนี้ PR1–5ยังOPENไม่merge

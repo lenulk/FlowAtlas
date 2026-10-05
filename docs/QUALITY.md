@@ -1,5 +1,17 @@
 # รอบทดสอบและปรับปรุง FlowAtlas
 
+### รอบ64 — collector component replay diagnostics
+
+Finalcomponent `16-11-44-629Z`1/1และfailureguard `16-11-54-374Z`1/1หลังreviewcanonicalparentก่อนmkdtemp/delete, numericoutcome/policycounters, explicit2048/1000และclearNodepreload/test/OTELenvironment. SHAของdiagnosticscriptในJSONตรงactualsourceที่อ่านตรวจแล้ว; fixtureมีdigestแยก. Coremain `16-07-55-642Z`134/134ผ่านก่อนQA-onlymetadata/environmentpatchสุดท้าย; src/public/examples/testไม่เปลี่ยนรอบนี้ Hostedexactrevisionต้องตรวจmainและQAทั้งหมดต่อก่อนรับรองbundle
+
+ต่อจากclean6bac098บนdiag/trace-cost-isolation หลังรอบ63CI/sourceverified. เพิ่มQA-only benchmarkใช้productionexporterคนละprocessกับcollector เปรียบเทียบcontrolledHTTPsink/memory/disk3rotatedrounds×1051simulatedspans ไม่เรียกแอป/NodeSDKinstrumentationและไม่ใช้รับรอง10%performance (met=null). ไม่มีproductioncode/policy/backendเปลี่ยน ดูcollector-cost.mdสำหรับขอบเขต/การรันและSDKcostที่ยังไม่ได้แยก
+
+Initialdiagnostic `15-56-56-908Z`1/1ทั้ง9conditionscaptureครบ/no dropsและdisk100graphsreloadตรง; medians transport279.391ms/memory278.906ms/disk394.788msเฉพาะexport/drainไม่รวมstartup/spanconstruction ไม่subtractจากHTTPp95หรืออ้างcausalSDKcost. Disk33savesทุกround validation/serialize/fsyncยังวัดได้และshape-sourceเป็นsimulation ไม่pilot
+
+Beforefaultguard `15-58-43-010Z`0/1: controlledfaultยังไม่implemented innerจึงexit0แทนexpected1; rawTAPเก็บไว้. เพิ่มQA503rejectเฉพาะtransportfirstcondition; after `15-59-42-944Z`1/1 guardยืนยันinnerยังfailed/drop1051reasonrejected/workspaceretained และother8conditionsผ่าน. Failureไม่ถูกกลบด้วยpassingoutertest คงnumericworkeroutcome/fixedfailurecodes ไม่มีIPCtokenในreports
+
+Workflowเพิ่มสองgateแยก normalcomponentและnegativeguardหลังordinary/timingbenchmark (13runnerreportsต่อช่อง, benchmarkJSON4ชุดรวมcontrolledfault). แยกรันเพื่อลดการวัดที่รบกวนกันด้วยparallelbenchmarks ไม่มีการลดacceptanceหรือเปลี่ยนSDKfixtureที่ใช้เดิม
+
 ### รอบ63 — reuse normalized span JSON within one validation
 
 **Exact5c6172a:** [PR37334972757](https://github.com/lenulk/FlowAtlas/actions/runs/37334972757) และ [push37334881014](https://github.com/lenulk/FlowAtlas/actions/runs/37334881014)success4/4ทั้งสอง. Audit `15-49-10-072Z`/`15-49-10-526Z`1/1แต่ละชุด ตรวจ88runnerreports/77filesตรงGit5c6172aทุกชุดแม้PRmergec9bfa5ab; main134ทุกช่อง/11gatesexit0/failed0/skipped0, innerERR_ASSERTION/cleanupครบ, ordinaryและdiagnosticcapture3153ack0dropsทุกช่อง, diagnosticmet=null/allowlistednumericfieldsครบ

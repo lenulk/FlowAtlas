@@ -1,5 +1,7 @@
 # บันทึกการรันทดสอบ
 
+Manual round64 start/review: round63code5c6172a exactCI/audit completed before creatingdiag/trace-cost-isolation fromdocs6bac098; productionfiles unchanged. Component results are simulated replay only, timed export/drain excludesstartup/spanconstruction/SDK. Initial9conditions1051ackeach zero drops anddisk100graphreload; controlledfailureguard first0/1 retained, after1/1 preserves inner503failure/rejected1051 andworkspace. Workflow separate sequential component/fault steps reviewed and no empty duplicate step remains beforecommit; no productioncollector flag added.
+
 Manual round63 partial CI read: Linux artifacts PR37334972757/push37334881014 downloaded separately; all4jobs normal+diagnosticcapture complete but ordinaryperformanceFAILED. PRUbuntu24diagnostic firstpair shutdownQueued795/inFlight64/deliveredDuringShutdown859 in146.454ms/deadlineFired0, storage33saves total420.003ms/sync348.711ms/syncMax89.272ms. Not a reproduction of827 loss. Windows stillInstallChromium at review; exactinventory audit pending. QA audit file copied/adapted from round62 usesGit5c6172a/main134/11reports, not priorcodeinventory.
 
 Manual round63 start: clean3ebc2b5/fetch/pullup-to-date; ownbranch perf/span-validation-json. Prior docs push37332918966success, PR37332925143in-progress at check; do not infer stablecapture from a documentation run. Tool read src/http-traces.mjs failed nonexistentpath; corrected via rg --files to src/http-spans.mjs. Isolatedcost raw reports/benchmarks/round63-validator-cost.json read:1spanmedian10.644→9.996ms,48span293.582→304.038ms; no latency improvement claim. Git3ebc2b5 programarchive extracted only after canonical destination/entries check and refusing existing destination; testdir empty to avoid duplicate default discovery, dependencies unchanged via ancestor node_modules.
@@ -2625,3 +2627,116 @@ First matched3×1000 measurement: all6000 measured business responses pluswarmup
 - Environment: win32/x64; OS 10.0.26200; Node v24.19.0
 - commit: 5c6172ae644ef65064cc495ed147a8736d405709; dirty: true
 - หลักฐาน: `reports/tests/2026-10-05T15-49-10-526Z.tap` และ `.json`
+
+## 2026-10-05T15-56-56-908Z
+
+- จุดประสงค์: Round64 component cost simulated replay transport memory durable storage
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 6bac098c350bb0a6eb7de8bb7a07c468107279ce; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T15-56-56-908Z.tap` และ `.json`
+
+## 2026-10-05T15-58-43-010Z
+
+- จุดประสงค์: Round64 before controlled-failure guard implementation
+- ผล: ไม่ผ่าน — 0/1; failed 1; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 6bac098c350bb0a6eb7de8bb7a07c468107279ce; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T15-58-43-010Z.tap` และ `.json`
+- ไม่ผ่าน: rejected component replay remains a reported failure and retains its owned workspace
+
+## 2026-10-05T15-59-42-944Z
+
+- จุดประสงค์: Round64 controlled rejected replay fails and retains evidence after guard
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 6bac098c350bb0a6eb7de8bb7a07c468107279ce; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T15-59-42-944Z.tap` และ `.json`
+
+## 2026-10-05T16-02-31-759Z
+
+- จุดประสงค์: Round64 final simulated component cost transport memory disk with reload
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 6bac098c350bb0a6eb7de8bb7a07c468107279ce; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T16-02-31-759Z.tap` และ `.json`
+
+## 2026-10-05T16-03-50-795Z
+
+- จุดประสงค์: Round64 final component canonical path and capture guards
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 6bac098c350bb0a6eb7de8bb7a07c468107279ce; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T16-03-50-795Z.tap` และ `.json`
+
+## 2026-10-05T16-04-50-225Z
+
+- จุดประสงค์: Round64 final controlled component failure with canonical cleanup
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 6bac098c350bb0a6eb7de8bb7a07c468107279ce; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T16-04-50-225Z.tap` และ `.json`
+
+## 2026-10-05T16-04-58-492Z
+
+- จุดประสงค์: Round64 final main production behavior unchanged
+- ผล: ผ่าน — 134/134; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 6bac098c350bb0a6eb7de8bb7a07c468107279ce; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T16-04-58-492Z.tap` และ `.json`
+
+## 2026-10-05T16-06-52-505Z
+
+- จุดประสงค์: Round64 final component policy counters explicit defaults
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 6bac098c350bb0a6eb7de8bb7a07c468107279ce; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T16-06-52-505Z.tap` และ `.json`
+
+## 2026-10-05T16-07-00-834Z
+
+- จุดประสงค์: Round64 final negative component policy counters
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 6bac098c350bb0a6eb7de8bb7a07c468107279ce; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T16-07-00-834Z.tap` และ `.json`
+
+## 2026-10-05T16-07-55-642Z
+
+- จุดประสงค์: Round64 final main exact QA source inventory
+- ผล: ผ่าน — 134/134; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 6bac098c350bb0a6eb7de8bb7a07c468107279ce; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T16-07-55-642Z.tap` และ `.json`
+
+## 2026-10-05T16-09-44-914Z
+
+- จุดประสงค์: Round64 final component code and fixture digest binding
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 6bac098c350bb0a6eb7de8bb7a07c468107279ce; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T16-09-44-914Z.tap` และ `.json`
+
+## 2026-10-05T16-09-52-898Z
+
+- จุดประสงค์: Round64 final controlled failure code digest binding
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 6bac098c350bb0a6eb7de8bb7a07c468107279ce; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T16-09-52-898Z.tap` และ `.json`
+
+## 2026-10-05T16-11-44-629Z
+
+- จุดประสงค์: Round64 final isolated worker environment and component identity
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 6bac098c350bb0a6eb7de8bb7a07c468107279ce; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T16-11-44-629Z.tap` และ `.json`
+
+## 2026-10-05T16-11-54-374Z
+
+- จุดประสงค์: Round64 final isolated worker rejected replay evidence
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 6bac098c350bb0a6eb7de8bb7a07c468107279ce; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T16-11-54-374Z.tap` และ `.json`

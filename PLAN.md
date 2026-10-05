@@ -111,6 +111,8 @@ Release levels: Alpha = ติดตั้งและ trace เส้นทา�
 
 ## แหล่งอ้างอิงและข้อจำกัดทางเทคนิค
 
+รอบ64QA-onlycollectorcomponentreplay+controlled503guardพร้อม: แยกHTTPsink/memory/diskด้วยproductionexporterคนละprocess, disk100graphreloadตรง, met=nullและsimulationlabelsชัด ไม่วัดNodeSDK/applicationp95หรือแทนpilot. ExactCIpending(13gates/channel); round65SDK-onlycostยังต้องวัดก่อนtransport/backendrepairและADRdurability/recovery. Productionpolicyและacceptanceเดิมคงอยู่; performance/sustained/stablecapture/pilot/releaseยังเปิด
+
 รอบ63reuseclean span JSONในvalidationcallเดียว ลดserialization4→3/spanโดยยังอ่านnode/traceและตรวจใหม่ทุกครั้ง Exact5c6172a PR/pushCI4/4ทั้งสอง/main134ทุกช่อง/77filesตรงGit/normal+diagnosticcaptureครบ แต่isolated48spanไม่ได้เร็วขึ้นและordinaryperformanceFAILEDทุกช่อง. Stablecapture/rootcause827ยังเปิด รอบ64แยกSDK/transport/memory/durablestorageต้นทุนในdiagnosticsก่อนตัดสินใจjournal/ADRcrashrecovery/migration/rollback ไม่ลดdurability/ackguaranteeหรือใช้diagnosticแทนacceptance. Realpilot/users/sustained/releaseยังไม่ผ่าน
 
 รอบ62เพิ่มopt-in flush/storagetimingเพื่อวิเคราะห์shutdown827 โดยคงpolicy/backend/threshold. Exactb554312 PR/pushCI4/4ทั้งสอง/main132ทุกช่อง/77filesตรงGit/normal+diagnosticcaptureครบ; ordinaryperformanceFAILEDทุกช่อง, diagnosticmet=null. พบfsyncpause589msในPRUbuntu24แต่ไม่reproducefailed827จึงยังเปิดshutdownrootcause/stablecapture. รอบ63ลดvalidation/serializationที่วัดได้ หรือADRdurablejournalก่อนbackendchangeโดยคงdurability/recovery. Sustainedload/realpilot/users/releaseยังไม่ผ่าน

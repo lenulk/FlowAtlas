@@ -83,6 +83,16 @@ jobs:
           FLOWATLAS_TEST_PURPOSE: CI opt-in numeric flush storage timing diagnostics
           FLOWATLAS_BENCHMARK_TIMING: '1'
         run: node scripts/run-tests.mjs scripts/benchmark-http-trace.mjs
+      - name: Collector component cost (simulated replay only)
+        if: ${{ !cancelled() }}
+        env:
+          FLOWATLAS_TEST_PURPOSE: CI simulated collector component cost diagnostic
+        run: node scripts/run-tests.mjs scripts/benchmark-collector-cost.mjs
+      - name: Component failure evidence retention
+        if: ${{ !cancelled() }}
+        env:
+          FLOWATLAS_TEST_PURPOSE: CI controlled rejected replay reports failure and retains evidence
+        run: node scripts/run-tests.mjs scripts/collector-cost-failure-check.mjs
       - name: Pack and install in disposable workspace
         id: package_install
         if: ${{ !cancelled() }}
