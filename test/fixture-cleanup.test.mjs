@@ -18,6 +18,10 @@ function fixture(code = "process.stdin.on('data',()=>process.exit(0));") {
   return { child, closed, parent, workspace, canonical, origins: [] };
 }
 async function dispose(owned) {
+  // The boundary helper intentionally unrefs an unconfirmed child. This test
+  // owns the subsequent forced disposal and must keep its close wait alive.
+  owned.child.ref();
+  for (const stream of [owned.child.stdin, owned.child.stdout, owned.child.stderr]) stream?.ref?.();
   if (owned.child.exitCode === null && owned.child.signalCode === null) owned.child.kill('SIGKILL');
   await owned.closed;
   // This exact canonical workspace was generated above, and the owned child is closed.

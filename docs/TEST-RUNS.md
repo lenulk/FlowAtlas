@@ -2268,3 +2268,30 @@ First matched3×1000 measurement: all6000 measured business responses pluswarmup
 - หลักฐาน: `reports/tests/2026-10-05T10-31-43-458Z.tap` และ `.json`
 - FinalRound59 10-31-43-458Z6/6ผ่าน หลัง catch-onlyunrefguard; main123/123ก่อนguard, normalSDK+Edge2/2 และ deliberatefailureยัง0/1พร้อมERR_ASSERTION/cleanupครบ ภาพactualSDK MJSตรวจด้วยตาแล้ว evidencepartial/observed/unknownคงเดิม ไม่มีwriterlockพบในreports/storage ณ snapshot; Get-CimInstance process inventoryถูก sandboxปฏิเสธ จึงไม่อ้างว่าตรวจทุกprocessบนเครื่องแล้ว
 - Commitครั้งแรกไม่สำเร็จเพราะ checkoutใหม่ไม่มี Git author config; คำสั่งpushที่ตามมาเผยแพร่เฉพาะbranchฐานc9563bd ยังไม่มีrepaircommit ตรวจauthorcommitเดิมเป็น Codex <codex@localhost> แล้วใช้ identity นี้เฉพาะคำสั่งcommit ไม่แก้globalconfig
+
+## 2026-10-05T10-34-07-673Z
+
+- จุดประสงค์: Round60 unchanged paired fixture performance baseline after FA15 repair
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 3749c992c64f1c8064b319def01948810504c412; dirty: false
+- หลักฐาน: `reports/tests/2026-10-05T10-34-07-673Z.tap` และ `.json`
+
+## 2026-10-05T10-34-53-441Z
+
+- จุดประสงค์: Round60 collector CPU diagnosis same paired fixture timings not acceptance
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 3749c992c64f1c8064b319def01948810504c412; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T10-34-53-441Z.tap` และ `.json`
+- Round60 baseline10-34-07-673Z1/1 measurementผ่าน: responses/captureครบ3153ack0drops แต่performance FAILED+386.389% aggregatep95(base2.520ms/traced12.257ms), unchanged3pairsx1000requests/concurrency8/threshold10%. Collectorprofile10-34-53-441Z1/1 captureครบ ผลperformance unassessable/profiled_run. Selfsamplesใน3tracedprofilesพบvalidateGraph41–55ms, fsync38–53ms, save22–47ms; spawnSyncรวมstartup209–268msไม่ใช่workload-onlycost ไม่ระบุว่าsamplingพิสูจน์stallrootcause
+- CI3749c99 PRrun37297381429 Ubuntu22main121/123, cancelled2: unresponsivechildboundary disposeรอcloseหลังhelperunref จนeventloopไม่มีreferencedhandle; rawjob111721712043ชี้cancelledByParent/Promisepending งานSDKbrowserและdeliberatefaultgateผ่านบนLinux22; ไม่มีproductionfailureจากหลักฐานนี้ gh run log-failedใช้ไม่ได้ขณะrunยังไม่จบ และrawlogครั้งแรกถูกescape-sequenceguardปฏิเสธ รับเป็นไฟล์ด้วย--allow-escape-sequencesแล้วไม่execute
+
+## 2026-10-05T10-38-56-938Z
+
+- จุดประสงค์: Round59 CI boundary disposal re-ref and original browser fault regression
+- ผล: ผ่าน — 6/6; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 3749c992c64f1c8064b319def01948810504c412; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T10-38-56-938Z.tap` และ `.json`
+- Boundarydisposalrepair focused10-38-56-938Z6/6ผ่าน Windows24.19/Edge ยืนยันfaultเดิมและretentionguards ไม่รับรองLinux22จนCIcommitใหม่ผ่าน

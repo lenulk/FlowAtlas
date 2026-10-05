@@ -637,3 +637,9 @@ FA-15 พบ native exit3221226505 สองรอบใน Windows ขณะ br
 - Regression harnessแรก `10-28-47-833Z`0/1: inherited NODE_TEST_CONTEXT ทำ Node ข้าม recursive test runnerแล้วexit0; raw inner TAPยืนยัน แก้เฉพาะ environment ของ separate QA runner ล่าสุด `10-29-27-979Z`1/1 ผ่าน โดยตรวจว่าผล inner ยังคง failed assertion และcleanupครบ เพิ่ม gate นี้ในCIทุกช่อง ไม่ใช้ outerpassซ่อนinnerfault
 - Default main `10-29-45-335Z`123/123 failed/skipped0 ผ่านก่อนเพิ่ม catch-only unref guard; final focused checksตามท้าย TEST-RUNS. ไม่มีsource serving/SDK/workloadเปลี่ยน จึงไม่ใช้ผลนี้รับรองperformance ต้องรอexactCIและLinuxfailuregateรุ่นใหม่
 - ผู้ใช้ยืนยันยังไม่มีแอปธุรกิจ ให้พัฒนาฐาน/เตรียมpilotต่อ R4/R5และusertrialยังไม่ผ่าน
+
+- ExactCI3749c99 Ubuntu22 main121/123 cancelled2: boundary disposal รอcloseของknownchildที่helperunref จนeventloopจบ (rawjob111721712043). NormalSDK/Chromium2และdeliberatefault1ผ่านบนช่องนี้แล้ว แก้เฉพาะ test-owned disposal ให้ref child/stdioกลับก่อนkill/awaitclose ไม่เปลี่ยนretention/productiontimeout ไม่rerunเดิมเพื่อกลบ failure ต้องใช้commitใหม่ตรวจครบmatrix
+
+### รอบ 60 — วัดต้นทุนก่อนเลือก performance repair
+
+Baseline `2026-10-05T10-34-07-673Z` บน3749c99 WindowsNode24.19.0: measurement1/1ผ่าน responses/capture3153ack0drops แต่ performanceFAILED+386.389% aggregatep95 (2.520→12.257ms) ด้วย3pairs×1000/concurrency8/เกณฑ์10%เดิม Collectorprofile `10-34-53-441Z`1/1 captureครบ แต่performanceassessable=false/met=null/profiled_run. SelfsamplesของvalidateGraph41–55ms, fsync38–53ms, save22–47ms; spawnSync209–268msรวมstartupจึงห้ามอ้างworkloadcost. ยังไม่พิสูจน์ackpause/rootcauseและไม่ปรับนโยบายqueue/deadline หลังพบCIboundaryfailureย้อนมาแก้FA-15ก่อน optimization; profile/rawsummaryอยู่reports/benchmarksและไม่ได้เป็นpilot
