@@ -1,5 +1,7 @@
 # บันทึกการรันทดสอบ
 
+Manual round63 start: clean3ebc2b5/fetch/pullup-to-date; ownbranch perf/span-validation-json. Prior docs push37332918966success, PR37332925143in-progress at check; do not infer stablecapture from a documentation run. Tool read src/http-traces.mjs failed nonexistentpath; corrected via rg --files to src/http-spans.mjs. Isolatedcost raw reports/benchmarks/round63-validator-cost.json read:1spanmedian10.644→9.996ms,48span293.582→304.038ms; no latency improvement claim. Git3ebc2b5 programarchive extracted only after canonical destination/entries check and refusing existing destination; testdir empty to avoid duplicate default discovery, dependencies unchanged via ancestor node_modules.
+
 Manual round62 artifact transfer failure: push CI Windows artifact download failed TLS handshake timeout from GitHub artifact storage. Kept existing Linux artifacts and retry only Windows download; this is network/tool failure, not a software test. PR CI37331499111 and push37331409424 both completed success at latest API check; raw Windows audit still pending when transfer failed. Do not persist temporary signed artifact URLs.
 
 Manual round62 partial hosted review: downloaded Linux artifacts separately for PR37331499111 and push37331409424 after job completion. Numeric diagnostics capturecomplete=true all4Linux jobs. PRUbuntu24 firstpair saveMax684.922ms/syncMax589.189ms/shutdown297.307ms; other3Linuxjobs shutdown3.89–6.36ms. This proves a measured fsync pause in that run, not the cause of prior shutdown827. Pinned SDK source located via rg --files after sdk-trace-base/build guess failed; actual sdk-trace/build/src/export/SimpleSpanProcessor.js _shutdown directly delegates exporter.shutdown. Windows/exact inventory audit pending at this check.
@@ -2532,3 +2534,76 @@ First matched3×1000 measurement: all6000 measured business responses pluswarmup
 - Environment: win32/x64; OS 10.0.26200; Node v24.19.0
 - commit: b5543123cdc528b3e1fda069fb4eeb5b347b69ba; dirty: true
 - หลักฐาน: `reports/tests/2026-10-05T15-25-15-003Z.tap` และ `.json`
+
+## 2026-10-05T15-33-22-904Z
+
+- จุดประสงค์: Round63 before repair HTTP span serialization repetition regression
+- ผล: ไม่ผ่าน — 8/9; failed 1; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 3ebc2b5722da48ea053fee2c6927cbfb230ad339; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T15-33-22-904Z.tap` และ `.json`
+- ไม่ผ่าน: one validation serializes the normalized HTTP span once and rechecks later mutations
+
+## 2026-10-05T15-33-44-988Z
+
+- จุดประสงค์: Round63 JSON reuse equivalence HTTP contract and atomic persistence
+- ผล: ผ่าน — 28/28; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 3ebc2b5722da48ea053fee2c6927cbfb230ad339; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T15-33-44-988Z.tap` และ `.json`
+
+## 2026-10-05T15-35-06-616Z
+
+- จุดประสงค์: Round63 exact baseline diagnostics and isolated alternating validator cost
+- ผล: ผ่าน — 2/2; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 3ebc2b5722da48ea053fee2c6927cbfb230ad339; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T15-35-06-616Z.tap` และ `.json`
+
+## 2026-10-05T15-36-58-537Z
+
+- จุดประสงค์: Round63 after repair unchanged ordinary workload
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 3ebc2b5722da48ea053fee2c6927cbfb230ad339; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T15-36-58-537Z.tap` และ `.json`
+
+## 2026-10-05T15-37-26-158Z
+
+- จุดประสงค์: Round63 numeric diagnostics unchanged workload separate performance scope
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 3ebc2b5722da48ea053fee2c6927cbfb230ad339; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T15-37-26-158Z.tap` และ `.json`
+
+## 2026-10-05T15-37-51-032Z
+
+- จุดประสงค์: Round63 final main no persistent validation cache
+- ผล: ผ่าน — 134/134; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 3ebc2b5722da48ea053fee2c6927cbfb230ad339; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T15-37-51-032Z.tap` และ `.json`
+
+## 2026-10-05T15-38-44-161Z
+
+- จุดประสงค์: Round63 final isolated source
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 3ebc2b5722da48ea053fee2c6927cbfb230ad339; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T15-38-44-161Z.tap` และ `.json`
+
+## 2026-10-05T15-38-56-220Z
+
+- จุดประสงค์: Round63 actual SDK CJS ESM Edge and deliberate failure guard
+- ผล: ผ่าน — 3/3; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 3ebc2b5722da48ea053fee2c6927cbfb230ad339; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T15-38-56-220Z.tap` และ `.json`
+
+## 2026-10-05T15-40-10-222Z
+
+- จุดประสงค์: Round63 final source evidence and archived baseline Git audit
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 3ebc2b5722da48ea053fee2c6927cbfb230ad339; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T15-40-10-222Z.tap` และ `.json`

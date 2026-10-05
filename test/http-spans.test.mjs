@@ -15,6 +15,41 @@ const make = () => new FlowAtlas(version, 100, null, { version: (project) => pro
 const send = (atlas, spans, extra = {}) => ingestEvent(atlas, { kind: 'otel-spans', projectId: 'target', codeDigest: version.digest, traceId, spans, ...extra });
 const sendBatch = (atlas, items) => ingestEvent(atlas, { kind: 'otel-span-batch', projectId: 'target', codeDigest: version.digest, items });
 
+test('one validation serializes the normalized HTTP span once and rechecks later mutations', (t) => {
+  const atlas = make(); const { actionId } = send(atlas, [span(rootId)]);
+  const graph = atlas.get(actionId);
+  const original = JSON.stringify; let calls = 0;
+  const mocked = t.mock.method(JSON, 'stringify', (...args) => {
+    if (args[0]?.spanId) calls++;
+    return Reflect.apply(original, JSON, args);
+  });
+  try {
+    assert.deepEqual(validateGraph(graph), []);
+    assert.equal(calls, 3, 'Trace input, normalized span and node input each serialize once');
+  } finally { mocked.mock.restore(); }
+  const node = graph.nodes.find(node => node.type === 'http-span');
+  node.span = { ...node.span, httpStatus: 503 };
+  assert.ok(validateGraph(graph).includes('span node does not match trace metadata'));
+  graph.trace.spans[0].durationMs = -1;
+  assert.ok(validateGraph(graph).includes('invalid trace span'));
+});
+
+test('HTTP span JSON shape, order and duplicate diagnostics remain strict across validation calls', () => {
+  const atlas = make(); const { actionId } = send(atlas, [span(rootId)]);
+  const original = atlas.get(actionId);
+  for (const change of [
+    graph => { graph.trace.spans[0].secret = 'canary-secret'; },
+    graph => { graph.trace.spans[0] = Object.fromEntries(Object.entries(graph.trace.spans[0]).reverse()); },
+    graph => { graph.trace.spans.push({ ...graph.trace.spans[0] }); },
+  ]) {
+    const graph = structuredClone(original); change(graph);
+    assert.ok(validateGraph(graph).includes('invalid or duplicate trace span'));
+    assert.deepEqual(validateGraph(original), []);
+  }
+  const extra = structuredClone(original); extra.nodes.find(node => node.type === 'http-span').span.secret = 'canary-secret';
+  assert.ok(validateGraph(extra).includes('span node does not match trace metadata'));
+});
+
 test('cross-trace batches commit once and preserve isolation, ancestry and idempotency', () => {
   let saves = 0;
   const store = { load: () => [], save: () => { saves++; } };

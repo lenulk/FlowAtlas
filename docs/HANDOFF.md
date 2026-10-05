@@ -19,6 +19,14 @@ Repository: https://github.com/lenulk/FlowAtlas; branch หลัก `master` �
 
 ## งานค้างแรก: รอบ 59 / FA-15
 
+### งานรับช่วงรอบ63 — span validation JSON
+
+Branch `perf/span-validation-json` ต่อจาก3ebc2b5, stackedbase `diag/shutdown-timing`/PR4. เก็บcleanJSONภายในvalidateGraph callเดิมเพื่อเทียบnode แทนserializecleanobjectซ้ำ ลด4→3calls/span แต่ยังserializetraceinput/nodeinputแยกทุกครั้ง และทุกvalidationอ่านข้อมูลใหม่ ไม่มีcacheข้ามcall/readonlyAPI/backend/schema/durabilitypolicyเปลี่ยน
+
+Before8/9จากserializationcountregression; afterfocused28/28, diagnosticsเทียบGit3ebc2b5+isolatedcost2/2, main134/source1/SDK+Edge+failure3/audit1ผ่าน. Isolated1spanmedian10.644→9.996msแต่48spans293.582→304.038ms จึงไม่claimlatencyimprovement. Ordinarybefore/aftercapture3153ack0dropsแต่performanceFAILED568.733%/304.718%; diagnosticmet=null. ExactCIรุ่นใหม่ยังรอ; prior827shutdowndropsยังเปิด
+
+รอบ64ควรประเมินdurablejournalเพื่อลดการserialize/เขียนhistoryทั้งชุดต่อbatch เทียบกับJSONsnapshotเดิมก่อนเปลี่ยนbackend: ADRต้องกำหนดackหลังfsync, batchatomicity, crash/torn-write/corruptionrecovery, retention/sizebounds, migration+backup/rollback และbenchmarkworkloadเดิม. ไม่ใช้microcostreductionหรือCIgreenรับรองperformance/realpilot; ผู้ใช้ยังไม่มีแอปหรือผู้ทดลอง
+
 ### งานรับช่วงรอบ62 — วิเคราะห์ shutdown drain
 
 **รุ่นโค้ดที่ตรวจแล้ว:** b554312, [PR#4](https://github.com/lenulk/FlowAtlas/pull/4), stackedbase diagจากPR3 `perf/immutable-snapshot-digest`. PRCI37331499111และpush37331409424ผ่าน4/4ทั้งสอง; audit88reports/77filesตรงGit, main132ทุกช่อง/11gatesต่อช่อง/normalและdiagnosticcapture3153ack0drops. PerformanceยังFAILEDทุกช่อง ดูQUALITY. Docscommitถัดไปไม่เปลี่ยนprogramsourceนี้ PR1–4ยังOPENไม่merge

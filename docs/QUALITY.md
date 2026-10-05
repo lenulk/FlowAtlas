@@ -1,5 +1,19 @@
 # รอบทดสอบและปรับปรุง FlowAtlas
 
+### รอบ63 — reuse normalized span JSON within one validation
+
+Finalmain `15-37-51-032Z`134/134, isolatedsource `15-38-44-161Z`1/1, actualSDKCJS/ESM+Edge+deliberatefailure `15-38-56-220Z`3/3ผ่าน; audit `15-40-10-222Z`1/1ยืนยันทุกfinalgate/ordinary+diagnosticprograminventoryตรงcheckoutและarchivebeforeตรงGit3ebc2b5. Diagnosticaftervalidation62.113–73.528ms/serialize45.687–56.458ms/fsync31.983–56.761msทั้ง3pairs; shutdown7.69–20.28ms/deadlineFired0 ไม่มีprior827repro. ExactCIยังตรวจต่อ ไม่ใช้CIรุ่นก่อนรับรอง
+
+Ordinarybaselinearchive3ebc2b5 `15-35-57-302Z`1/1 / after `15-36-58-537Z`1/1 capture3153ack0dropsทั้งคู่ แต่performanceFAILED568.733% (2.613→17.474ms) /304.718% (3.370→13.639ms). Baselineต่าง/ลำดับbefore-after/ไม่มีpairedrandomizedimplementationconditions จึงไม่อ้างcausallatencyimprovement. Diagnosticafter `15-37-26-158Z`1/1captureครบ/met=null ไม่แทนperformancegate Main/source/SDK/exactCIกำลังตรวจต่อ
+
+เริ่มclean3ebc2b5/fetch/pullup-to-date branch perf/span-validation-json ต่อจากPR4. อ่านrawtimingรอบ62และcodeพบvalidateGraphserializeclean spanซ้ำตอนเทียบnode เลือกเก็บcleanJSONในMapภายในcallเดิม แทนcleanobject ไม่cacheข้ามvalidationและยังserializeinputspan/nodeแยกทุกครั้ง ไม่เปลี่ยนbackend/schema/fsync/ack/queue/deadline/workload
+
+Regressionbefore `15-33-22-904Z`8/9: directserializationcount4แต่คาด3; negativeJSONshape/order/duplicateผ่านอยู่แล้ว Afterfocused `15-33-44-988Z`28/28ผ่าน รวมmutablemetadata/node/spanextra/order/duplicateและatomicpersistence/snapshotchecks. Failedreproเก็บไว้ไม่ใช่HTTPcapturefault
+
+Equivalence/cost `15-35-06-616Z`2/2: เทียบGit3ebc2b5 validatorบนfixture1/6/48spans×16valid/malformedvariantsและfollowupmutation diagnostics/throwsตรงกัน. Isolatedalternating5pairs×1000call:1spanmedian10.644→9.996ms;48spans293.582→304.038ms (หลังช้าลง) scatterสูง ไม่อ้างspeedupหรือHTTPimprovement มีเพียงserializationcallsที่ลด4→3โดยตรง ไม่มีtimingthresholdปรับเพื่อให้ผ่าน
+
+Toolread guessed src/http-traces.mjsไม่มีไฟล์ ใช้rg --filesพบsrc/http-spans.mjsและอ่านจริงก่อนแก้. QA baseline validator filesมาจากgitshowbytesและไม่มีชื่อ.test.mjsที่defaultdiscoveryจะเก็บซ้ำ. BaselinefullprogramarchiveGit3ebc2b5ตรวจresolveddestinationและZIPentriesอยู่ในreports/storage/round63-baselineก่อนextract ไม่มีการoverwriteexistingdirectory
+
 ### รอบ62 — opt-in numeric shutdown/storage timing
 
 **ผล exact สุดท้าย b554312:** [PR37331499111](https://github.com/lenulk/FlowAtlas/actions/runs/37331499111) และ [push37331409424](https://github.com/lenulk/FlowAtlas/actions/runs/37331409424)success4/4ทั้งสอง บนWindows2025/Ubuntu24.04×Node22.23.3/24.21.0. Artifactaudit `15-24-40-537Z`/`15-25-15-003Z`1/1แต่ละชุด:88runnerreports/77filesตรงGitb554312ทุกชุดแม้PRcheckoutmerged5bf4dc8; main132ทุกช่อง, 11gatesต่อช่องexit0/failed0/skipped0, innerERR_ASSERTION/cleanupครบ, normal+diagnosticcapture3153ack0dropsทุกช่อง และdiagnostics met=null/sanitizedfieldsครบ
