@@ -2740,3 +2740,44 @@ First matched3×1000 measurement: all6000 measured business responses pluswarmup
 - Environment: win32/x64; OS 10.0.26200; Node v24.19.0
 - commit: 6bac098c350bb0a6eb7de8bb7a07c468107279ce; dirty: true
 - หลักฐาน: `reports/tests/2026-10-05T16-11-54-374Z.tap` และ `.json`
+
+## 2026-10-05 round64 exact CI failure investigation
+
+- PR CI 37339435370 on ceddc0f: Linux Node22/24 component diagnostic failed. Artifact download succeeded; raw reports retained under reports/releases/ci-ceddc0f-pr.
+- Normal simulated disk replay: Node22 round3 delivered416/dropped635; Node24 round1 delivered160/dropped891. Both health.shutdown equals dropped; deadlineFired=1, shutdown approximately902ms, no overflow/invalid/rejected/timeout/transport losses. Disk reopen verified retained100 graphs, which does not prove full capture.
+- Controlled-fault gate Node22 also failed: its intended transport503 rejected1051 correctly, but independent disk round1 additionally delivered256/dropped795 at the shutdown deadline. Node24 controlled-fault gate passed. These are real unexpected capture failures in simulated replay, not a test-runner crash.
+- Keep the 900ms deadline and failed checks; do not rerun or weaken assertions to erase failures. Storage timings and exact remaining matrix evidence must be audited before choosing a repair. No business pilot or performance acceptance implied.
+
+## 2026-10-05T16-25-37-271Z
+
+- จุดประสงค์: Round64 exact PR source and unexpected shutdown losses evidence audit
+- ผล: ไม่ผ่าน — 0/1; failed 1; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: ceddc0f2a635989e52b9c52a3c8d4f3780f235b6; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T16-25-37-271Z.tap` และ `.json`
+- ไม่ผ่าน: round64 exact source and failed capture evidence reconcile without accepting performance
+
+- Round64 audit 16-25-37-271Z failed0/1 because its provisional audit assumed every ordinary performance report must fail. PR Windows24 actually met the existing absolute criterion: baseline0.975ms (<1ms), delta3.214ms≤5ms; relative329.641% is not the selected criterion. Correct the evidence audit to recompute the existing policy, not alter benchmark/source/threshold. All other seven ordinary reports fail their relative criterion. This one passing fixture measurement does not prove performance readiness.
+
+## 2026-10-05T16-26-18-933Z
+
+- จุดประสงค์: Round64 exact PR evidence audit with existing performance criterion
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: ceddc0f2a635989e52b9c52a3c8d4f3780f235b6; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T16-26-18-933Z.tap` และ `.json`
+
+## 2026-10-05T16-26-24-944Z
+
+- จุดประสงค์: Round64 exact push evidence audit separate from failed PR replay
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: ceddc0f2a635989e52b9c52a3c8d4f3780f235b6; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T16-26-24-944Z.tap` และ `.json`
+
+## 2026-10-05 round64 final hosted evidence review
+
+- Exactceddc0f PR37339435370 completed failure2/4; push37339368441 success4/4. Downloads succeeded for all8artifacts. Audits16-26-18-933Z/16-26-24-944Z passed1/1 each:104runnerreports,79codefiles exactGit,main134 all8jobs,FA15assertion/cleanup,ordinary+diagnosticcapture3153 allchannels. Audit includes expected unexpecteddiskfailures and negativefault innerTAP; it does not turn capture failures into acceptance.
+- Unexpecteddisk measured sync915.331/944.152/860.015ms, total935.270/954.990/880.782ms for Node22normal/Node24normal/Node22negative. Nofsync errors; deadline abort may race with server persistence, so ackloss does not establish all spans absent on disk. Transport/memorycomplete; prior827cause still not proven.
+- Existingperformancecriterion:7/8ordinary reports FAILED; PRWindows24 tinybaseline0.975ms selectsabsolute delta3.214ms≤5ms PASS. No criteria changed; not projectperformance readiness. Full details in QUALITY/HANDOFF/PLAN.
+- Final documentation records afterceddc0f are documentation-only. No productionpolicy/workload/backend/source change; allsix stacked PRs remain OPEN. Next round controlled slow-fsync regression and durable drain ADR, SDK-onlycost still pending, no realbusinesspilot/users.

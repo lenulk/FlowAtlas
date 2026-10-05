@@ -111,7 +111,7 @@ Release levels: Alpha = ติดตั้งและ trace เส้นทา�
 
 ## แหล่งอ้างอิงและข้อจำกัดทางเทคนิค
 
-รอบ64QA-onlycollectorcomponentreplay+controlled503guardพร้อม: แยกHTTPsink/memory/diskด้วยproductionexporterคนละprocess, disk100graphreloadตรง, met=nullและsimulationlabelsชัด ไม่วัดNodeSDK/applicationp95หรือแทนpilot. ExactCIpending(13gates/channel); round65SDK-onlycostยังต้องวัดก่อนtransport/backendrepairและADRdurability/recovery. Productionpolicyและacceptanceเดิมคงอยู่; performance/sustained/stablecapture/pilot/releaseยังเปิด
+รอบ64QA-onlycollectorcomponentreplay+controlled503guard: exactceddc0f PRCI2/4/pushCI4/4 (13gates/channel); main134ทุก8jobs/79exactfiles/104reportsauditครบ. PRLinuxdiskburstshutdownloss635/891และnegativeguarddiskloss795; save sync915/944/860msเป็นช่วงใหญ่ ต้องเก็บfailureไม่rerunกลบ. Transport/memorysimulationครบและdisk100graphreloadตรงแต่ไม่พิสูจน์ackครบ; met=nullไม่ใช้แทนNodeSDK/applicationp95/pilot. รอบ65controlledslow-fsync reproduction+ADRdurable drainก่อนrepairหนึ่งประเด็น ไม่ขยาย900ms/ลดfsync/ackpolicy. SDK-onlycostยังค้าง. Ordinaryperformance7/8FAILED; PRWindows24ผ่านtinybaselineabsolutecriterionเดิมครั้งเดียว ไม่ใช่readiness. Performance/sustained/stablecapture/pilot/releaseยังเปิด
 
 รอบ63reuseclean span JSONในvalidationcallเดียว ลดserialization4→3/spanโดยยังอ่านnode/traceและตรวจใหม่ทุกครั้ง Exact5c6172a PR/pushCI4/4ทั้งสอง/main134ทุกช่อง/77filesตรงGit/normal+diagnosticcaptureครบ แต่isolated48spanไม่ได้เร็วขึ้นและordinaryperformanceFAILEDทุกช่อง. Stablecapture/rootcause827ยังเปิด รอบ64แยกSDK/transport/memory/durablestorageต้นทุนในdiagnosticsก่อนตัดสินใจjournal/ADRcrashrecovery/migration/rollback ไม่ลดdurability/ackguaranteeหรือใช้diagnosticแทนacceptance. Realpilot/users/sustained/releaseยังไม่ผ่าน
 
