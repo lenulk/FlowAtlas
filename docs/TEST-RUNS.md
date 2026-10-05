@@ -3234,3 +3234,185 @@ First matched3×1000 measurement: all6000 measured business responses pluswarmup
 - Environment: win32/x64; OS 10.0.26200; Node v24.19.0
 - commit: b60ea05c889463fda6b55d6d37735d173450b8b0; dirty: true
 - หลักฐาน: `reports/tests/2026-10-05T21-02-42-936Z.tap` และ `.json`
+
+## 2026-10-05T21-05-40-428Z
+
+- จุดประสงค์: Round70 before transport repair owned connection cleanup and incomplete acknowledgement regressions
+- ผล: ไม่ผ่าน — 13/15; failed 2; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: c27230824eeede3f197274972261669e3aaad1c6; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T21-05-40-428Z.tap` และ `.json`
+- ไม่ผ่าน: exporter closes its own reused HTTP connections after draining without leaking headers
+- ไม่ผ่าน: a successful header with incomplete response body remains bounded and is not acknowledged
+
+## 2026-10-05T21-06-14-820Z
+
+- จุดประสงค์: Round70 native owned HTTP transport regression abort refusal acknowledgement and cleanup
+- ผล: ผ่าน — 24/24; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: c27230824eeede3f197274972261669e3aaad1c6; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T21-06-14-820Z.tap` และ `.json`
+
+## 2026-10-05T21-07-37-389Z
+
+- จุดประสงค์: Round70 actual SDK native owned HTTP transport diagnostic alone
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: c27230824eeede3f197274972261669e3aaad1c6; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T21-07-37-389Z.tap` และ `.json`
+
+## 2026-10-05T21-07-45-258Z
+
+- จุดประสงค์: Round70 ordinary HTTP native transport capture and unchanged performance criterion
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: c27230824eeede3f197274972261669e3aaad1c6; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T21-07-45-258Z.tap` และ `.json`
+
+## 2026-10-05T21-08-49-957Z
+
+- จุดประสงค์: Round70 final native transport refusal incomplete response and capture atomicity
+- ผล: ผ่าน — 25/25; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: c27230824eeede3f197274972261669e3aaad1c6; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T21-08-49-957Z.tap` และ `.json`
+
+## 2026-10-05T21-08-55-597Z
+
+- จุดประสงค์: Controlled SDK HTTP sink rejection must fail measurement
+- ผล: ไม่ผ่าน — 0/1; failed 1; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: c27230824eeede3f197274972261669e3aaad1c6; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T21-08-55-597Z.tap` และ `.json`
+- ไม่ผ่าน: actual SDK HTTP count-only and production exporter sink costs remain diagnostic
+
+## 2026-10-05T21-08-55-035Z
+
+- จุดประสงค์: Round70 native transport controlled SDK rejection and parity
+- ผล: ผ่าน — 2/2; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: c27230824eeede3f197274972261669e3aaad1c6; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T21-08-55-035Z.tap` และ `.json`
+
+## 2026-10-05T21-09-08-444Z
+
+- จุดประสงค์: Round70 actual SDK CJS ESM Edge and deliberate assertion native transport
+- ผล: ไม่ผ่าน — 1/3; failed 2; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: c27230824eeede3f197274972261669e3aaad1c6; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T21-09-08-444Z.tap` และ `.json`
+- ไม่ผ่าน: deliberate browser assertion retains its original report and confirms fixture cleanup
+- ไม่ผ่าน: real OTel preload captures cjs HTTP/Undici fan-out and isolates concurrent requests
+
+## 2026-10-05T21-09-30-018Z
+
+- จุดประสงค์: Round70 main regression final native owned transport
+- ผล: ไม่ผ่าน — 142/143; failed 1; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: c27230824eeede3f197274972261669e3aaad1c6; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T21-09-30-018Z.tap` และ `.json`
+- ไม่ผ่าน: real OTel preload captures cjs HTTP/Undici fan-out and isolates concurrent requests
+
+- Round70 failed21-09-08-444Z1/3 and main21-09-30-018Z142/143: CJS fanout graph readiness failed consistently; ESM passes. Deliberate fault could not reach intended assertion, so failureguardfailed legitimately. Allownedfixturecleanupconfirmed. Keep these failures; add numericgraph-count QA diagnostics and inspect before furthertransportrepair, not increasewait/relaxcounts. SDK/ordinary performance runs before final error-listener placement: accounting valid but not finalsourcebinding.
+
+## 2026-10-05T21-11-35-837Z
+
+- จุดประสงค์: Round70 reproduce CJS native HTTP instrumentation regression with numeric graph counts
+- ผล: ไม่ผ่าน — 0/1; failed 1; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: c27230824eeede3f197274972261669e3aaad1c6; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T21-11-35-837Z.tap` และ `.json`
+- ไม่ผ่าน: real OTel preload captures cjs HTTP/Undici fan-out and isolates concurrent requests
+
+## 2026-10-05T21-13-45-658Z
+
+- จุดประสงค์: Round70 lazy HTTP import fixes duplicated CJS fanout span without changing expected graph
+- ผล: ผ่าน — 2/2; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: c27230824eeede3f197274972261669e3aaad1c6; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T21-13-45-658Z.tap` และ `.json`
+
+- Round70 deterministic CJS regression21-11-35-837Z0/1: two graphs each4spans (1SERVER+3CLIENT), expected3. Diagnosticcontainscounts only. Eager exporter import of node:http beforeSDKstartup interferes with pinned CJS/ESM hooking; replacing eagerimport/Agentcreation with a shared lazytransportPromise afterspan creation restoresCJSfanout infocusedrun. Preserve failedmain/browser runs and expectedgraphs unchanged. New native transport waits for complete2xxbody within originaldeadline, stronger than oldheaders+bodycancel; non2xxrefusals remain immediate/no redirect/no retry.
+
+## 2026-10-05T21-14-47-068Z
+
+- จุดประสงค์: Round70 final lazy native transport focused contract accounting and ownership
+- ผล: ผ่าน — 25/25; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: c27230824eeede3f197274972261669e3aaad1c6; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T21-14-47-068Z.tap` และ `.json`
+
+## 2026-10-05T21-14-52-093Z
+
+- จุดประสงค์: Round70 final lazy native actual SDK component diagnostic alone
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: c27230824eeede3f197274972261669e3aaad1c6; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T21-14-52-093Z.tap` และ `.json`
+
+## 2026-10-05T21-15-04-960Z
+
+- จุดประสงค์: Controlled SDK HTTP sink rejection must fail measurement
+- ผล: ไม่ผ่าน — 0/1; failed 1; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: c27230824eeede3f197274972261669e3aaad1c6; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T21-15-04-960Z.tap` และ `.json`
+- ไม่ผ่าน: actual SDK HTTP count-only and production exporter sink costs remain diagnostic
+
+## 2026-10-05T21-15-04-122Z
+
+- จุดประสงค์: Round70 final lazy native SDK parity and rejected sink evidence
+- ผล: ผ่าน — 2/2; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: c27230824eeede3f197274972261669e3aaad1c6; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T21-15-04-122Z.tap` และ `.json`
+
+## 2026-10-05T21-15-16-030Z
+
+- จุดประสงค์: Round70 final actual SDK Edge CJS ESM viewer and assertion owned cleanup
+- ผล: ผ่าน — 3/3; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: c27230824eeede3f197274972261669e3aaad1c6; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T21-15-16-030Z.tap` และ `.json`
+
+## 2026-10-05T21-15-39-158Z
+
+- จุดประสงค์: Round70 final main native transport exactsource
+- ผล: ผ่าน — 143/143; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: c27230824eeede3f197274972261669e3aaad1c6; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T21-15-39-158Z.tap` และ `.json`
+
+## 2026-10-05T21-17-36-649Z
+
+- จุดประสงค์: Round70 audit exact round68 failed PR matrix without hiding Linux loss
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: c27230824eeede3f197274972261669e3aaad1c6; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T21-17-36-649Z.tap` และ `.json`
+
+## 2026-10-05T21-19-28-388Z
+
+- จุดประสงค์: Round70 audit exact round68 push three completed channels missing Linux22 remains unverified
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: c27230824eeede3f197274972261669e3aaad1c6; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T21-19-28-388Z.tap` และ `.json`
+
+## 2026-10-05T21-19-34-290Z
+
+- จุดประสงค์: Round70 final ordinary workload lazy native transport unchanged acceptance
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: c27230824eeede3f197274972261669e3aaad1c6; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T21-19-34-290Z.tap` และ `.json`
+
+## 2026-10-05T21-19-50-319Z
+
+- จุดประสงค์: Round70 isolated source identity final native exporter
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: c27230824eeede3f197274972261669e3aaad1c6; dirty: true
+- หลักฐาน: `reports/tests/2026-10-05T21-19-50-319Z.tap` และ `.json`
+
+- Round70 final manualinventory: sevenfinalgates21-14-47/21-14-52/21-15-04/21-15-16/21-15-39/21-19-34/21-19-50 all91programSHA256matchcurrentfinalcandidate; allouterexit0/failed-skipped0. Deliberateassertion/503innerfailures retainedseparately. gitdiffcheckpassed. Baseb60PR/pushauditsconfirmedraw443/923losses; do not close fromcandidatepassinglocalgates. Ordinary560.428%FAILED, no transportcausalperformanceclaim. Candidatehostedpending.

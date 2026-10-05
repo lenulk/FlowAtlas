@@ -1,5 +1,13 @@
 # รอบทดสอบและปรับปรุง FlowAtlas
 
+### รอบ70 — owned HTTP transport และ complete acknowledgement
+
+[ADR](adr-local-http-transport.md). Before21-05-40-428Z13/15failedconnectionbound/incomplete2xxdelivered. NativeAgent2sockets/2free/no redirects/retries/importlazy/drainresponse2xxcomplete/destroyownedagent; deadlines/capacity/storage unchanged. Initialeagerimport caused reproducibleCJSextraCLIENT:2graphs×4spans(1SERVER3CLIENT) vs3 expected. SDKfaultgate21-09-08-444Z1/3และmain21-09-30-018Z142/143failedจริง (ESMpassed); fixednumericgraphdiagnostic21-11-35-837Z0/1 preserved. LazyimportหลังapplicationHTTPspanrestoresCJS/ESMwithoutrelaxingcounts; focused21-13-45-658Z2/2. This is response/connectioncorrectness repair, not provenperformancewin
+
+Final91programfiles:focused21-14-47-068Z25/25,component21-14-52-093Z1/1 all9exact/removed,parity/503guard21-15-04-122Z2/2 (inner21-15-04-960Z0/1expected/retained),SDK+Edge+assertion21-15-16-030Z3/3 withactualfanout/privacy/reload/ownedcleanup,main21-15-39-158Z143/143,ordinary21-19-34-290Z1/1capture3153/source21-19-50-319Z1/1. OrdinaryperformanceFAILED560.428% unchanged10%(baseline2.992/traced19.760ms). Earlierbefore/finalbaselinevaluesdiffer, no causalHTTPimprovement/declineclaim. Successfulheaderswithtruncatedbodynowdropwithinexistingdeadline: persistedbutunacknowledgedpossible, no retries. Sourcecode/schema/fsync/storage/ackaftercommit unchanged; newtransportackrequirescompleteHTTPresponse andclosesonlyownedpool
+
+Hostedbaseb60ea05: PR37372382537failureUbuntu24timing+normalcomponent,other3success; push37372376237threecompleted/Ubuntu22cancelledno steps. Artifactaudits21-17-36-649Z/21-19-28-388Z1/1all7sets/112reports/86exactfiles/main140. Ordinarycapture3153all7 butperformanceFAILEDall. Ubuntu24timingthirdpairack608/drop443shutdown,storage20saves/sync1205.909ms of1263.690ms/maxsync236.791ms,exportershutdown902.268ms/deadline1. Uninstrumentedcomponentdiskround1ack128/drop923/reloadexact. These are actualfailures inbase independentofnewnativecandidate; retainraw+workspacereferences, no re-run tohide. Controlledslowfsyncguards stillpasswithintentionalinnerfailures. Startuprootcause/SDKcost/performance/stablecapture/sustained/pilot/usertrial/release remainopen
+
 ### รอบ69 — actual SDK HTTP component isolation
 
 [วิธีและขอบเขต](sdk-http-cost.md): sharedappSource byte-identicalกับb60ea05 literalตรวจจริง; baseline/actualSDKcount-only/productionSDKexporter-controlledsink3rotated roundsบน1050requests+metrics1. ไม่มีdurablecollector/businessapp. Count-onlyนับSDKspansไม่ใช่ack, SDKoptionsparityตรวจเทียบsourceconstructor. Whole-sourceinventory+runtimefiledigests/fixtureSHAเก็บแยก ค่าmet=nullไม่เป็นperformancegate

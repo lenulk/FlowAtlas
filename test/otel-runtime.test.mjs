@@ -103,11 +103,16 @@ process.stdin.resume();
       fetch(ready.target + path, { headers: { authorization: 'canary-auth', cookie: 'canary-cookie', baggage: 'secret=canary-baggage' } })));
     assert.deepEqual(responses.map((response) => response.status), [200, 503]);
     for (const response of responses) assert.equal(await response.text(), 'canary-business-response');
+    let graphState = { actions: 0, spanCounts: [] };
     const graphs = await waitFor(async () => {
       const list = await (await read(ready.collector + '/flowatlas/actions')).json();
       const graphs = await Promise.all(list.map(async ({ id }) => (await read(ready.collector + '/flowatlas/actions/' + id)).json()));
+      graphState = { actions: graphs.length, spanCounts: graphs.slice(0, 8).map(graph => ({
+        total: graph.trace?.spans.length ?? 0,
+        server: graph.trace?.spans.filter(span => span.kind === 'SERVER').length ?? 0,
+        client: graph.trace?.spans.filter(span => span.kind === 'CLIENT').length ?? 0 })) };
       return graphs.length === 2 && graphs.every((graph) => graph.trace?.spans.length === 3) && graphs;
-    });
+    }).catch(error => { t.diagnostic('SDK graph count state: ' + JSON.stringify(graphState)); throw error; });
     assert.deepEqual(graphs.map((graph) => graph.outcome).sort(), ['error', 'success']);
     assert.equal(new Set(graphs.map((graph) => graph.trace.traceId)).size, 2);
     for (const graph of graphs) {
