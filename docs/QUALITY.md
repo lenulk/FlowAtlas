@@ -640,6 +640,20 @@ FA-15 พบ native exit3221226505 สองรอบใน Windows ขณะ br
 
 - ExactCI3749c99 Ubuntu22 main121/123 cancelled2: boundary disposal รอcloseของknownchildที่helperunref จนeventloopจบ (rawjob111721712043). NormalSDK/Chromium2และdeliberatefault1ผ่านบนช่องนี้แล้ว แก้เฉพาะ test-owned disposal ให้ref child/stdioกลับก่อนkill/awaitclose ไม่เปลี่ยนretention/productiontimeout ไม่rerunเดิมเพื่อกลบ failure ต้องใช้commitใหม่ตรวจครบmatrix
 
+- Windows22rawjob111721711665ยืนยันcancelled2ที่boundaryเดียวกัน; 8b1e270แก้test-ownedrefแล้ว exactPRrun37298050345ผ่าน4/4 ทุกstepบนWindows2025/Ubuntu24.04 Node22.23.3/24.21.0 ตรวจAPIสด5ต.ค.2026 ไม่มีfailedstep ผลนี้รับรองQAfixture/failuregate ไม่ใช่nativeinternalrootcause/performance/pilot
+
 ### รอบ 60 — วัดต้นทุนก่อนเลือก performance repair
 
 Baseline `2026-10-05T10-34-07-673Z` บน3749c99 WindowsNode24.19.0: measurement1/1ผ่าน responses/capture3153ack0drops แต่ performanceFAILED+386.389% aggregatep95 (2.520→12.257ms) ด้วย3pairs×1000/concurrency8/เกณฑ์10%เดิม Collectorprofile `10-34-53-441Z`1/1 captureครบ แต่performanceassessable=false/met=null/profiled_run. SelfsamplesของvalidateGraph41–55ms, fsync38–53ms, save22–47ms; spawnSync209–268msรวมstartupจึงห้ามอ้างworkloadcost. ยังไม่พิสูจน์ackpause/rootcauseและไม่ปรับนโยบายqueue/deadline หลังพบCIboundaryfailureย้อนมาแก้FA-15ก่อน optimization; profile/rawsummaryอยู่reports/benchmarksและไม่ได้เป็นpilot
+
+- Branch `perf/graph-validation-index` ต่อยอด8b1e270แยกจากPRFA-15 ลดfilter/Set/findที่เคยทำซ้ำต่อedge เป็นMapหนึ่งชุดต่อvalidateGraph แต่exportedvalidateEdgeยังสร้างindexจากข้อมูลปัจจุบันเอง คงfirst-matchเมื่อnodeIDซ้ำ ไม่เก็บmutablevalidationcacheหรือเปลี่ยนชนิดหลักฐาน
+- Equivalence/contract/persistence `10-42-10-284Z`23/23ผ่าน รวมเทียบdiagnosticsกับvalidatorในGit8b1e270บนmalformed/100nodes200edges และmutation/duplicate-first-match regression. Main `10-43-00-150Z`125/125ผ่าน(core124+ignoredlocalcomparator1ที่Nodeค้นเจอ; เปลี่ยนชื่อdiagnosticหลังรันให้เรียกexplicitเท่านั้น ไม่มีsourcechange)
+- Unprofiledafter `10-42-31-580Z`1/1 capture3153ack0drops แต่performanceFAILED+479.671% (2.735→15.854ms). ไม่อ้างHTTPดีขึ้นหรือแก้overheadจากผลนี้ คงthreshold/workload; CPUprofileเป็นเพียงเหตุผลเลือกlocalcostrepair
+- Isolatedalternating5pairs×1000validatorcalls `10-44-18-877Z`1/1: capturedHTTPfixture median23.187→19.630ms; synthetic100nodes200edges1122.924→90.821ms ผลนี้แยกจากHTTPacceptanceและไม่ใช่businesspilot เป็นหลักฐานจำกัดว่าลดงานซ้ำในvalidatorได้โดยdiagnosticsเดิมคงอยู่ ต้องรอexactCIของoptimizationbranch
+- เตรียม [pilot protocol](pilot.md) ตามPLAN: app/businesscases/knownanswers/privacy/rollback/performance/sustainedloadและusertrial ยังไม่มีแอปหรือผู้ทดลอง ไม่ปิดR4/R5จากเอกสาร
+
+- FinalSDK/Edge+failuregate `10-44-53-329Z`3/3ผ่านบนvalidatorใหม่ failed/skipped0; normalgraphsมี6ack0drop/exactreloadและsyntheticgeometryแยกเดิม. ตรวจdiffแล้วไม่มีproductionqueue/deadline/storagepolicyเปลี่ยน ยังรอexactCIของoptimization ไม่ใช้FA-15CI8b1e270รับรองsourceที่เปลี่ยนนี้
+
+- Exact44151a5 PRrun37299083948ผ่าน4/4ทุกstepแล้ว: sourceaudit `2026-10-05T10-57-17-148Z`1/1ตรวจartifacts4ชุด/40runnerreports/inventory74ไฟล์ตรงGitทุกชุด, main124/124ทุกช่อง exit0 failed/skipped0 และinnerassertionยังfailedพร้อมERR_ASSERTION/cleanupครบ. Capture3153ack0dropsแต่performanceFAILED Ubuntu22+71.129%,Ubuntu24+117.530%,Windows22+196.786%,Windows24+303.755%. ไม่ใช้relativeoverheadที่ต่างbaselineอ้างHTTPimprovement; sustainedload/realpilot/users/releaseยังเปิด
+- Base8b1e270audit `10-52-37-063Z`1/1: main123ทุกช่อง/40reports/74exactfiles, failuregateครบ/capture3153ack0drops, performanceFAILED Ubuntu22+95.963%,Ubuntu24+177.016%,Windows22+256.427%,Windows24+193.342%. เก็บartifactแยกreports/releases/ci-8b1e270และci-44151a5ไม่มีการนำrawmetadataข้ามรุ่นมาใช้รับรอง
+- Finaldocsreview: HANDOFF/PLAN/QUALITY/TEST-RUNS/pilotชี้รุ่น/PRbase/หลักฐานจริงครบ ยังไม่มีการmerge; remote masterc9563bdไม่มีงานใหม่ที่ต้องทับ Documentation-onlyrecordไม่เปลี่ยนprogramsourceที่CIตรวจแล้ว

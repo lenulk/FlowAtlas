@@ -29,12 +29,23 @@ function validateSource(source, version, location) {
   return issues;
 }
 
+function indexNodes(nodes) {
+  const indexed = new Map();
+  for (const node of Array.isArray(nodes) ? nodes : []) {
+    // Preserve find()'s first-match behavior even in a graph with duplicate IDs.
+    if (node && typeof node === 'object' && !indexed.has(node.id)) indexed.set(node.id, node);
+  }
+  return indexed;
+}
+
 export function validateEdge(action, edge) {
+  return validateIndexedEdge(action, edge, indexNodes(action?.nodes));
+}
+
+function validateIndexedEdge(action, edge, nodes) {
   const issues = [];
   const label = `edge ${edge?.id ?? '?'}`;
-  const nodes = Array.isArray(action?.nodes) ? action.nodes.filter((node) => node && typeof node === 'object') : [];
-  const nodeIds = new Set(nodes.map((node) => node.id));
-  if (!isText(edge?.from) || !isText(edge?.to) || !nodeIds.has(edge.from) || !nodeIds.has(edge.to)) {
+  if (!isText(edge?.from) || !isText(edge?.to) || !nodes.has(edge.from) || !nodes.has(edge.to)) {
     issues.push(`${label}: endpoint is missing`);
   }
   const evidence = edge?.evidence;
@@ -48,20 +59,20 @@ export function validateEdge(action, edge) {
   }
 
   if (evidence.type === 'client-report-and-http-inbound') {
-    if (nodes.find((node) => node.id === edge.from)?.origin !== 'client-reported') {
+    if (nodes.get(edge.from)?.origin !== 'client-reported') {
       issues.push(`${label}: no client-reported action exists`);
     }
     if (evidence.correlationId !== action.id || !isText(evidence.method) || !isText(evidence.path)) {
       issues.push(`${label}: correlation or HTTP request data is missing`);
     }
-    const target = nodes.find((node) => node.id === edge.to);
+    const target = nodes.get(edge.to);
     if (target?.type !== 'api' || target.label !== `${evidence.method} ${evidence.path}`) {
       issues.push(`${label}: HTTP evidence does not match the API node`);
     }
   } else if (evidence.type === 'instrumented-handler-entry') {
     if (!isText(evidence.symbol)) issues.push(`${label}: handler symbol is missing`);
     issues.push(...validateSource(evidence.sourceDeclaration, action.codeVersion, label));
-    const target = nodes.find((node) => node.id === edge.to);
+    const target = nodes.get(edge.to);
     if (target?.type !== 'code' || target.source?.symbol !== evidence.symbol
       || target.source?.file !== evidence.sourceDeclaration?.file) {
       issues.push(`${label}: handler evidence does not match the code node`);
@@ -84,7 +95,7 @@ export function validateEdge(action, edge) {
     }
     const requestId = evidence.destination === undefined ? `http:${evidence.method}:${evidence.path}`
       : `http:${encodeURIComponent(evidence.destination)}:${evidence.method}:${evidence.path}`;
-    const target = nodes.find((node) => node.id === edge.to);
+    const target = nodes.get(edge.to);
     if (edge.to !== requestId || target?.type !== 'external-request'
       || (evidence.destination !== undefined && (!isText(evidence.destination) || target.destination !== evidence.destination))) {
       issues.push(`${label}: outbound evidence does not match the request node`);
@@ -92,12 +103,12 @@ export function validateEdge(action, edge) {
   } else if (evidence.type === 'source-route-match') {
     if (!isText(evidence.reason)) issues.push(`${label}: inference reason is missing`);
     issues.push(...validateSource(evidence.source, action.codeVersion, label));
-    const target = nodes.find((node) => node.id === edge.to);
+    const target = nodes.get(edge.to);
     if (target?.source?.file !== evidence.source?.file || target.source?.sha256 !== evidence.source?.sha256) {
       issues.push(`${label}: inferred source does not match the target node`);
     }
   } else if (evidence.type === 'otel-span-parent') {
-    const from = nodes.find((node) => node.id === edge.from), to = nodes.find((node) => node.id === edge.to);
+    const from = nodes.get(edge.from), to = nodes.get(edge.to);
     if (action.schemaVersion !== '0.2' || from?.type !== 'http-span' || to?.type !== 'http-span'
       || !/^[a-f0-9]{32}$/.test(evidence.traceId ?? '') || evidence.traceId !== action.trace?.traceId
       || from.span?.spanId !== evidence.parentSpanId || to.span?.spanId !== evidence.spanId
@@ -152,11 +163,13 @@ export function validateGraph(graph) {
   if (graph.schemaVersion === '0.2' && (graph.nodes.filter((node) => node?.type === 'http-span').length !== traceSpans.size
     || graph.nodes[0]?.type !== 'http-trace')) issues.push('HTTP trace graph has missing span nodes');
   const edgeIds = new Set();
+  // One index per validation call; no cached result can outlive graph mutations.
+  const indexedNodes = indexNodes(graph.nodes);
   for (const edge of graph.edges) {
     if (!edge || typeof edge !== 'object' || Array.isArray(edge)) { issues.push('invalid edge'); continue; }
     if (!isText(edge.id) || edgeIds.has(edge.id)) issues.push(`duplicate or missing edge ID ${edge.id}`);
     edgeIds.add(edge.id);
-    issues.push(...validateEdge(graph, edge));
+    issues.push(...validateIndexedEdge(graph, edge, indexedNodes));
   }
   return issues;
 }
