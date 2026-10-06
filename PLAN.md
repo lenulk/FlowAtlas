@@ -165,3 +165,5 @@ FA-03 lifecycle repair: managed CLIinspect now has private ownership proof and d
 รอบ75: forceFlush เติมช่องส่งที่ว่างโดยไม่ติดรอ peer ที่ค้าง ภายใน shutdown900ms เดิม. Focused18/main150/SDK+Edge+fault3/source1ผ่าน; ordinary3153/drop0 แต่ p95 overhead315.101% ยังFAILED. Slowfsync/CLIrootcause/sustained30min/pilot/users/releaseยังเปิด
 
 รอบ76full reference20×30min ล้มเหลวจริงหลัง4m25s: business48078ถูก แต่metadata19สูญเสีย; RSS/queue/diskอยู่ใต้limits. ไม่ผ่านFA-07/FA-08/sustained. ต่อไปcontrolled-reorder batchidentity repairและdrop/storage/failedreloaddiagnosticsก่อนแก้production cause; ไม่เปลี่ยนเกณฑ์เพื่อผ่าน
+
+รอบ77controlled reorderเลือกknownfixturebatchidentityแล้ว ผ่านsender/reversedarrival2guardsและnormal/control/rejectioncomponent. ไม่ถือว่าactualsustained19lossได้รับการแก้; เตรียมdiagnosticsแยกก่อนrepeatworkload

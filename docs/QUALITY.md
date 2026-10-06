@@ -862,3 +862,11 @@ Clean source675fafa, runner10-57-30-677Z0/1, report10-57-30-943Z: requested18000
 รายงานแรกยังขาดdropReasons/storage timing/failed-reload จึงห้ามสรุปว่า19dropsเกิดจากfsync/EPERM/transportชนิดใด. TAPไม่พบstoragewarning แต่ไม่ใช่proofว่าไม่มีstoragecause. ต้องเพิ่มallowlisteddiagnostics/failedreloadเป็นรอบแยกก่อนทดลองต่อ ห้ามปรับdeadline/limitหรือrerun unchangedเพื่อทำให้ดูผ่าน
 
 675fafa hosted PR37453182274 Ubuntu22/24 controlled collector order failures แม้pushUbuntuทั้งสองผ่าน ณAPIล่าสุด. QA controlเดิมยึดarrival ordinal31/32ซึ่งอาจต่างsender batch orderตั้งแต่ต้น; ต้องตรวจrawและแก้controlให้เลือกpayloadbatchที่กำหนดเองโดยไม่relaxassertionsก่อนปิดประเด็น
+
+### รอบ77 — เลือก reorder จาก fixture batch identity
+
+Before11-05-27-379Z1/2 reproducesoldcontrol: network arrival batch32ก่อน31 ถูกordinalcontrolย้อนกลับเป็นsenderorder. แก้ownedQAhelperให้อ่านbody≤16384bytesแล้วreplay bytesเดิมบนreqเดิม (headers/socket/productionparserเดิม), เลือกsyntheticbatch31/32จากfirsttraceIdที่ทราบล่วงหน้า. batch31จะcommitหลังbatch32เสมอแม้arrivalกลับกัน; productiontransport/deadlinesไม่เปลี่ยน. NewCIarrival-independence2guards
+
+Final11-05-54-663Z2/2/controlledfull11-05-55-078Z1/1/normal11-05-59-455Z1/1/rejectionguard11-06-03-877Z1/1ผ่าน, eachnormal/control9conditions1051/drop0และdiskreopenexact. ผลนี้แก้QAcontrol ไม่ปิดactualsustained19loss/fsync827loss/performance/startup/pilot
+
+Exact675fafaAPIcompleted: PR37453182274ผ่านWindows2/failedUbuntu2 controlled-orderstep; push37453176461success4channels. CIshortsmokeทั้ง4ไม่ใช่30-minute gate. FullWindowsactualยังfailed. ต้องauditrawเทียบprogramก่อนรับรองexactและรอรอบ77CI; ไม่ใช้pushpassแทนPRfailure

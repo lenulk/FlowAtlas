@@ -154,3 +154,7 @@ Branch `fix/exporter-flush-slot-refill` ต่อจาก4f5f5ac/[PR16](https:/
 ## รอบ76ผลเต็ม (6 ตุลาคม 2026)
 
 675fafa full20worker30min FAILEDหลัง4m25s: business48078ถูก/ack48059/drop19, resource limitsยังอยู่ใต้เกณฑ์. เก็บworkspace sustained-reference-JoNW9D; ไม่รับรอง30min/reloadจากfailedrun. ต้องเก็บdropReasons+storage timingและfailedreloadเพิ่มก่อนหาสาเหตุ19loss. HostedPR Ubuntu controlled-reorder fixturefailed ต้องแยกarrivalordinalจากsenderbatch. รอบ75flushrepairยังมีhostedfsync827lossอยู่. Performance/stablecapture/CLIrootcause/sustained/pilot/users/releaseไม่ผ่าน
+
+## รอบ77ล่าสุด
+
+Branch `test/reorder-by-fixture-batch` ต่อจาก5dd816b/PR18 แก้controlledQAใช้senderbatchidentityแทนarrivalordinal พร้อมreverse-arrivalbefore1/2/after2/2 และcomponentnormal/control/rejectionผ่าน. Full30minรุ่น675fafaยังFAILED19lossหลัง4m25s; ขั้นถัดไปdropReasons/storage/failedreloaddiagnosticsเพื่อแยกcauseก่อนproductionrepair. ไม่มีrealpilot/performancepass

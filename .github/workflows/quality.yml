@@ -94,6 +94,11 @@ jobs:
           FLOWATLAS_TEST_PURPOSE: CI accepted commit order under controlled concurrent upload reversal
           FLOWATLAS_COLLECTOR_COST_REORDER: '1'
         run: node scripts/run-tests.mjs scripts/benchmark-collector-cost.mjs
+      - name: Collector reorder fixture arrival independence
+        if: ${{ !cancelled() }}
+        env:
+          FLOWATLAS_TEST_PURPOSE: CI controlled collector batches independent of request arrival order
+        run: node scripts/run-tests.mjs scripts/collector-reorder-check.mjs
       - name: Component failure evidence retention
         if: ${{ !cancelled() }}
         env:
