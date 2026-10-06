@@ -1,6 +1,6 @@
 # ส่งต่องาน FlowAtlas
 
-ตรวจสถานะสำหรับส่งต่องานวันที่ 5 ตุลาคม 2026 เอกสารนี้เป็นจุดเริ่มอ่านงานต่อ ต้องตรวจโค้ด Git และผล CI ปัจจุบันอีกครั้งก่อนเปลี่ยนไฟล์
+ตรวจสถานะสำหรับส่งต่องานวันที่ 6 ตุลาคม 2026 เอกสารนี้เป็นจุดเริ่มอ่านงานต่อ ต้องตรวจโค้ด Git และผล CI ปัจจุบันอีกครั้งก่อนเปลี่ยนไฟล์
 
 ## เป้าหมายของเจ้าของโปรเจกต์
 
@@ -9,6 +9,8 @@
 Repository: https://github.com/lenulk/FlowAtlas; branch หลัก `master` ไม่จำเป็นต้องใช้พาธของเครื่องเดิมบนเครื่องใหม่ อ่าน [AGENTS.md](../AGENTS.md), [PLAN.md](../PLAN.md), [QUALITY.md](QUALITY.md), [TEST-RUNS.md](TEST-RUNS.md), [install.md](install.md), [linux-vm.md](linux-vm.md) ก่อนเริ่ม
 
 ## สถานะที่ตรวจแล้ว
+
+**ล่าสุดรอบ76:** ต่อจาก845547e/[PR17](https://github.com/lenulk/FlowAtlas/pull/17) เตรียม [sustained reference](sustained-reference.md) แบบ actual SDK/durable JSON/20 workers โดยกำหนด limits ก่อนรัน Short smoke740spans/ackครบ/reloadตรง แต่ sustained met=null; controlled business409 inner ยังfailedและretained/ownedcleanupครบ ทั้งสอง startup fixture failuresเก็บแล้ว กำลังเตรียม full30-minute run แยกจาก workload อื่น ห้ามอ้าง pilot หรือ performance จากผลนี้ รอบ75 main150/SDK+Edge+fault3/source1ผ่าน แต่ ordinary p95+315.101%FAILED; fsync loss/startup root cause/realpilot/users/release ยังเปิด
 
 **รอบ73:** branchtest/bounded-fixture-workersต่อจากad3dbaf/[PR14](https://github.com/lenulk/FlowAtlas/pull/14). [Runnerresourcepolicy](test-resources.md) default2test-fileworkers/explicitoverridepreserved ไม่เพิ่มappdeadline/skiptests/เปลี่ยนproduction. Newdefaultmain10-28-25-404Z148/148ผ่าน; overridesสองรูปแบบ5/5แต่ละชุดและargsบันทึกจริง. Oldstartupfailure2casesยังไม่ปิดrootcauseจากresourceconditionที่ผ่าน. ต่อไปรอบ74componentretentionaccepted-orderและcontrolledreorderingก่อนdrainfix/sustainedload. Pilot/users/performance/fsyncloss/CLIrootcause/releaseยังเปิด
 

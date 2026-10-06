@@ -846,3 +846,7 @@ Final focused10-45-20-838Z18/18: healthy peer ส่ง64/drop32shutdown เม�
 Ordinary10-46-44-956Z1/1 รับครบ3153/drop0 แต่ performance FAILED +315.101% (baseline2.523/traced10.473ms). ไม่อ้าง causal speedup จาก host timings ที่ต่างกัน. Slow fsync guardยังผ่านพร้อม inner disk failures/reload exact; การเติมช่องว่างไม่แก้ collector ที่ block synchronous fsync ทั้ง process. Startup root cause/sustained30min/realpilot/users/release ยังเปิด
 
 CI ตรวจสด: 3a23a3e push37450840821 success แต่ PR37450846858 failure3/4 Ubuntu22 ordinary/timing/component/negativeguard; ad3dbaf PR37449864287 failure3/4 Ubuntu22component/negativeguard. จึงยังไม่ใช้ passing local แทน exact hosted evidence. เริ่มโหลด raw artifacts เพื่อ audit รุ่นfe507c6/3a23a3e; มี TLS handshake timeout ของหนึ่ง artifact บันทึกเป็น download failure ไม่ใช่ test failure
+
+### รอบ76 — เตรียม sustained reference และตรวจหลักฐานเดิม
+
+เพิ่ม actualSDK + durable collector reference20workers/100ms response พร้อม limitsระบุก่อนรัน (RSS512MiBต่อtargetและdriver+collector/state64MiB/queue2048/slots2/history100). [วิธีรันและขอบเขต](sustained-reference.md). Short smoke10-53-44-624Zผ่าน740spans/reloadแต่met=null; ก่อนหน้านั้นมี QAregistration/ESMloader failures0/1ทั้งสองชุด เก็บครบ. Controlled business409 guard10-54-34-592Zผ่านแต่innerยังfailed/retainedและcloseownedchild+collector/lockremoved. ไม่ลดความคาดหวังให้businesserrorผ่าน ไม่ใช้realpilotหรือ30minclaimจาก4วินาที

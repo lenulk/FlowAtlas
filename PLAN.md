@@ -14,6 +14,8 @@ Node.js เป็น integration ที่กำลังพัฒนาแล�
 
 ## สถานะเริ่มต้น
 
+รอบ76เพิ่ม sustained reference20 workers พร้อม limits ที่ตั้งก่อนรันและ CI short smoke/controlled business-error guard. Full30-minute conditionยังรอผล; smokeไม่ผ่านแทน30นาที/ไม่มีpairedperformance/realpilot. รอบ75แก้ flush slot refillโดย deadlineเดิม main150ผ่าน; performance315.101%FAILED. ข้อมูลสูญหายเมื่อ synchronous fsyncช้าและstartuprootcauseยังเปิด
+
 รอบ73run-testsdefault2fileworkers/explicitoverrideสำหรับresourceexperiment; actualmain148passedโดยappdeadlinesเดิม. Startupfailureเดิมยังมีบันทึกและไม่claimrootcauseclosed. ต่อcomponentcommit-order/schedulingdrain/sustained30min; ยังไม่มีrealpilot/usertrial/performancepass
 
 รอบ72QAmetadatafaultใช้controlledresponses/no-dispatchและrealbusiness5calls ทำattempt-vs-admissionชัดเจน Productionclientไม่เปลี่ยน. Focused5/5/mainconcurrency2 148/148passed แต่defaultmainfailedCLIstartup2casesยังเปิด. ต้องboundedtest-resource/cleanupและreceipt-orderdiagnosticsก่อนdrain/sustainedload; ไม่ลดเกณฑ์เดิม/ไม่ปิดpilot-usergate

@@ -124,6 +124,17 @@ jobs:
         env:
           FLOWATLAS_TEST_PURPOSE: CI SDK cost configuration parity and rejected sink evidence
         run: node scripts/run-tests.mjs scripts/sdk-http-fixture-check.mjs scripts/sdk-http-failure-check.mjs
+      - name: Short sustained reference smoke
+        if: ${{ !cancelled() }}
+        env:
+          FLOWATLAS_TEST_PURPOSE: CI short sustained reference smoke only, not 30-minute acceptance
+          FLOWATLAS_SUSTAINED_DURATION_MS: '4000'
+        run: node scripts/run-tests.mjs scripts/sustained-reference-check.mjs
+      - name: Sustained reference failure retention
+        if: ${{ !cancelled() }}
+        env:
+          FLOWATLAS_TEST_PURPOSE: CI controlled sustained business response failure retention
+        run: node scripts/run-tests.mjs scripts/sustained-reference-failure-check.mjs
       - name: Pack and install in disposable workspace
         id: package_install
         if: ${{ !cancelled() }}

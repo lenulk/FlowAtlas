@@ -3769,3 +3769,69 @@ First matched3×1000 measurement: all6000 measured business responses pluswarmup
 ### Round75 manual CI/download check
 
 ตรวจ API run3a23a3e push success/PR3of4pass และ ad3dbaf PR3of4pass; failed Ubuntu22 stepsตามQUALITY. Artifact downloadพบ TLS handshake timeout ของ Windows22 artifact ในชุด3a23a3e PR จึงยังไม่อ้างcomplete audit. ไม่เก็บ signed download URL ลงเอกสาร
+
+## 2026-10-06T10-52-44-099Z
+
+- จุดประสงค์: Round76 short actual SDK durable sustained reference plumbing, not 30-minute acceptance
+- ผล: ไม่ผ่าน — 0/1; failed 1; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 845547e43a0d3dbec5eae032c758fba28881095a; dirty: true
+- หลักฐาน: `reports/tests/2026-10-06T10-52-44-099Z.tap` และ `.json`
+- ไม่ผ่าน: bounded sustained reference HTTP workload uses actual SDK and durable reload, never pilot acceptance
+
+## 2026-10-06T10-53-17-770Z
+
+- จุดประสงค์: Round76 repaired owned app registration short smoke, no sustained acceptance
+- ผล: ไม่ผ่าน — 0/1; failed 1; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 845547e43a0d3dbec5eae032c758fba28881095a; dirty: true
+- หลักฐาน: `reports/tests/2026-10-06T10-53-17-770Z.tap` และ `.json`
+- ไม่ผ่าน: bounded sustained reference HTTP workload uses actual SDK and durable reload, never pilot acceptance
+
+## 2026-10-06T10-53-44-624Z
+
+- จุดประสงค์: Round76 ESM SDK hook included, short smoke not 30-minute acceptance
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 845547e43a0d3dbec5eae032c758fba28881095a; dirty: true
+- หลักฐาน: `reports/tests/2026-10-06T10-53-44-624Z.tap` และ `.json`
+
+## 2026-10-06T10-54-34-889Z
+
+- จุดประสงค์: Controlled sustained reference business response must fail measurement
+- ผล: ไม่ผ่าน — 0/1; failed 1; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 845547e43a0d3dbec5eae032c758fba28881095a; dirty: true
+- หลักฐาน: `reports/tests/2026-10-06T10-54-34-889Z.tap` และ `.json`
+- ไม่ผ่าน: bounded sustained reference HTTP workload uses actual SDK and durable reload, never pilot acceptance
+
+## 2026-10-06T10-54-34-592Z
+
+- จุดประสงค์: Round76 controlled business error retains failed capture evidence
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 845547e43a0d3dbec5eae032c758fba28881095a; dirty: true
+- หลักฐาน: `reports/tests/2026-10-06T10-54-34-592Z.tap` และ `.json`
+
+## 2026-10-06T10-55-22-641Z
+
+- จุดประสงค์: Round76 audit prior fe507c6 PR raw CI exact source and real capture failures
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 845547e43a0d3dbec5eae032c758fba28881095a; dirty: true
+- หลักฐาน: `reports/tests/2026-10-06T10-55-22-641Z.tap` และ `.json`
+
+## 2026-10-06T10-55-27-987Z
+
+- จุดประสงค์: Round76 audit prior fe507c6 push raw CI exact source and real capture failures
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 845547e43a0d3dbec5eae032c758fba28881095a; dirty: true
+- หลักฐาน: `reports/tests/2026-10-06T10-55-27-987Z.tap` และ `.json`
+
+### Round76 tool and setup failures
+
+- Artifact directory `reports/releases/ci-3a23a3e-pr` ไม่เกิดหลัง TLS download failure; Get-ChildItem จึงแจ้ง path not found. ชุดfe507c6 PR/pushมี artifacts4ช่องและตรวจแยก ไม่ถือว่าชุด3a23a3eถูก audit
+- Initial sustained smoke10-52-44-099Z0/1 ตั้ง registered app root เป็นworkspaceเอง ซึ่ง ProjectSources ห้ามตามขอบเขตเดิม; แก้ QA fixture ให้ใช้ subdirectory app โดยไม่แก้ production policy
+- Next smoke10-53-17-770Z0/1 business740ตอบถูกแต่SDK0 เพราะ QA ESM child launchขาด instrumentation/hook.mjs; เพิ่มloaderตาม existing SDK runner ไม่ถือว่าผลนั้นมี capture
+- Repaired smoke10-53-44-624Z1/1 actualSDK740/ack740/drop0/reload exact และ sustained met=null. Negative outer10-54-34-592Z1/1 มี inner failรายงานbusiness_response_mismatch/409/retained workspace/lockremoved; ไม่ใช้outerpassอ้างinnerผ่าน
