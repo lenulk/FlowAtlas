@@ -1,5 +1,9 @@
 # รอบทดสอบและปรับปรุง FlowAtlas
 
+### รอบ73 — bounded QA test workers
+
+[นโยบาย](test-resources.md) run-testsdefault--test-concurrency=2เพื่อจำกัดจำนวนtest-fileworkersที่สร้างnestedCLI/SDKfixtures ไม่ผูกhostCPUcount. Explicit overrideทั้งequals/spacedรูปแบบคงไว้. ไม่เปลี่ยนcoverage/assertions/producttimeout/no skipped tests. Main10-28-25-404Z148/148passed; override10-29-11-346Z/10-29-11-956Z5/5แต่ละชุด. ActualargsmanualverifiedกับJSONและprogrambytesรวม93filesยังตรงcandidate. Evidenceolddefault4startup146/148และcontrolled2passingทั้งสองชุดถูกเก็บ ไม่claimSDKinternalcausefixed. นี่เป็นQAresourcepolicy ไม่ใช่แก้captureperformance/performancepassหรือรับรองappภายใต้OSresourceexhaustion
+
 ### รอบ72 — metadata attempt ไม่รับรอง server admission
 
 Windows24push81f3846browser-clienttestคาดserverได้รับ4metadatarequestsแม้deadline50msสามารถabortก่อนdispatchได้ ส่งbusiness4ครบ/status409/bodyเดิมอยู่แล้ว. Controlled QA preloadปฏิเสธstart-rejectedก่อนnetworkทำ10-12-37-965Z0/1ด้วย3!=4เหมือนอาการจริง ไม่ยืนยันว่าทุกnetworkfailureต้นเหตุเดียวกัน
