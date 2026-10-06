@@ -3966,3 +3966,57 @@ Round76 manual evidence: full failed report reconciles48078business/SDK=48059ack
 - Environment: win32/x64; OS 10.0.26200; Node v24.19.0
 - commit: fd553715935ad2d7232545c25d5070bddbe5a66a; dirty: true
 - หลักฐาน: `reports/tests/2026-10-06T11-11-40-109Z.tap` และ `.json`
+
+## 2026-10-06T11-13-22-188Z
+
+- จุดประสงค์: Round78 full 20-worker 30-minute reference with drop storage diagnostics and failed reload
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 0daabf0fea0cb8cbc06648a60e233366814c1e22; dirty: false
+- หลักฐาน: `reports/tests/2026-10-06T11-13-22-188Z.tap` และ `.json`
+
+## 2026-10-06T11-44-13-063Z
+
+- จุดประสงค์: Round78 exact round77 PR CI audit all channels preserving negative inner evidence
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 0daabf0fea0cb8cbc06648a60e233366814c1e22; dirty: true
+- หลักฐาน: `reports/tests/2026-10-06T11-44-13-063Z.tap` และ `.json`
+
+## 2026-10-06T11-44-17-588Z
+
+- จุดประสงค์: Round78 exact round77 push CI audit all channels
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 0daabf0fea0cb8cbc06648a60e233366814c1e22; dirty: true
+- หลักฐาน: `reports/tests/2026-10-06T11-44-17-588Z.tap` และ `.json`
+
+## 2026-10-06T11-44-21-950Z
+
+- จุดประสงค์: Round78 exact diagnostics push CI audit short smoke not full sustained
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 0daabf0fea0cb8cbc06648a60e233366814c1e22; dirty: true
+- หลักฐาน: `reports/tests/2026-10-06T11-44-21-950Z.tap` และ `.json`
+
+## 2026-10-06T11-44-26-464Z
+
+- จุดประสงค์: Round78 exact diagnostics PR Ubuntu22 audit preserves incomplete browser failure
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 0daabf0fea0cb8cbc06648a60e233366814c1e22; dirty: true
+- หลักฐาน: `reports/tests/2026-10-06T11-44-26-464Z.tap` และ `.json`
+
+## 2026-10-06T11-45-52-466Z
+
+- จุดประสงค์: Round78 exact local full thirty-minute program inventory and capture evidence audit
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 0daabf0fea0cb8cbc06648a60e233366814c1e22; dirty: true
+- หลักฐาน: `reports/tests/2026-10-06T11-45-52-466Z.tap` และ `.json`
+
+### Round78 final manual evidence review
+
+- ตรวจ CI artifacts 13 ชุด รวม 317 runner reports: ไฟล์โปรแกรม 98 ไฟล์ตรง Git fd55371 หรือ 0daabf0 ตามแต่ละชุด; audit ผ่านไม่ใช่การรับรอง browser/performance
+- Full local0daabf0 sourceDirtyfalse/sourceinventory98ตรงGit ตรวจsummary/drop/rejectionทุกเหตุ0/resource limits/reload/ownedcleanupครบ. เก็บfirst19lossและnegativeinnerreports ไม่rerun unchangedเพื่อซ่อนfailure
+- บันทึกexactbrowserfailureจากrawTAP: CIUbuntu22 send-message HTTP200 แต่incompleteข้อความปรากฏที่scripts/independent-browser-check.mjs:86, หลังview-message viewer/sourceผ่าน. สาเหตุยังunknown

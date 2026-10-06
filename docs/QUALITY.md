@@ -1,5 +1,11 @@
 # รอบทดสอบและปรับปรุง FlowAtlas
 
+### ผลล่าสุดรอบ78 — full reference ผ่าน แต่ยังไม่ผ่าน v1
+
+Clean code0daabf0, full runner11-13-22-188Z1/1 และ exact local inventory audit11-45-52-466Z1/1: 20 HTTP workers/100ms fixtureต่อเนื่อง1800100.516ms, business/accepted/SDK/delivered328763เท่ากัน, ทุกdrop reason0, queued/inFlight0, invalid0. Reload JSONตรงก่อนปิด, child+collectorclosedและsuccessfulworkspaceถูกลบ. Memorydriver211144704/target206651392 bytes, peakbuffer40/inflight40/slots2/history100/state187030 bytes. Store25615saves/0failures/maxsync127.713ms; exporter25615ackbatches/0deadline/shutdown6ms. Performance met=null เพราะไม่มี paired baseline และไม่ใช่real app/user pilot. ไม่ปิด675fafa19lossที่ไม่ทราบcauseจาก passing conditionใหม่
+
+CI audits11-44-13-063Z/11-44-17-588Z/11-44-21-950Z/11-44-26-464Zผ่าน1/1แต่ละชุด รวม13artifactsets/317runnerreports/98exactfiles/main150ทุกช่องที่อ่าน. fd55371 PR/push8setsไม่มีunexpectedfailure/reversalและshortsmokeถูกต้อง แต่performanceFAILEDทุกช่อง; 0daabf0push4setsไม่มีunexpectedfailure/main150/ordinarycaptureครบ/performanceFAILED79.793–177.456%. Selected0daabf0 PRUbuntu22ยังมีindependentbrowserfailure: send-messagebusiness200แต่captureIncomplete trueที่line86 หลังview-messageกราฟ/sourceผ่าน. OtherPRchannelsดูAPIpassed ไม่ได้โหลดrawครบ จึงไม่อ้าง4-setPRaudit. Failedinner SDK/409/503และfailedreloadevidenceยังอยู่ตามscopeของแต่ละรุ่น. Currentpushผ่านไม่แทนPRfailure/oldfsyncloss/CLIrootcause
+
 ### รอบ73 — bounded QA test workers
 
 [นโยบาย](test-resources.md) run-testsdefault--test-concurrency=2เพื่อจำกัดจำนวนtest-fileworkersที่สร้างnestedCLI/SDKfixtures ไม่ผูกhostCPUcount. Explicit overrideทั้งequals/spacedรูปแบบคงไว้. ไม่เปลี่ยนcoverage/assertions/producttimeout/no skipped tests. Main10-28-25-404Z148/148passed; override10-29-11-346Z/10-29-11-956Z5/5แต่ละชุด. ActualargsmanualverifiedกับJSONและprogrambytesรวม93filesยังตรงcandidate. Evidenceolddefault4startup146/148และcontrolled2passingทั้งสองชุดถูกเก็บ ไม่claimSDKinternalcausefixed. นี่เป็นQAresourcepolicy ไม่ใช่แก้captureperformance/performancepassหรือรับรองappภายใต้OSresourceexhaustion
