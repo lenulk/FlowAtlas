@@ -3539,3 +3539,42 @@ First matched3×1000 measurement: all6000 measured business responses pluswarmup
 - หลักฐาน: `reports/tests/2026-10-05T22-07-32-956Z.tap` และ `.json`
 
 - Round71 final manualinventory: eightfinalgate93programSHA256matchcurrentcandidate; allouterexit0/no failed-skipped. Numericparsercache only; graphmetadatafresh. NativeCIaudit8sets/152reports/91exactfiles; PR4/4/push2/4. PushfailureWindows24servermetadata3!=4despite4businessresponses, Linux22faultmemoryack1051/drop0completefalse toinspect separately. CandidateHTTP200.909%stillFAIL/CLIoldtimeout/fsync/pilot/sustainedunclosed. gitdiffcheckpassed; docs updated; nativebody/completionpolicyunchanged.
+
+## 2026-10-06T10-12-37-965Z
+
+- จุดประสงค์: Round72 reproduce server-admission assumption with controlled metadata failure before dispatch
+- ผล: ไม่ผ่าน — 0/1; failed 1; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: fe507c6ff824d2dd349e5d2f1da63c73bb250378; dirty: false
+- หลักฐาน: `reports/tests/2026-10-06T10-12-37-965Z.tap` และ `.json`
+- ไม่ผ่าน: failed, malformed, oversized or stalled start metadata does not retry business requests
+
+## 2026-10-06T10-13-50-938Z
+
+- จุดประสงค์: Round72 controlled metadata faults and real business response non-interference
+- ผล: ผ่าน — 5/5; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: fe507c6ff824d2dd349e5d2f1da63c73bb250378; dirty: true
+- หลักฐาน: `reports/tests/2026-10-06T10-13-50-938Z.tap` และ `.json`
+
+## 2026-10-06T10-15-11-754Z
+
+- จุดประสงค์: Round72 final main regression controlled metadata attempted-vs-admitted coverage
+- ผล: ไม่ผ่าน — 146/148; failed 2; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: fe507c6ff824d2dd349e5d2f1da63c73bb250378; dirty: true
+- หลักฐาน: `reports/tests/2026-10-06T10-15-11-754Z.tap` และ `.json`
+- ไม่ผ่าน: CLI owner-kill closes owned services and lock (HTTP SDK flush)
+- ไม่ผ่าน: CLI SIGINT closes owned services and lock (HTTP SDK flush)
+
+- Round72 main10-15-11-754Z146/148failedtwoexistingtracedCLIstartupcases, metadatarepairtestpassed. Startupdiagnostics: spawnedtrue/exitedfalse/closedfalse, collector-targetReportedfalse/stdout0/stderr622/lockexists true, elapsed12024/12001ms. This supports inspection reachingstorage+targetpreload but not readiness; doesnotproveSDKinternalcause. Keepfailedfixtures and originaltimeouts. Nextcontrolled main test-concurrency=2 evaluates fixturebootresourcepressure without changing app12sdeadline; notrerunidenticalsettings tohidefailure.
+
+## 2026-10-06T10-23-58-048Z
+
+- จุดประสงค์: Round72 controlled main with two fixture workers same application startup deadlines
+- ผล: ผ่าน — 148/148; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: fe507c6ff824d2dd349e5d2f1da63c73bb250378; dirty: true
+- หลักฐาน: `reports/tests/2026-10-06T10-23-58-048Z.tap` และ `.json`
+
+- Round72 manual checks: availableParallelism4; diffcheckpassed. Focused5/5/controlledmain2workers148/148 onidentical93programfiles; defaultmain146/148retained(twoSDKCLIstartup12s/stdout0/stderr622/locktrue). Productionnotchanged. Do notclaimstartuprootcausefixedorconcurrency2asperformancepass. NextboundedQAworkerpolicy+receipt-orderproofseparately.

@@ -1,5 +1,13 @@
 # รอบทดสอบและปรับปรุง FlowAtlas
 
+### รอบ72 — metadata attempt ไม่รับรอง server admission
+
+Windows24push81f3846browser-clienttestคาดserverได้รับ4metadatarequestsแม้deadline50msสามารถabortก่อนdispatchได้ ส่งbusiness4ครบ/status409/bodyเดิมอยู่แล้ว. Controlled QA preloadปฏิเสธstart-rejectedก่อนnetworkทำ10-12-37-965Z0/1ด้วย3!=4เหมือนอาการจริง ไม่ยืนยันว่าทุกnetworkfailureต้นเหตุเดียวกัน
+
+เปลี่ยนเฉพาะtest/browser-client.test.mjs: mockmetadata503/malformed20koversized/stalledAbortSignal/no-dispatchให้แน่นอน แต่forwardbusinessไปoriginalfetch+actualHTTPserver. Checkattempt1/case,metadataServerCalls0,business5actualcalls,status409/bodyเดิม/incomplete/viewerNull. มีrealmetadataack/concurrency/redirect testsอื่นเดิม จึงแยกsimulatedfaultsจากactualbusinessHTTP. ไม่เปลี่ยนproductionclient/50msconfiguredtesttimeout/1000msdefault/API. Focused10-13-50-938Z5/5ผ่าน
+
+Defaultmain10-15-11-754Z146/148failedtracedCLIowner-kill/SIGINTreadinessoldpath. Numericdiagnostics spawnedtrue/noexit/closedfalse/stdout0/stderr622/locktrue/elapsed12024,12001ms แสดงถึงstorage+preloadแต่ไม่บอกSDKinternalcause; retainfixturesและfailedTAP. ไม่rerunsettingsเดิม: controlledmainconcurrency2 10-23-58-048Z148/148passedบนsamecode/unchanged12sdeadline. Availableparallelism4 ณmanualcheck; ผลนี้เป็นevidenceว่าresourceconditionเปลี่ยนแล้วผ่าน ไม่ปิดrootcauseหรือfullmatrix. ถัดไปboundedQAworkerpolicy/cleanupแยกrepair ไม่เพิ่มappdeadline/skiptests
+
 ### รอบ71 — bounded timestamp parsing reuse
 
 [ADR](adr-timestamp-cache.md). ยกเลิกแนวwhole-recordserialization/graphvalidationcacheโดยไม่มีproductionpatchแนวนั้น; ใช้pureDate.parseผลของimmutableUTCstringsเพื่อลดงานซ้ำทุกvalidationแทน. จำกัด2048/FIFO/24chars/nativeparseridentity+sourceguard; mutable/oddformat/overridefresh, schema/nativecalendarsemanticsเดิม. Before21-44-55-633Z2/4, initialfocused21-45-32-129Z22/22, final23/23เพิ่มpreexistingoverrideguard. No graph/metadata validation skipped, no timers/I/O/persistence/durability/capturedeadline changes
