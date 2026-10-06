@@ -3578,3 +3578,29 @@ First matched3×1000 measurement: all6000 measured business responses pluswarmup
 - หลักฐาน: `reports/tests/2026-10-06T10-23-58-048Z.tap` และ `.json`
 
 - Round72 manual checks: availableParallelism4; diffcheckpassed. Focused5/5/controlledmain2workers148/148 onidentical93programfiles; defaultmain146/148retained(twoSDKCLIstartup12s/stdout0/stderr622/locktrue). Productionnotchanged. Do notclaimstartuprootcausefixedorconcurrency2asperformancepass. NextboundedQAworkerpolicy+receipt-orderproofseparately.
+
+## 2026-10-06T10-28-25-404Z
+
+- จุดประสงค์: Round73 default runner bounded two fixture workers unchanged application deadlines
+- ผล: ผ่าน — 148/148; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: ad3dbaf14eabcafd82d82426d25200415e24de6d; dirty: true
+- หลักฐาน: `reports/tests/2026-10-06T10-28-25-404Z.tap` และ `.json`
+
+## 2026-10-06T10-29-11-346Z
+
+- จุดประสงค์: Round73 explicit equals-form concurrency override remains recorded
+- ผล: ผ่าน — 5/5; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: ad3dbaf14eabcafd82d82426d25200415e24de6d; dirty: true
+- หลักฐาน: `reports/tests/2026-10-06T10-29-11-346Z.tap` และ `.json`
+
+## 2026-10-06T10-29-11-956Z
+
+- จุดประสงค์: Round73 explicit spaced-form concurrency override remains recorded
+- ผล: ผ่าน — 5/5; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: ad3dbaf14eabcafd82d82426d25200415e24de6d; dirty: true
+- หลักฐาน: `reports/tests/2026-10-06T10-29-11-956Z.tap` และ `.json`
+
+- Round73 manualactualargvcheck: main10-28-25-404Zdefault--test-concurrency=2/148pass; equals1 andspaced1 overrides both5pass/no injecteddefault2. diffcheckpassed. QAresourcepolicyonly; no appdeadline/coverage/sampler/storage/queuechanges. Oldstartupfailure/normalperformancefailures/pilotgaps retained.

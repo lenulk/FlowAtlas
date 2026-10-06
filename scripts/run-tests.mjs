@@ -27,7 +27,11 @@ try {
   dirty = execFileSync('git', ['status', '--porcelain'], { cwd: root }).toString().trim().length > 0;
 } catch { /* Tests can also run before Git is initialized. */ }
 const purpose = process.env.FLOWATLAS_TEST_PURPOSE ?? 'ตรวจคุณภาพปัจจุบัน';
-const args = ['--test', '--test-reporter=tap', ...process.argv.slice(2)];
+const requestedArgs = process.argv.slice(2);
+const explicitConcurrency = requestedArgs.some(arg => arg === '--test-concurrency' || arg.startsWith('--test-concurrency='));
+// Each fixture may launch its own CLI, inspector and SDK target. Bound the
+// default worker count independently of the host's reported CPU count.
+const args = ['--test', '--test-reporter=tap', ...(explicitConcurrency ? [] : ['--test-concurrency=2']), ...requestedArgs];
 const child = spawn(process.execPath, args, { cwd: root, stdio: ['ignore', 'pipe', 'pipe'] });
 let output = '';
 child.stdout.on('data', (chunk) => { output += chunk; process.stdout.write(chunk); });
