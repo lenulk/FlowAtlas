@@ -1,5 +1,11 @@
 # รอบทดสอบและปรับปรุง FlowAtlas
 
+### ผลล่าสุดรอบ78 — full reference ผ่าน แต่ยังไม่ผ่าน v1
+
+Clean code0daabf0, full runner11-13-22-188Z1/1 และ exact local inventory audit11-45-52-466Z1/1: 20 HTTP workers/100ms fixtureต่อเนื่อง1800100.516ms, business/accepted/SDK/delivered328763เท่ากัน, ทุกdrop reason0, queued/inFlight0, invalid0. Reload JSONตรงก่อนปิด, child+collectorclosedและsuccessfulworkspaceถูกลบ. Memorydriver211144704/target206651392 bytes, peakbuffer40/inflight40/slots2/history100/state187030 bytes. Store25615saves/0failures/maxsync127.713ms; exporter25615ackbatches/0deadline/shutdown6ms. Performance met=null เพราะไม่มี paired baseline และไม่ใช่real app/user pilot. ไม่ปิด675fafa19lossที่ไม่ทราบcauseจาก passing conditionใหม่
+
+CI audits11-44-13-063Z/11-44-17-588Z/11-44-21-950Z/11-44-26-464Zผ่าน1/1แต่ละชุด รวม13artifactsets/317runnerreports/98exactfiles/main150ทุกช่องที่อ่าน. fd55371 PR/push8setsไม่มีunexpectedfailure/reversalและshortsmokeถูกต้อง แต่performanceFAILEDทุกช่อง; 0daabf0push4setsไม่มีunexpectedfailure/main150/ordinarycaptureครบ/performanceFAILED79.793–177.456%. Selected0daabf0 PRUbuntu22ยังมีindependentbrowserfailure: send-messagebusiness200แต่captureIncomplete trueที่line86 หลังview-messageกราฟ/sourceผ่าน. OtherPRchannelsดูAPIpassed ไม่ได้โหลดrawครบ จึงไม่อ้าง4-setPRaudit. Failedinner SDK/409/503และfailedreloadevidenceยังอยู่ตามscopeของแต่ละรุ่น. Currentpushผ่านไม่แทนPRfailure/oldfsyncloss/CLIrootcause
+
 ### รอบ73 — bounded QA test workers
 
 [นโยบาย](test-resources.md) run-testsdefault--test-concurrency=2เพื่อจำกัดจำนวนtest-fileworkersที่สร้างnestedCLI/SDKfixtures ไม่ผูกhostCPUcount. Explicit overrideทั้งequals/spacedรูปแบบคงไว้. ไม่เปลี่ยนcoverage/assertions/producttimeout/no skipped tests. Main10-28-25-404Z148/148passed; override10-29-11-346Z/10-29-11-956Z5/5แต่ละชุด. ActualargsmanualverifiedกับJSONและprogrambytesรวม93filesยังตรงcandidate. Evidenceolddefault4startup146/148และcontrolled2passingทั้งสองชุดถูกเก็บ ไม่claimSDKinternalcausefixed. นี่เป็นQAresourcepolicy ไม่ใช่แก้captureperformance/performancepassหรือรับรองappภายใต้OSresourceexhaustion
@@ -870,3 +876,11 @@ Before11-05-27-379Z1/2 reproducesoldcontrol: network arrival batch32ก่อน
 Final11-05-54-663Z2/2/controlledfull11-05-55-078Z1/1/normal11-05-59-455Z1/1/rejectionguard11-06-03-877Z1/1ผ่าน, eachnormal/control9conditions1051/drop0และdiskreopenexact. ผลนี้แก้QAcontrol ไม่ปิดactualsustained19loss/fsync827loss/performance/startup/pilot
 
 Exact675fafaAPIcompleted: PR37453182274ผ่านWindows2/failedUbuntu2 controlled-orderstep; push37453176461success4channels. CIshortsmokeทั้ง4ไม่ใช่30-minute gate. FullWindowsactualยังfailed. ต้องauditrawเทียบprogramก่อนรับรองexactและรอรอบ77CI; ไม่ใช้pushpassแทนPRfailure
+
+### รอบ78 — numeric drop/storage diagnostics และ failed reload
+
+ก่อนแก้ guard11-09-33-775Z0/2: businesserrorรายงานfailedแต่ไม่ตรวจreload; controlledcollector503ยังไม่มีpath/diagnostics. เพิ่มQAownedfirst-ingest503 (ไม่businessretry), parse allowlistednumericdelivery/rejection/exportertiming และ opt-in storagetiming, fixed-vocabulary storageerrorcountsสูงสุด16ชนิด. Failedvalidationยังcloseownedcollector/reopenstateและเทียบJSONกับin-memory checkpointที่acceptedจริง เก็บoriginalfailureเสมอ ไม่ลบworkspaceเมื่อfailed
+
+After11-10-28-044Z2/2: business409/collector503 innerทั้งสองfailed/retained แต่reloadexact/ownedcleanupครบ. 503dropReasons.rejectedตรงdropcount/rejection503 และbusinessresponsesถูกทุกครั้ง. Healthysmoke11-10-31-885Z1/1 SDK740/ack740/drop0/reloadexact/met=null. Source11-11-40-109Z1/1ผ่าน. Productioncapacity/deadline/durability unchanged; เพิ่มtimingเฉพาะownedQAprocess/collector ไม่เปลี่ยนdefault
+
+Original675fafafailedcheckpoint read11-11-39-617Z1/1: reopened100graphs/validateGraph100/statebytes187016/SHA587c09340654182bbd430623d6dda6733b14062934d68bfad60f942b916fd9bbตรงก่อนและหลัง/lockremoved. นี่พิสูจน์schema/readabilityของcheckpointที่เหลือ ไม่สร้าง19lostspansกลับหรือพิสูจน์originalin-memoryequality. 19lossrootcauseยังunknown; ต่อไปfull diagnostic workloadบนsourceใหม่ที่เก็บcauseได้ ห้ามใส่reasonย้อนกลับใน675fafa

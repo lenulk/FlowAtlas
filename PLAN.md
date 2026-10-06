@@ -14,6 +14,8 @@ Node.js เป็น integration ที่กำลังพัฒนาแล�
 
 ## สถานะเริ่มต้น
 
+ผลล่าสุด6ต.ค.2026: 0daabf0ผ่าน reference HTTP20workers×30min ในWindowsจริง328763spans/ackครบ/drop0/reloadexact/resourcesใต้limitsก่อนรัน. ปิดได้เฉพาะconditionนี้ ไม่แทน20businessactions/pilot/usertrial/performance หรือstablecaptureทุกenvironment. Original19loss/hostedfsync827loss/CLIrootcause/PRUbuntu22 independentbrowser captureIncompleteยังเปิด. Exactcodeauditmain150/CIpush4channelsผ่าน แต่performanceFAILED79.793–177.456%. ถัดไปround79metadata-phasecause diagnosticsก่อนproductionrepair; รักษาเกณฑ์และfailedreportsทั้งหมด
+
 รอบ76เพิ่ม sustained reference20 workers พร้อม limits ที่ตั้งก่อนรันและ CI short smoke/controlled business-error guard. Full30-minute conditionยังรอผล; smokeไม่ผ่านแทน30นาที/ไม่มีpairedperformance/realpilot. รอบ75แก้ flush slot refillโดย deadlineเดิม main150ผ่าน; performance315.101%FAILED. ข้อมูลสูญหายเมื่อ synchronous fsyncช้าและstartuprootcauseยังเปิด
 
 รอบ73run-testsdefault2fileworkers/explicitoverrideสำหรับresourceexperiment; actualmain148passedโดยappdeadlinesเดิม. Startupfailureเดิมยังมีบันทึกและไม่claimrootcauseclosed. ต่อcomponentcommit-order/schedulingdrain/sustained30min; ยังไม่มีrealpilot/usertrial/performancepass
@@ -167,3 +169,5 @@ FA-03 lifecycle repair: managed CLIinspect now has private ownership proof and d
 รอบ76full reference20×30min ล้มเหลวจริงหลัง4m25s: business48078ถูก แต่metadata19สูญเสีย; RSS/queue/diskอยู่ใต้limits. ไม่ผ่านFA-07/FA-08/sustained. ต่อไปcontrolled-reorder batchidentity repairและdrop/storage/failedreloaddiagnosticsก่อนแก้production cause; ไม่เปลี่ยนเกณฑ์เพื่อผ่าน
 
 รอบ77controlled reorderเลือกknownfixturebatchidentityแล้ว ผ่านsender/reversedarrival2guardsและnormal/control/rejectioncomponent. ไม่ถือว่าactualsustained19lossได้รับการแก้; เตรียมdiagnosticsแยกก่อนrepeatworkload
+
+รอบ78failedsustainreportมีnumericdelivery/storagecauseและdurablereloadแล้ว; 409/503guardsทั้งสองinnerfailedอย่างถูกต้อง/retained/reloadexact. Originalfailedcheckpoint100graphsreadableunchangedแต่19lossยังunknown. ต้องใช้newdiagnosticworkloadก่อนเลือกproductionrepair ไม่ยืดtime/ลดlimitsเพื่อผ่าน

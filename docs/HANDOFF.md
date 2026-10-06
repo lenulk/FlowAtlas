@@ -10,6 +10,14 @@ Repository: https://github.com/lenulk/FlowAtlas; branch หลัก `master` �
 
 ## สถานะที่ตรวจแล้ว
 
+**ล่าสุด — รอบ78 ตรวจครบแล้ว (6 ตุลาคม 2026):** โค้ด `0daabf0` บน branch `diag/sustained-drop-recovery` / [PR20](https://github.com/lenulk/FlowAtlas/pull/20) ผ่านโหลด HTTP อ้างอิง 20 workers ต่อเนื่อง 30 นาทีใน Windows Node24.19.0: 328,763 คำตอบถูกต้อง/SDK spans/acknowledgements, drop0, pending0, reloadตรง และปิด owned processes/ลบ successful workspace ครบ. RSS สูงสุด driver+collector211,144,704 / target206,651,392 bytes, buffer40, slots2, history100, state187,030 bytes อยู่ใต้ limits ที่ตั้งก่อนรัน. นี่เป็น actual SDK กับแอปจำลอง ไม่ใช่ business pilot/20 business actions หรือ performance acceptance; ดู [ขอบเขตและผล](sustained-reference.md)
+
+ตรวจ exact artifacts: fd55371 / PR19 ทั้ง PR และ push ผ่าน4/4 และ source audit8ชุด/192reports/98files/main150. 0daabf0 push ผ่าน4/4/source audit100reports; PRผ่าน3/4 โดย Ubuntu22 independent browser `send-message` business200แต่แสดงหลักฐานไม่ครบ (line86), selected raw artifact25reportsตรง98files. Auditผ่านแปลว่าหลักฐานตรงรุ่น ไม่ปิด browser failure. Performance ยังFAILEDทุกช่องที่อ่าน (push0daabf0 +79.793% ถึง177.456%). Original675fafa sustained19lossหลัง4m25sยังไม่ทราบcause; checkpoint100graphsยังอ่านได้ ไม่ใช้passing30minปิดเหตุนี้. Hosted845547e sync1828ms/shutdown827loss และ CLI startup root cause ยังเปิด
+
+**งานถัดไปรอบ79:** เก็บ bounded numeric metadata-phase/status/timeout diagnostics ของ independent browser `send-message` เพื่อแยก browser begin / Node handler / collector persistence failures ก่อนแก้. รักษา assertionว่าหลักฐานต้องครบ, business status/body, timeoutและno retryเดิม. จากนั้นลด overheadจากactual SDK/storage measurementsและตรวจstable captureต่อ. Pilot/users/compatibilityนอกที่ทดสอบ/releaseยังไม่ผ่าน; ผู้ใช้ยืนยันยังไม่มีแอปธุรกิจ จึงไม่ขอข้อมูลซ้ำหรืออ้าง Beta/v1
+
+หัวข้อรอบ76–78ด้านล่างเป็นบันทึกตามลำดับเวลา; ข้อความว่า full run ยังรอผลในหัวข้อเก่า ให้ใช้ผลล่าสุดด้านบน
+
 **ล่าสุดรอบ76:** ต่อจาก845547e/[PR17](https://github.com/lenulk/FlowAtlas/pull/17) เตรียม [sustained reference](sustained-reference.md) แบบ actual SDK/durable JSON/20 workers โดยกำหนด limits ก่อนรัน Short smoke740spans/ackครบ/reloadตรง แต่ sustained met=null; controlled business409 inner ยังfailedและretained/ownedcleanupครบ ทั้งสอง startup fixture failuresเก็บแล้ว กำลังเตรียม full30-minute run แยกจาก workload อื่น ห้ามอ้าง pilot หรือ performance จากผลนี้ รอบ75 main150/SDK+Edge+fault3/source1ผ่าน แต่ ordinary p95+315.101%FAILED; fsync loss/startup root cause/realpilot/users/release ยังเปิด
 
 **รอบ73:** branchtest/bounded-fixture-workersต่อจากad3dbaf/[PR14](https://github.com/lenulk/FlowAtlas/pull/14). [Runnerresourcepolicy](test-resources.md) default2test-fileworkers/explicitoverridepreserved ไม่เพิ่มappdeadline/skiptests/เปลี่ยนproduction. Newdefaultmain10-28-25-404Z148/148ผ่าน; overridesสองรูปแบบ5/5แต่ละชุดและargsบันทึกจริง. Oldstartupfailure2casesยังไม่ปิดrootcauseจากresourceconditionที่ผ่าน. ต่อไปรอบ74componentretentionaccepted-orderและcontrolledreorderingก่อนdrainfix/sustainedload. Pilot/users/performance/fsyncloss/CLIrootcause/releaseยังเปิด
@@ -158,3 +166,7 @@ Branch `fix/exporter-flush-slot-refill` ต่อจาก4f5f5ac/[PR16](https:/
 ## รอบ77ล่าสุด
 
 Branch `test/reorder-by-fixture-batch` ต่อจาก5dd816b/PR18 แก้controlledQAใช้senderbatchidentityแทนarrivalordinal พร้อมreverse-arrivalbefore1/2/after2/2 และcomponentnormal/control/rejectionผ่าน. Full30minรุ่น675fafaยังFAILED19lossหลัง4m25s; ขั้นถัดไปdropReasons/storage/failedreloaddiagnosticsเพื่อแยกcauseก่อนproductionrepair. ไม่มีrealpilot/performancepass
+
+## รอบ78ล่าสุด
+
+Branch `diag/sustained-drop-recovery` ต่อจากfd55371/PR19 เพิ่มnumericdropReasons/rejectionstatuses/exporter+storage timing และfixedstorageerrorcounts bounded16. Failedrunsตรวจdurablereopenเทียบacceptedin-memorycheckpointแม้captureไม่ครบ. Beforeguard0/2 หลัง2/2/healthysmoke740spans1/source1ผ่าน. Original675fafafailedcheckpointreopens100validgraphsด้วยbytesเดิม แต่19spansยังสูญเสียและcauseunknown. ถัดไปfull diagnostic workload unchangedlimits/deadlinesเพื่อหาcause; ยังไม่รับรอง30min/performance/pilot/users/release
