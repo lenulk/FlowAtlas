@@ -81,24 +81,41 @@ test('foreign origins and redirects never receive browser correlation', async (t
   assert.equal(businessCalls, 1); assert.equal(foreignCalls, 0); assert.equal(scope.complete, false);
 });
 
-test('failed, malformed, oversized or stalled start metadata does not retry business requests', async (t) => {
-  let startCalls = 0; let businessCalls = 0;
+test('controlled metadata failures including no dispatch never retry real business requests', async (t) => {
+  let serverStartCalls = 0; let businessCalls = 0;
+  const attempts = new Map();
   const origin = await serve(t, async (req, res) => {
     if (req.url.startsWith('/start')) {
-      startCalls++;
-      for await (const _part of req) { /* drain */ }
-      if (req.url === '/start-timeout') return;
-      if (req.url === '/start-rejected') res.writeHead(503);
-      res.end(req.url === '/start-oversized' ? 'x'.repeat(20000) : 'not-json-canary');
+      serverStartCalls++; req.resume(); res.writeHead(500); res.end();
     } else { businessCalls++; res.writeHead(409, { 'x-flowatlas-telemetry': 'complete' }); res.end('business rejected once'); }
   });
-  for (const path of ['/start-rejected', '/start-json', '/start-oversized', '/start-timeout']) {
+  // Model metadata faults deterministically. The original 50ms test incorrectly
+  // required every attempt to arrive at the server even when abort ran first.
+  // Business requests still use the actual HTTP server and the original fetch.
+  const realFetch = globalThis.fetch;
+  const paths = ['/start-rejected', '/start-json', '/start-oversized', '/start-timeout', '/start-no-dispatch'];
+  t.mock.method(globalThis, 'fetch', (input, options) => {
+    const url = new URL(input instanceof Request ? input.url : input);
+    if (!paths.includes(url.pathname)) return realFetch(input, options);
+    attempts.set(url.pathname, (attempts.get(url.pathname) ?? 0) + 1);
+    assert.equal(options.method, 'POST'); assert.equal(options.redirect, 'error');
+    if (url.pathname === '/start-no-dispatch') return Promise.reject(new TypeError('Controlled failure before dispatch'));
+    if (url.pathname === '/start-timeout') return new Promise((_resolve, reject) => {
+      const abort = () => reject(new DOMException('Controlled metadata abort', 'AbortError'));
+      if (options.signal.aborted) abort(); else options.signal.addEventListener('abort', abort, { once: true });
+    });
+    return Promise.resolve(new Response(url.pathname === '/start-oversized' ? 'x'.repeat(20000) : 'not-json-canary',
+      { status: url.pathname === '/start-rejected' ? 503 : 200 }));
+  });
+  for (const path of paths) {
     const scope = await createBrowserActions({ origin, startUrl: path, timeoutMs: 50 }).start('view');
     const result = await scope.fetch('/business');
     assert.equal(result.status, 409); assert.equal(await result.text(), 'business rejected once');
     assert.equal(scope.state, 'incomplete'); assert.equal(scope.viewerUrl, null);
   }
-  assert.equal(startCalls, 4); assert.equal(businessCalls, 4);
+  assert.deepEqual([...attempts], paths.map(path => [path, 1]));
+  assert.equal(serverStartCalls, 0, 'Controlled metadata faults never need a network dispatch');
+  assert.equal(businessCalls, 5);
 });
 
 test('browser config, action and request boundaries fail before dispatch', async (t) => {

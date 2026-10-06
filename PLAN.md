@@ -14,6 +14,8 @@ Node.js เป็น integration ที่กำลังพัฒนาแล�
 
 ## สถานะเริ่มต้น
 
+รอบ72QAmetadatafaultใช้controlledresponses/no-dispatchและrealbusiness5calls ทำattempt-vs-admissionชัดเจน Productionclientไม่เปลี่ยน. Focused5/5/mainconcurrency2 148/148passed แต่defaultmainfailedCLIstartup2casesยังเปิด. ต้องboundedtest-resource/cleanupและreceipt-orderdiagnosticsก่อนdrain/sustainedload; ไม่ลดเกณฑ์เดิม/ไม่ปิดpilot-usergate
+
 รอบ71ลดtimestampparseซ้ำเฉพาะ2048UTCstrings/nativeDate.parseที่เดิม ไม่cachegraphvalidity; localmain148/SDK+Edge+fault3/source1passed. Syntheticvalidatorcost142.644→113.647ms แต่ordinaryperformance200.909%FAILED. Nativeรอบ70PRCI4/4/push2/4withgenuineQA/componentfailures ต้องแก้แยกและเก็บหลักฐาน. ถัดไปbrowsermetadataattemptvsadmission/receipt-order/drain/resourcechecksก่อนpilot; realbusinessapp/usersยังไม่มี/ไม่ปิดv1
 
 รอบ70ownednativeHTTPtransport แก้connectionownership/complete2xxackพร้อมlazyimportหลบCJSduplicate-spanregression:main143/actualSDK+Edge+failure3/source1passedlocal. ไม่พิสูจน์performancegain;ordinary560.428%FAILED และbaselineCIมี443/923shutdowndrops. ต้องexacthostedCIและstoragecostrepair/retention/bounds/negativeguardsต่อ; sustained30min/pilot/usersยังไม่ผ่าน
