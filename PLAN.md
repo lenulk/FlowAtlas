@@ -14,6 +14,8 @@ Node.js เป็น integration ที่กำลังพัฒนาแล�
 
 ## สถานะเริ่มต้น
 
+รอบ76เพิ่ม sustained reference20 workers พร้อม limits ที่ตั้งก่อนรันและ CI short smoke/controlled business-error guard. Full30-minute conditionยังรอผล; smokeไม่ผ่านแทน30นาที/ไม่มีpairedperformance/realpilot. รอบ75แก้ flush slot refillโดย deadlineเดิม main150ผ่าน; performance315.101%FAILED. ข้อมูลสูญหายเมื่อ synchronous fsyncช้าและstartuprootcauseยังเปิด
+
 รอบ73run-testsdefault2fileworkers/explicitoverrideสำหรับresourceexperiment; actualmain148passedโดยappdeadlinesเดิม. Startupfailureเดิมยังมีบันทึกและไม่claimrootcauseclosed. ต่อcomponentcommit-order/schedulingdrain/sustained30min; ยังไม่มีrealpilot/usertrial/performancepass
 
 รอบ72QAmetadatafaultใช้controlledresponses/no-dispatchและrealbusiness5calls ทำattempt-vs-admissionชัดเจน Productionclientไม่เปลี่ยน. Focused5/5/mainconcurrency2 148/148passed แต่defaultmainfailedCLIstartup2casesยังเปิด. ต้องboundedtest-resource/cleanupและreceipt-orderdiagnosticsก่อนdrain/sustainedload; ไม่ลดเกณฑ์เดิม/ไม่ปิดpilot-usergate
@@ -161,3 +163,5 @@ FA-03 lifecycle repair: managed CLIinspect now has private ownership proof and d
 รอบ74: QA retention ตรวจ accepted commit order ภายใต้ concurrent uploads พร้อม controlled request31/32 reversal; simulated replay รับครบ1051/drop0 และ reload exact ทั้ง3 disk rounds. Controlled slow fsync ยังสูญเสีย859 shutdownต่อรอบตามเดิม ไม่ปิด capture/performance/pilot gate. ต่อไปแก้ drain scheduling และตรวจ sustained load ตามเกณฑ์เดิม
 
 รอบ75: forceFlush เติมช่องส่งที่ว่างโดยไม่ติดรอ peer ที่ค้าง ภายใน shutdown900ms เดิม. Focused18/main150/SDK+Edge+fault3/source1ผ่าน; ordinary3153/drop0 แต่ p95 overhead315.101% ยังFAILED. Slowfsync/CLIrootcause/sustained30min/pilot/users/releaseยังเปิด
+
+รอบ76full reference20×30min ล้มเหลวจริงหลัง4m25s: business48078ถูก แต่metadata19สูญเสีย; RSS/queue/diskอยู่ใต้limits. ไม่ผ่านFA-07/FA-08/sustained. ต่อไปcontrolled-reorder batchidentity repairและdrop/storage/failedreloaddiagnosticsก่อนแก้production cause; ไม่เปลี่ยนเกณฑ์เพื่อผ่าน

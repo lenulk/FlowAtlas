@@ -846,3 +846,19 @@ Final focused10-45-20-838Z18/18: healthy peer ส่ง64/drop32shutdown เม�
 Ordinary10-46-44-956Z1/1 รับครบ3153/drop0 แต่ performance FAILED +315.101% (baseline2.523/traced10.473ms). ไม่อ้าง causal speedup จาก host timings ที่ต่างกัน. Slow fsync guardยังผ่านพร้อม inner disk failures/reload exact; การเติมช่องว่างไม่แก้ collector ที่ block synchronous fsync ทั้ง process. Startup root cause/sustained30min/realpilot/users/release ยังเปิด
 
 CI ตรวจสด: 3a23a3e push37450840821 success แต่ PR37450846858 failure3/4 Ubuntu22 ordinary/timing/component/negativeguard; ad3dbaf PR37449864287 failure3/4 Ubuntu22component/negativeguard. จึงยังไม่ใช้ passing local แทน exact hosted evidence. เริ่มโหลด raw artifacts เพื่อ audit รุ่นfe507c6/3a23a3e; มี TLS handshake timeout ของหนึ่ง artifact บันทึกเป็น download failure ไม่ใช่ test failure
+
+### รอบ76 — เตรียม sustained reference และตรวจหลักฐานเดิม
+
+เพิ่ม actualSDK + durable collector reference20workers/100ms response พร้อม limitsระบุก่อนรัน (RSS512MiBต่อtargetและdriver+collector/state64MiB/queue2048/slots2/history100). [วิธีรันและขอบเขต](sustained-reference.md). Short smoke10-53-44-624Zผ่าน740spans/reloadแต่met=null; ก่อนหน้านั้นมี QAregistration/ESMloader failures0/1ทั้งสองชุด เก็บครบ. Controlled business409 guard10-54-34-592Zผ่านแต่innerยังfailed/retainedและcloseownedchild+collector/lockremoved. ไม่ลดความคาดหวังให้businesserrorผ่าน ไม่ใช้realpilotหรือ30minclaimจาก4วินาที
+
+Round76 prior exact CI audits10-55-22-641Z/10-55-27-987Zผ่าน1/1แต่ละชุด: fe507c6 PR/pushรวม8artifactsets/152runnerreports/93programfilesตรงGit; main148ทุกช่อง ไม่มีskip. PRUbuntu22componentmemoryround1 ack1051/drop0แต่oldsender-ordercheck failed; pushUbuntu22ordinary capture failedจริง และcomponentmemoryround2 ack1051/drop0. PerformanceFAILEDทุก8ช่อง. เก็บfailedreports/controlledinnerไว้ทั้งหมด; auditpassแปลว่าหลักฐานตรงsource ไม่ใช่ทุกtestผ่าน
+
+ตรวจสด4f5f5ac PR37451726655/push37451720941 success4channelsจากAPI แต่ยังไม่artifactauditทุกช่อง. 845547e PR37452346303success4channels/push37452339093failure3of4. Download rawเฉพาะUbuntu24pushสำเร็จ: timinground2 delivered224/shutdown827, storage9saves fsync1828.640ms/total1849.594ms/maxsync258.010ms; shutdown901.592ms/deadline1. Ordinaryยังcaptureครบตามrun APIแต่ต้องauditrawทุกช่องก่อนclaimexact. Flushrefillไม่ปิดsyncfsynclossนี้; rawอยู่reports/releases/ci-845547e-push-ubuntu24
+
+### รอบ76 full sustained result — FAILED
+
+Clean source675fafa, runner10-57-30-677Z0/1, report10-57-30-943Z: requested1800000msแต่หยุดเมื่อพบdropหลัง264979.849ms (~4m25s). Business48078ครบ/status200/bodyexact, SDK48078/delivered48059/dropped19, acceptedSpans48059/invalidGraphs0. RSSdriver141488128/target150028288 bytes, peakbuffer40/slots2/inflight40/history100/state187030 bytes อยู่ใต้limitsเดิม. Sustainedmet=false/performance met=null. Ownedchild/collectorclosedtrue และ retained workspace reports/storage/sustained-reference-JoNW9D ไม่ลบ; reloadVerifiedfalseเพราะvalidationfailedก่อนขั้นreopen จึงยังไม่รับรองreloadในfailedrunนี้
+
+รายงานแรกยังขาดdropReasons/storage timing/failed-reload จึงห้ามสรุปว่า19dropsเกิดจากfsync/EPERM/transportชนิดใด. TAPไม่พบstoragewarning แต่ไม่ใช่proofว่าไม่มีstoragecause. ต้องเพิ่มallowlisteddiagnostics/failedreloadเป็นรอบแยกก่อนทดลองต่อ ห้ามปรับdeadline/limitหรือrerun unchangedเพื่อทำให้ดูผ่าน
+
+675fafa hosted PR37453182274 Ubuntu22/24 controlled collector order failures แม้pushUbuntuทั้งสองผ่าน ณAPIล่าสุด. QA controlเดิมยึดarrival ordinal31/32ซึ่งอาจต่างsender batch orderตั้งแต่ต้น; ต้องตรวจrawและแก้controlให้เลือกpayloadbatchที่กำหนดเองโดยไม่relaxassertionsก่อนปิดประเด็น
