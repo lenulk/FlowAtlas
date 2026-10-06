@@ -3835,3 +3835,16 @@ First matched3×1000 measurement: all6000 measured business responses pluswarmup
 - Initial sustained smoke10-52-44-099Z0/1 ตั้ง registered app root เป็นworkspaceเอง ซึ่ง ProjectSources ห้ามตามขอบเขตเดิม; แก้ QA fixture ให้ใช้ subdirectory app โดยไม่แก้ production policy
 - Next smoke10-53-17-770Z0/1 business740ตอบถูกแต่SDK0 เพราะ QA ESM child launchขาด instrumentation/hook.mjs; เพิ่มloaderตาม existing SDK runner ไม่ถือว่าผลนั้นมี capture
 - Repaired smoke10-53-44-624Z1/1 actualSDK740/ack740/drop0/reload exact และ sustained met=null. Negative outer10-54-34-592Z1/1 มี inner failรายงานbusiness_response_mismatch/409/retained workspace/lockremoved; ไม่ใช้outerpassอ้างinnerผ่าน
+
+Round76 manual read: raw845547e Ubuntu24 timing failed delivered224/drop827shutdown/storagefsync1828.640ms/900msdeadline. First PowerShell ConvertTo-Json depth2 เตือนข้อมูลnestedถูกtruncate; อ่านใหม่เฉพาะnumericfieldsด้วยdepth5สำเร็จ ไม่ใช้truncateddisplayรับรองผล. fe507c6 PR/pushsourceaudit8sets/152reports/93filesตรงGitครบ แต่ hostedfailuresยังอยู่ตามQUALITY. ไม่มี workload testอื่นรันพร้อมfull30min; ระหว่างนี้อ่านCI/API/artifacts/เขียนเอกสารเท่านั้น
+
+## 2026-10-06T10-57-30-677Z
+
+- จุดประสงค์: Round76 full 20-worker 30-minute synthetic reference actual SDK and durable collector
+- ผล: ไม่ผ่าน — 0/1; failed 1; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 675fafaed08a8d649f39d7d28db4595dc1d81297; dirty: false
+- หลักฐาน: `reports/tests/2026-10-06T10-57-30-677Z.tap` และ `.json`
+- ไม่ผ่าน: bounded sustained reference HTTP workload uses actual SDK and durable reload, never pilot acceptance
+
+Round76 manual evidence: full failed report reconciles48078business/SDK=48059ack+19drop and accepted48059. resourcewithinlimits/ownedclose/retainedchecked. `gh run view --log-failed` ของ37453182274ขณะin_progressปฏิเสธเพราะlogsยังไม่พร้อม จึงยังไม่มีraw log audit; ไม่อ้างสาเหตุCIจากAPIstepnameอย่างเดียว

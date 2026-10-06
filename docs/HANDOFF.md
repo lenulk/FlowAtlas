@@ -150,3 +150,7 @@ Branch `test/collector-commit-order` ต่อจาก 3a23a3e/PR15 แก้�
 ## รอบ75 (6 ตุลาคม 2026)
 
 Branch `fix/exporter-flush-slot-refill` ต่อจาก4f5f5ac/[PR16](https://github.com/lenulk/FlowAtlas/pull/16). แก้ pump ให้ forceFlush เติมช่องที่ว่างได้โดยไม่รอช่องค้างทั้งคู่; deadlines/bounds/durability เดิม. Before0/1 requests2แทน3; finalfocused18/main150/SDK+Edge+fault3/source1ผ่าน. Ordinaryรับครบ3153แต่performanceFAILED315.101%. Slowfsync lossและ startup root cause ยังไม่ปิด. ขั้นถัดไป sustained reference workload20×30นาที พร้อม resource limits ที่ระบุก่อนรันและ exact CI audit; ไม่มี real pilot/user trial ให้รับรอง Beta/v1
+
+## รอบ76ผลเต็ม (6 ตุลาคม 2026)
+
+675fafa full20worker30min FAILEDหลัง4m25s: business48078ถูก/ack48059/drop19, resource limitsยังอยู่ใต้เกณฑ์. เก็บworkspace sustained-reference-JoNW9D; ไม่รับรอง30min/reloadจากfailedrun. ต้องเก็บdropReasons+storage timingและfailedreloadเพิ่มก่อนหาสาเหตุ19loss. HostedPR Ubuntu controlled-reorder fixturefailed ต้องแยกarrivalordinalจากsenderbatch. รอบ75flushrepairยังมีhostedfsync827lossอยู่. Performance/stablecapture/CLIrootcause/sustained/pilot/users/releaseไม่ผ่าน
