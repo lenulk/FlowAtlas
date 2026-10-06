@@ -10,11 +10,13 @@ import { release } from 'node:os';
 import { startServers } from '../src/server.mjs';
 import { JsonActionStore } from '../src/action-store.mjs';
 import { getCodeVersion } from '../src/flowatlas.mjs';
+import { reorderCollectorPair } from './collector-reorder-fixture.mjs';
 
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
 const count = 1051;
 const controlledFault = process.env.FLOWATLAS_COLLECTOR_COST_FAULT === 'transport-reject';
 const controlledSync = process.env.FLOWATLAS_SLOW_FSYNC_QA === '1';
+const controlledReorder = process.env.FLOWATLAS_COLLECTOR_COST_REORDER === '1';
 const workerSource = `import { LocalHttpSpanExporter } from ${JSON.stringify(pathToFileURL(join(root, 'src/otel-exporter.mjs')).href)};
 import { performance } from 'node:perf_hooks';
 process.once('message', async (config) => {
@@ -63,7 +65,8 @@ async function condition(mode, round) {
     durable: mode === 'disk', complete: false, worker: null, storageTiming: null, received: null,
     retainedActions: null, reloadVerified: false, failure: null, workerOutcome: null, workspaceRemoved: false, retainedWorkspace: null };
   const sessionToken = randomBytes(32).toString('base64url');
-  let servers, sink, child, childClosed = false, cleanClosed = false, received = 0;
+  let servers, sink, child, childClosed = false, cleanClosed = false, received = 0, reorderProbe;
+  const accepted = new Set(), retained = new Map(); let acceptedCount = 0;
   try {
     mkdirSync(join(workspace, 'app'));
     writeFileSync(join(workspace, 'app/worker.mjs'), workerSource, { flag: 'wx' });
@@ -86,6 +89,21 @@ async function condition(mode, round) {
       servers = await startServers({ port: 0, inventoryPort: 0, dataDir: mode === 'disk' ? 'data/actions' : null,
         workspace, sessionToken, traceTiming: true, projects: [{ id: 'component', root: 'app', files: ['worker.mjs'] }] });
       port = servers.port; digest = servers.atlas.projectSources.version('component').digest;
+      // Observe successful commits independently of the retained store. Concurrent
+      // uploads may commit in a different order from the sender's input array.
+      const commit = servers.atlas.putTraceGraphs;
+      servers.atlas.putTraceGraphs = function (graphs) {
+        const value = commit.call(this, graphs);
+        for (const graph of graphs) {
+          if (acceptedCount >= count || !/^[0-9a-f]{32}$/.test(graph.trace.traceId)
+            || BigInt(`0x${graph.trace.traceId}`) < 1n || BigInt(`0x${graph.trace.traceId}`) > BigInt(count)) throw new Error('unexpected_qa_trace');
+          acceptedCount++; accepted.add(graph.trace.traceId);
+          retained.set(graph.id, graph.trace.traceId);
+          if (retained.size > 100) retained.delete(retained.keys().next().value);
+        }
+        return value;
+      };
+      if (controlledReorder) reorderProbe = reorderCollectorPair(servers.app);
     }
     const workerEnv = { ...process.env };
     delete workerEnv.NODE_OPTIONS; delete workerEnv.NODE_TEST_CONTEXT;
@@ -107,6 +125,7 @@ async function condition(mode, round) {
       signal: ['SIGKILL', 'SIGTERM', 'SIGINT', 'spawn_error'].includes(outcome.signal) ? outcome.signal : outcome.signal ? 'other' : null };
     if (outcome.code !== 0 || outcome.signal || !report) throw new Error('worker_diagnostic_failed');
     result.worker = report;
+    result.reorder = reorderProbe?.() ?? null;
     const summary = report.summary;
     result.complete = summary.httpSpans === count && summary.delivered === count && summary.dropped === 0
       && summary.invalidSpans === 0 && summary.queued === 0 && summary.inFlight === 0
@@ -116,9 +135,18 @@ async function condition(mode, round) {
       result.received = received; result.complete &&= received === count;
     } else {
       const graphs = [...servers.atlas.actions.values()]; result.retainedActions = graphs.length;
-      const expected = Array.from({ length: 100 }, (_, index) => (count - 99 + index).toString(16).padStart(32, '0'));
-      result.complete &&= graphs.length === 100 && graphs.every((graph, index) => graph.trace.traceId === expected[index]
+      const expected = [...retained.values()];
+      const orderDigest = ids => createHash('sha256').update(JSON.stringify(ids)).digest('hex');
+      result.acceptedCount = acceptedCount; result.acceptedUnique = accepted.size;
+      result.expectedRetainedOrderDigest = orderDigest(expected);
+      result.actualRetainedOrderDigest = orderDigest(graphs.map(graph => graph.trace.traceId));
+      const senderTail = Array.from({ length: 100 }, (_, index) => (count - 99 + index).toString(16).padStart(32, '0'));
+      result.senderTailOrderDigest = orderDigest(senderTail);
+      result.complete &&= acceptedCount === count && accepted.size === count && graphs.length === 100 && graphs.every((graph, index) => graph.trace.traceId === expected[index]
         && graph.trace.spans.length === 1 && graph.trace.spans[0].httpStatus === 200 && graph.outcome === 'success');
+      if (controlledReorder) result.complete &&= result.reorder.requests === 33 && result.reorder.releases === 1
+        && result.reorder.aborted === 0 && result.reorder.held === false
+        && result.expectedRetainedOrderDigest !== result.senderTailOrderDigest;
       result.storageTiming = servers.atlas.store?.timingHealth() ?? null;
       if (mode === 'disk') {
         const before = JSON.stringify(graphs); await servers.close(); servers = null;
@@ -153,8 +181,10 @@ test('component collector cost diagnostic uses simulated replay, never performan
   const id = new Date().toISOString().replace(/[:.]/g, '-');
   const version = getCodeVersion(root);
   const report = { id, sourceCommit: version.commit, sourceDigest: version.digest, sourceDirty: version.dirty,
+    controlledReorder,
     sourceScope: 'core tool snapshot; diagnostic script and generated fixture identified separately',
     diagnosticScriptDigest: createHash('sha256').update(readFileSync(fileURLToPath(import.meta.url))).digest('hex'),
+    reorderFixtureDigest: createHash('sha256').update(readFileSync(join(root, 'scripts/collector-reorder-fixture.mjs'))).digest('hex'),
     fixtureDigest: createHash('sha256').update(workerSource).digest('hex'),
     runtime: { node: process.version, platform: process.platform, osRelease: release() },
     evidenceKind: 'component diagnostic with simulated normalized HTTP spans; not application/SDK workload or pilot',

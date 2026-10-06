@@ -3604,3 +3604,66 @@ First matched3×1000 measurement: all6000 measured business responses pluswarmup
 - หลักฐาน: `reports/tests/2026-10-06T10-29-11-956Z.tap` และ `.json`
 
 - Round73 manualactualargvcheck: main10-28-25-404Zdefault--test-concurrency=2/148pass; equals1 andspaced1 overrides both5pass/no injecteddefault2. diffcheckpassed. QAresourcepolicyonly; no appdeadline/coverage/sampler/storage/queuechanges. Oldstartupfailure/normalperformancefailures/pilotgaps retained.
+
+## 2026-10-06T10-37-41-284Z
+
+- จุดประสงค์: Round74 before receipt-order repair force request31 after32 without changing shutdown deadline
+- ผล: ไม่ผ่าน — 0/1; failed 1; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 3a23a3e91eb8145e47d93ce5747e1fae124c577c; dirty: true
+- หลักฐาน: `reports/tests/2026-10-06T10-37-41-284Z.tap` และ `.json`
+- ไม่ผ่าน: component collector cost diagnostic uses simulated replay, never performance or SDK acceptance
+
+## 2026-10-06T10-41-47-801Z
+
+- จุดประสงค์: Round74 repaired accepted-commit order under controlled request31/32 reversal
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 3a23a3e91eb8145e47d93ce5747e1fae124c577c; dirty: true
+- หลักฐาน: `reports/tests/2026-10-06T10-41-47-801Z.tap` และ `.json`
+
+## 2026-10-06T10-42-14-399Z
+
+- จุดประสงค์: Round74 final controlled commit reversal
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 3a23a3e91eb8145e47d93ce5747e1fae124c577c; dirty: true
+- หลักฐาน: `reports/tests/2026-10-06T10-42-14-399Z.tap` และ `.json`
+
+## 2026-10-06T10-42-26-883Z
+
+- จุดประสงค์: Round74 normal component replay and retained failure regression
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 3a23a3e91eb8145e47d93ce5747e1fae124c577c; dirty: true
+- หลักฐาน: `reports/tests/2026-10-06T10-42-26-883Z.tap` และ `.json`
+
+## 2026-10-06T10-42-31-525Z
+
+- จุดประสงค์: Round74 normal component replay and retained failure regression
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 3a23a3e91eb8145e47d93ce5747e1fae124c577c; dirty: true
+- หลักฐาน: `reports/tests/2026-10-06T10-42-31-525Z.tap` และ `.json`
+
+## 2026-10-06T10-42-36-558Z
+
+- จุดประสงค์: Round74 normal component replay and retained failure regression
+- ผล: ผ่าน — 2/2; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 3a23a3e91eb8145e47d93ce5747e1fae124c577c; dirty: true
+- หลักฐาน: `reports/tests/2026-10-06T10-42-36-558Z.tap` และ `.json`
+
+## 2026-10-06T10-42-55-907Z
+
+- จุดประสงค์: Round74 final main regression with default bounded workers
+- ผล: ผ่าน — 148/148; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 3a23a3e91eb8145e47d93ce5747e1fae124c577c; dirty: true
+- หลักฐาน: `reports/tests/2026-10-06T10-42-55-907Z.tap` และ `.json`
+
+### Round74 manual/tool evidence
+
+- `git fetch origin` สำเร็จโดยไม่ทับ branch ที่มีงานค้าง; ตรวจ status แล้ว
+- `gh pr list` ภายใน sandbox อ่าน GitHub CLI config ไม่ได้ (Access is denied); ยังไม่ถือว่าตรวจ remote PR สำเร็จ จะใช้สิทธิ์ที่ผู้ใช้อนุญาตสำหรับ GitHub
+- เรียก apply_patch ด้วยหัว TEST-RUNS ที่ไม่ตรงไฟล์จึงถูกปฏิเสธ ไม่มีไฟล์ถูกแก้จากคำสั่งนั้น; บันทึกนี้เขียนด้วย native Add-Content แทน

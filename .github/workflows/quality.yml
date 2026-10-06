@@ -88,6 +88,12 @@ jobs:
         env:
           FLOWATLAS_TEST_PURPOSE: CI simulated collector component cost diagnostic
         run: node scripts/run-tests.mjs scripts/benchmark-collector-cost.mjs
+      - name: Controlled collector commit order
+        if: ${{ !cancelled() }}
+        env:
+          FLOWATLAS_TEST_PURPOSE: CI accepted commit order under controlled concurrent upload reversal
+          FLOWATLAS_COLLECTOR_COST_REORDER: '1'
+        run: node scripts/run-tests.mjs scripts/benchmark-collector-cost.mjs
       - name: Component failure evidence retention
         if: ${{ !cancelled() }}
         env:

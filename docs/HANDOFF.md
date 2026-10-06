@@ -140,3 +140,7 @@ node scripts/run-tests.mjs --test-name-pattern=cjs --import ./reports/vm/asserti
 - ทดสอบด้วย `node scripts/run-tests.mjs ...` เท่านั้น ตั้งชื่อ purpose ของแต่ละรอบ บันทึก failure และวิเคราะห์ใน QUALITY.md แก้ทีละประเด็น ตรวจ source-check แยกจาก snapshot tests ตาม AGENTS.md
 - เก็บไฟล์ของโปรเจกต์ใน checkout และเก็บรายงานใน reports/ ตรวจ diff และทดสอบที่ตรงกับความเสี่ยงก่อน commit/push ไม่ forcepush ไม่ทับงานอีกเครื่อง และไม่ส่งข้อมูลลับลง Git
 - รายงานแยก source inspection / simulation / automated fixture / VM / CI / real pilot ไม่ประกาศสมบูรณ์จากเทสต์ผ่านเพียงอย่างเดียว
+
+## รอบ74 (6 ตุลาคม 2026)
+
+Branch `test/collector-commit-order` ต่อจาก 3a23a3e/PR15 แก้ตัวตรวจ retained history ให้ใช้ลำดับ commit ที่สำเร็จจริงจาก independent observer แทน sender order เพิ่ม controlled reversal ของ request31/32 ใน CI ก่อนแก้ 0/1 ทั้งที่ ackครบ1051/drop0; หลังแก้ controlled1/normal1/503guard1/slow-fsync2 ผ่าน ยังรักษา inner loss859 ต่อ disk round และ reload exact. Production ไม่เปลี่ยน ดู QUALITY/TEST-RUNS. ถัดไปตรวจ forceFlush ว่าปล่อยช่องว่างให้ส่งต่อได้เมื่ออีกช่องค้าง โดยไม่เพิ่ม deadline หรือ retries; performance, startup root cause, sustained30min, pilot/users/release ยังเปิด
