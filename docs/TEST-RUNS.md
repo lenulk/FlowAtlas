@@ -3848,3 +3848,44 @@ Round76 manual read: raw845547e Ubuntu24 timing failed delivered224/drop827shutd
 - ไม่ผ่าน: bounded sustained reference HTTP workload uses actual SDK and durable reload, never pilot acceptance
 
 Round76 manual evidence: full failed report reconciles48078business/SDK=48059ack+19drop and accepted48059. resourcewithinlimits/ownedclose/retainedchecked. `gh run view --log-failed` ของ37453182274ขณะin_progressปฏิเสธเพราะlogsยังไม่พร้อม จึงยังไม่มีraw log audit; ไม่อ้างสาเหตุCIจากAPIstepnameอย่างเดียว
+
+## 2026-10-06T11-05-27-379Z
+
+- จุดประสงค์: Round77 before reorder repair reverse sender batch arrival deterministically
+- ผล: ไม่ผ่าน — 1/2; failed 1; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 5dd816b36f35b800e6ae48a4eaec3537eee006d6; dirty: true
+- หลักฐาน: `reports/tests/2026-10-06T11-05-27-379Z.tap` และ `.json`
+- ไม่ผ่าน: owned reorder fixture commits batch32 before31 with reversed arrival
+
+## 2026-10-06T11-05-54-663Z
+
+- จุดประสงค์: Round77 repair sender batch selection independent of arrival
+- ผล: ผ่าน — 2/2; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 5dd816b36f35b800e6ae48a4eaec3537eee006d6; dirty: true
+- หลักฐาน: `reports/tests/2026-10-06T11-05-54-663Z.tap` และ `.json`
+
+## 2026-10-06T11-05-55-078Z
+
+- จุดประสงค์: Round77 final full controlled batch reversal
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 5dd816b36f35b800e6ae48a4eaec3537eee006d6; dirty: true
+- หลักฐาน: `reports/tests/2026-10-06T11-05-55-078Z.tap` และ `.json`
+
+## 2026-10-06T11-05-59-455Z
+
+- จุดประสงค์: Round77 normal component and rejection guard unaffected
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 5dd816b36f35b800e6ae48a4eaec3537eee006d6; dirty: true
+- หลักฐาน: `reports/tests/2026-10-06T11-05-59-455Z.tap` และ `.json`
+
+## 2026-10-06T11-06-03-877Z
+
+- จุดประสงค์: Round77 normal component and rejection guard unaffected
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 5dd816b36f35b800e6ae48a4eaec3537eee006d6; dirty: true
+- หลักฐาน: `reports/tests/2026-10-06T11-06-03-877Z.tap` และ `.json`
