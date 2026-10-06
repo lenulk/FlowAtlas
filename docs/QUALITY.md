@@ -826,3 +826,13 @@ Exact PR run37302472603 พบ Ubuntu22 capture gate failed: first pair delivere
 - Baselinearchiveที่สร้างจากGit4b5c2ecไม่รวมtesttreeเพื่อไม่ให้defaultdiscoveryเพิ่มtests; ทุกcodebyteมาจากgitarchive ไม่มีproductiondependencyเปลี่ยน runnerครั้งแรกpathผิดเพราะcwdเปลี่ยน (`11-13-32-238Z`) บันทึกtoolfailureและแก้command ไม่rerunกลบsoftwarefailure Rawreportsอยู่ใต้reports/storage/round61-baseline
 - Baseline `11-13-46-842Z`1/1และafter `11-14-07-368Z`1/1 capture3153ack0dropsทั้งคู่ แต่performanceFAILED +347.753% (2.425→10.858ms) / +254.808% (3.567→12.656ms). ไม่อ้างHTTPเร็วขึ้นจากrelativeที่baselineเปลี่ยน; immutableSHAลดงานโดยตรงเท่านั้น
 - Final local main `11-14-42-347Z`127/127, isolated source `11-16-48-033Z`1/1, actual SDK CJS/ESM+Edge+deliberate assertion `11-16-48-895Z`3/3 ผ่าน failed/skipped0. Inventory audit `11-20-19-776Z`1/1 ยืนยัน baseline files ตรง Git4b5c2ec และทั้งสาม final gates ตรงไฟล์ checkout ปัจจุบันทุกไฟล์ ยังรอ exact hosted CI ไม่ใช้ผลรุ่นก่อนแทน
+
+### รอบ74 — ตรวจลำดับ commit ของ concurrent uploads (6 ตุลาคม 2026)
+
+ตัวตรวจเดิมคาดว่า retained history 100 รายการเรียงตาม sender เสมอ ทั้งที่ exporter ส่งพร้อมกันสองช่องได้ QA fixture ของ collector ที่เราเป็นเจ้าของบังคับให้ request 32 commit ก่อน 31: ก่อนแก้ 10-37-41-284Z ล้มเหลว 0/1 โดยทั้ง 9 conditions รับ 1051/drop0 และ disk ทั้งสามเปิดกลับตรงกัน จึงพิสูจน์ข้อสมมติของตัวตรวจผิด ไม่ใช่ข้อพิสูจน์ว่าความเสียหายจาก fsync เดิมหายไป
+
+หลังแก้สังเกต putTraceGraphs เฉพาะเมื่อ commit สำเร็จ แล้วจำลอง Map retention แยกจาก actions/store จำกัด history100 และตรวจ trace IDs ครบ 1051 ไม่ซ้ำ/อยู่ในชุด input ตรวจ shape/status/outcome และ exact disk reload เดิม บันทึกเฉพาะ counts/order digests ไม่เผย trace IDs เพิ่ม controlled-reorder CI gate โดยต้องพิสูจน์ release1/request33/ไม่ abort และลำดับต่างจาก sender จริง
+
+Final reversal 10-42-14-399Z 1/1 และ normal 10-42-26-883Z 1/1 ผ่านทุก9conditions. Failure guard 10-42-31-525Z 1/1 ยังรักษา 503 failure/workspace; slow-fsync 10-42-36-558Z 2/2 ยังมี inner failed disk ทั้ง3: delivered192/shutdown859 และ reloadตรง ไม่เปลี่ยน shutdown900ms/upload1000ms/cap2048/slots2/fsync/schema. หลักฐานเป็น simulated span replay ไม่ใช่ SDK workload, performance acceptance หรือ pilot
+
+Round74 final main 2026-10-06T10-42-55-907Z ผ่าน148/148 ไม่มี skip; QA-only change ไม่อ้าง CI ผ่านจนตรวจ exact head จริง

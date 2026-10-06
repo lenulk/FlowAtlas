@@ -157,3 +157,5 @@ Current exact-evidence update: da9a0b6 hosted3/4 (Windows22mainfixturefailed), V
 
 FA-03 lifecycle repair: managed CLIinspect now has private ownership proof and disconnect shutdown. Windows hidden inspector escapes parentforced-kill job so it can performexistingboundedstop/SDKflush/collectorlockclose; Linux remainsnon-detached. Focused14/14 verifies ready/startup/silentowner paths and actualSDKdrain, defaultmain/exactCI/VM pending. Directinspectorkill/arbitrarygrandchildren and historicalprocesscleanup remainunverified; see installguide.
 
+
+รอบ74: QA retention ตรวจ accepted commit order ภายใต้ concurrent uploads พร้อม controlled request31/32 reversal; simulated replay รับครบ1051/drop0 และ reload exact ทั้ง3 disk rounds. Controlled slow fsync ยังสูญเสีย859 shutdownต่อรอบตามเดิม ไม่ปิด capture/performance/pilot gate. ต่อไปแก้ drain scheduling และตรวจ sustained load ตามเกณฑ์เดิม
