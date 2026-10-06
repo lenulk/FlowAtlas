@@ -91,7 +91,9 @@ export class LocalHttpSpanExporter {
       });
       this.active.add(work);
     }
-    return Promise.all([...this.active]);
+    // A flush must refill each free slot independently. Waiting for both peers
+    // lets one stalled upload strand queued batches until shutdown aborts them.
+    return this.active.size ? Promise.race([...this.active]) : Promise.resolve();
   }
   async sendBatch() {
     const started = this.timing ? performance.now() : null;

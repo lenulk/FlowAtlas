@@ -159,3 +159,5 @@ FA-03 lifecycle repair: managed CLIinspect now has private ownership proof and d
 
 
 รอบ74: QA retention ตรวจ accepted commit order ภายใต้ concurrent uploads พร้อม controlled request31/32 reversal; simulated replay รับครบ1051/drop0 และ reload exact ทั้ง3 disk rounds. Controlled slow fsync ยังสูญเสีย859 shutdownต่อรอบตามเดิม ไม่ปิด capture/performance/pilot gate. ต่อไปแก้ drain scheduling และตรวจ sustained load ตามเกณฑ์เดิม
+
+รอบ75: forceFlush เติมช่องส่งที่ว่างโดยไม่ติดรอ peer ที่ค้าง ภายใน shutdown900ms เดิม. Focused18/main150/SDK+Edge+fault3/source1ผ่าน; ordinary3153/drop0 แต่ p95 overhead315.101% ยังFAILED. Slowfsync/CLIrootcause/sustained30min/pilot/users/releaseยังเปิด

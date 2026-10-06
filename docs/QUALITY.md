@@ -836,3 +836,13 @@ Exact PR run37302472603 พบ Ubuntu22 capture gate failed: first pair delivere
 Final reversal 10-42-14-399Z 1/1 และ normal 10-42-26-883Z 1/1 ผ่านทุก9conditions. Failure guard 10-42-31-525Z 1/1 ยังรักษา 503 failure/workspace; slow-fsync 10-42-36-558Z 2/2 ยังมี inner failed disk ทั้ง3: delivered192/shutdown859 และ reloadตรง ไม่เปลี่ยน shutdown900ms/upload1000ms/cap2048/slots2/fsync/schema. หลักฐานเป็น simulated span replay ไม่ใช่ SDK workload, performance acceptance หรือ pilot
 
 Round74 final main 2026-10-06T10-42-55-907Z ผ่าน148/148 ไม่มี skip; QA-only change ไม่อ้าง CI ผ่านจนตรวจ exact head จริง
+
+### รอบ75 — refill ช่องส่งที่ว่างระหว่าง forceFlush
+
+`pump()` เดิมคืน Promise.all ของสองช่อง และ schedule ไม่ทำงานระหว่าง flush/closed จึงรอช่องค้างแม้อีกช่องส่งเสร็จแล้ว Controlled owned HTTP server ปล่อยช่องแรกค้าง: before10-44-41-000Z0/1 คำขอ2แทน3. เปลี่ยนเป็นรอช่องแรกที่เสร็จแล้ววน pump เพื่อเติมช่องว่าง; ยังคง slots2/batch32/cap2048/upload1000/shutdown900/coalescing20/no retries/complete2xx ack/fsync
+
+Final focused10-45-20-838Z18/18: healthy peer ส่ง64/drop32shutdown เมื่ออีกช่องค้าง; direct forceFlush ส่งครบ96/drop0 โดยปล่อยช่องแรกหลังชุดสามมาถึง. Existing both-stalled/overflow/rejection/truncated-body/connection ownership guards ยังผ่าน. Actual SDK+Edge+fault10-46-27-526Z3/3, main10-47-03-145Z150/150, source10-47-53-740Z1/1 ผ่าน. Controlled reversal10-45-26-557Z1/1, actualSDKcost10-45-33-075Z1/1 และ parity/503guard10-45-48-748Z2/2 ผ่าน; inner503failed10-45-49-622Zยังอยู่
+
+Ordinary10-46-44-956Z1/1 รับครบ3153/drop0 แต่ performance FAILED +315.101% (baseline2.523/traced10.473ms). ไม่อ้าง causal speedup จาก host timings ที่ต่างกัน. Slow fsync guardยังผ่านพร้อม inner disk failures/reload exact; การเติมช่องว่างไม่แก้ collector ที่ block synchronous fsync ทั้ง process. Startup root cause/sustained30min/realpilot/users/release ยังเปิด
+
+CI ตรวจสด: 3a23a3e push37450840821 success แต่ PR37450846858 failure3/4 Ubuntu22 ordinary/timing/component/negativeguard; ad3dbaf PR37449864287 failure3/4 Ubuntu22component/negativeguard. จึงยังไม่ใช้ passing local แทน exact hosted evidence. เริ่มโหลด raw artifacts เพื่อ audit รุ่นfe507c6/3a23a3e; มี TLS handshake timeout ของหนึ่ง artifact บันทึกเป็น download failure ไม่ใช่ test failure
