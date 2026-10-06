@@ -144,3 +144,7 @@ node scripts/run-tests.mjs --test-name-pattern=cjs --import ./reports/vm/asserti
 ## รอบ74 (6 ตุลาคม 2026)
 
 Branch `test/collector-commit-order` ต่อจาก 3a23a3e/PR15 แก้ตัวตรวจ retained history ให้ใช้ลำดับ commit ที่สำเร็จจริงจาก independent observer แทน sender order เพิ่ม controlled reversal ของ request31/32 ใน CI ก่อนแก้ 0/1 ทั้งที่ ackครบ1051/drop0; หลังแก้ controlled1/normal1/503guard1/slow-fsync2 ผ่าน ยังรักษา inner loss859 ต่อ disk round และ reload exact. Production ไม่เปลี่ยน ดู QUALITY/TEST-RUNS. ถัดไปตรวจ forceFlush ว่าปล่อยช่องว่างให้ส่งต่อได้เมื่ออีกช่องค้าง โดยไม่เพิ่ม deadline หรือ retries; performance, startup root cause, sustained30min, pilot/users/release ยังเปิด
+
+## รอบ75 (6 ตุลาคม 2026)
+
+Branch `fix/exporter-flush-slot-refill` ต่อจาก4f5f5ac/[PR16](https://github.com/lenulk/FlowAtlas/pull/16). แก้ pump ให้ forceFlush เติมช่องที่ว่างได้โดยไม่รอช่องค้างทั้งคู่; deadlines/bounds/durability เดิม. Before0/1 requests2แทน3; finalfocused18/main150/SDK+Edge+fault3/source1ผ่าน. Ordinaryรับครบ3153แต่performanceFAILED315.101%. Slowfsync lossและ startup root cause ยังไม่ปิด. ขั้นถัดไป sustained reference workload20×30นาที พร้อม resource limits ที่ระบุก่อนรันและ exact CI audit; ไม่มี real pilot/user trial ให้รับรอง Beta/v1

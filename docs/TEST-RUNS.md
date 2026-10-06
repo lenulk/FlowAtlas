@@ -3667,3 +3667,105 @@ First matched3×1000 measurement: all6000 measured business responses pluswarmup
 - `git fetch origin` สำเร็จโดยไม่ทับ branch ที่มีงานค้าง; ตรวจ status แล้ว
 - `gh pr list` ภายใน sandbox อ่าน GitHub CLI config ไม่ได้ (Access is denied); ยังไม่ถือว่าตรวจ remote PR สำเร็จ จะใช้สิทธิ์ที่ผู้ใช้อนุญาตสำหรับ GitHub
 - เรียก apply_patch ด้วยหัว TEST-RUNS ที่ไม่ตรงไฟล์จึงถูกปฏิเสธ ไม่มีไฟล์ถูกแก้จากคำสั่งนั้น; บันทึกนี้เขียนด้วย native Add-Content แทน
+
+## 2026-10-06T10-44-41-000Z
+
+- จุดประสงค์: Round75 before drain repair one stalled slot starves healthy queued batch
+- ผล: ไม่ผ่าน — 0/1; failed 1; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 4f5f5aca47943bd1411aadaec7b4bbb161e8c8f9; dirty: true
+- หลักฐาน: `reports/tests/2026-10-06T10-44-41-000Z.tap` และ `.json`
+- ไม่ผ่าน: shutdown refills the free slot while its peer stalls without retrying or extending the deadline
+
+## 2026-10-06T10-44-52-369Z
+
+- จุดประสงค์: Round75 repaired independent flush slot refill and exporter conformance
+- ผล: ผ่าน — 17/17; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 4f5f5aca47943bd1411aadaec7b4bbb161e8c8f9; dirty: true
+- หลักฐาน: `reports/tests/2026-10-06T10-44-52-369Z.tap` และ `.json`
+
+## 2026-10-06T10-45-20-838Z
+
+- จุดประสงค์: Round75 final focused exporter contract
+- ผล: ผ่าน — 18/18; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 4f5f5aca47943bd1411aadaec7b4bbb161e8c8f9; dirty: true
+- หลักฐาน: `reports/tests/2026-10-06T10-45-20-838Z.tap` และ `.json`
+
+## 2026-10-06T10-45-26-557Z
+
+- จุดประสงค์: Round75 final controlled reorder with independent drain slots
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 4f5f5aca47943bd1411aadaec7b4bbb161e8c8f9; dirty: true
+- หลักฐาน: `reports/tests/2026-10-06T10-45-26-557Z.tap` และ `.json`
+
+## 2026-10-06T10-45-33-075Z
+
+- จุดประสงค์: Round75 actual SDK component and 503 evidence
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 4f5f5aca47943bd1411aadaec7b4bbb161e8c8f9; dirty: true
+- หลักฐาน: `reports/tests/2026-10-06T10-45-33-075Z.tap` และ `.json`
+
+## 2026-10-06T10-45-49-622Z
+
+- จุดประสงค์: Controlled SDK HTTP sink rejection must fail measurement
+- ผล: ไม่ผ่าน — 0/1; failed 1; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 4f5f5aca47943bd1411aadaec7b4bbb161e8c8f9; dirty: true
+- หลักฐาน: `reports/tests/2026-10-06T10-45-49-622Z.tap` และ `.json`
+- ไม่ผ่าน: actual SDK HTTP count-only and production exporter sink costs remain diagnostic
+
+## 2026-10-06T10-45-48-748Z
+
+- จุดประสงค์: Round75 actual SDK component and 503 evidence
+- ผล: ผ่าน — 2/2; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 4f5f5aca47943bd1411aadaec7b4bbb161e8c8f9; dirty: true
+- หลักฐาน: `reports/tests/2026-10-06T10-45-48-748Z.tap` และ `.json`
+
+## 2026-10-06T10-46-27-526Z
+
+- จุดประสงค์: Round75 actual SDK CJS ESM Edge and deliberate failure lifecycle
+- ผล: ผ่าน — 3/3; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 4f5f5aca47943bd1411aadaec7b4bbb161e8c8f9; dirty: true
+- หลักฐาน: `reports/tests/2026-10-06T10-46-27-526Z.tap` และ `.json`
+
+## 2026-10-06T10-46-44-956Z
+
+- จุดประสงค์: Round75 unchanged ordinary paired capture and performance workload
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 4f5f5aca47943bd1411aadaec7b4bbb161e8c8f9; dirty: true
+- หลักฐาน: `reports/tests/2026-10-06T10-46-44-956Z.tap` และ `.json`
+
+## 2026-10-06T10-46-54-798Z
+
+- จุดประสงค์: Round75 controlled slow fsync keeps genuine shutdown failures
+- ผล: ผ่าน — 2/2; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 4f5f5aca47943bd1411aadaec7b4bbb161e8c8f9; dirty: true
+- หลักฐาน: `reports/tests/2026-10-06T10-46-54-798Z.tap` และ `.json`
+
+## 2026-10-06T10-47-03-145Z
+
+- จุดประสงค์: Round75 full main regression
+- ผล: ผ่าน — 150/150; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 4f5f5aca47943bd1411aadaec7b4bbb161e8c8f9; dirty: true
+- หลักฐาน: `reports/tests/2026-10-06T10-47-03-145Z.tap` และ `.json`
+
+## 2026-10-06T10-47-53-740Z
+
+- จุดประสงค์: Round75 isolated source serving regression
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 4f5f5aca47943bd1411aadaec7b4bbb161e8c8f9; dirty: true
+- หลักฐาน: `reports/tests/2026-10-06T10-47-53-740Z.tap` และ `.json`
+
+### Round75 manual CI/download check
+
+ตรวจ API run3a23a3e push success/PR3of4pass และ ad3dbaf PR3of4pass; failed Ubuntu22 stepsตามQUALITY. Artifact downloadพบ TLS handshake timeout ของ Windows22 artifact ในชุด3a23a3e PR จึงยังไม่อ้างcomplete audit. ไม่เก็บ signed download URL ลงเอกสาร

@@ -206,6 +206,42 @@ test('shutdown aborts both active upload slots and accounts for queued spans onc
   assert.equal(exporter.deliveryHealth().shutdown, 96);
 });
 
+test('shutdown refills the free slot while its peer stalls without retrying or extending the deadline', async (t) => {
+  const batches = []; let requests = 0;
+  const url = await serve(t, async (req, res) => {
+    const ordinal = ++requests;
+    let body = ''; for await (const part of req) body += part;
+    batches.push(JSON.parse(body).items.map(item => item.span.spanId));
+    if (ordinal !== 1) res.end('{}'); // First owned request stays stalled.
+  });
+  const exporter = new LocalHttpSpanExporter(config(url, { timing: true }));
+  exporter.export(Array.from({ length: 96 }, (_, index) => sdkSpan(index + 1)), () => {});
+  await exporter.shutdown();
+  assert.equal(requests, 3, 'The healthy slot must send the third batch before the unchanged deadline');
+  assert.equal(new Set(batches.flat()).size, 96, 'No batch is retried');
+  assert.deepEqual(exporter.summary(), { httpSpans: 96, invalidSpans: 0, delivered: 64,
+    dropped: 32, queued: 0, inFlight: 0 });
+  assert.deepEqual(exporter.deliveryHealth(), { overflow: 0, invalid: 0, rejected: 0, timeout: 0, transport: 0, shutdown: 32 });
+  assert.equal(exporter.transportHealth().peakRequests, 2);
+  assert.equal(exporter.timingHealth().deadlineFired, 1);
+  assert.ok(exporter.timingHealth().shutdownMs < 1500, 'Shutdown remains bounded at the existing nominal 900ms deadline');
+});
+
+test('forceFlush progresses on a healthy peer before the first response is released', async (t) => {
+  let requests = 0, held;
+  const url = await serve(t, (req, res) => {
+    req.resume(); requests++;
+    if (requests === 1) held = res;
+    else { res.end('{}'); if (requests === 3) held.end('{}'); }
+  });
+  const exporter = new LocalHttpSpanExporter(config(url));
+  exporter.export(Array.from({ length: 96 }, (_, index) => sdkSpan(index + 1)), () => {});
+  await exporter.forceFlush();
+  assert.equal(requests, 3); assert.equal(exporter.summary().delivered, 96);
+  assert.equal(exporter.summary().dropped, 0); assert.equal(exporter.transportHealth().peakRequests, 2);
+  await exporter.shutdown();
+});
+
 test('small exports coalesce without holding callbacks and sparse traffic drains on its own', async (t) => {
   const received = []; let firstReceived;
   const arrived = new Promise((resolve) => { firstReceived = resolve; });
