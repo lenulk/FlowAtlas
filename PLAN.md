@@ -167,3 +167,5 @@ FA-03 lifecycle repair: managed CLIinspect now has private ownership proof and d
 รอบ76full reference20×30min ล้มเหลวจริงหลัง4m25s: business48078ถูก แต่metadata19สูญเสีย; RSS/queue/diskอยู่ใต้limits. ไม่ผ่านFA-07/FA-08/sustained. ต่อไปcontrolled-reorder batchidentity repairและdrop/storage/failedreloaddiagnosticsก่อนแก้production cause; ไม่เปลี่ยนเกณฑ์เพื่อผ่าน
 
 รอบ77controlled reorderเลือกknownfixturebatchidentityแล้ว ผ่านsender/reversedarrival2guardsและnormal/control/rejectioncomponent. ไม่ถือว่าactualsustained19lossได้รับการแก้; เตรียมdiagnosticsแยกก่อนrepeatworkload
+
+รอบ78failedsustainreportมีnumericdelivery/storagecauseและdurablereloadแล้ว; 409/503guardsทั้งสองinnerfailedอย่างถูกต้อง/retained/reloadexact. Originalfailedcheckpoint100graphsreadableunchangedแต่19lossยังunknown. ต้องใช้newdiagnosticworkloadก่อนเลือกproductionrepair ไม่ยืดtime/ลดlimitsเพื่อผ่าน

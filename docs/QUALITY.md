@@ -870,3 +870,11 @@ Before11-05-27-379Z1/2 reproducesoldcontrol: network arrival batch32ก่อน
 Final11-05-54-663Z2/2/controlledfull11-05-55-078Z1/1/normal11-05-59-455Z1/1/rejectionguard11-06-03-877Z1/1ผ่าน, eachnormal/control9conditions1051/drop0และdiskreopenexact. ผลนี้แก้QAcontrol ไม่ปิดactualsustained19loss/fsync827loss/performance/startup/pilot
 
 Exact675fafaAPIcompleted: PR37453182274ผ่านWindows2/failedUbuntu2 controlled-orderstep; push37453176461success4channels. CIshortsmokeทั้ง4ไม่ใช่30-minute gate. FullWindowsactualยังfailed. ต้องauditrawเทียบprogramก่อนรับรองexactและรอรอบ77CI; ไม่ใช้pushpassแทนPRfailure
+
+### รอบ78 — numeric drop/storage diagnostics และ failed reload
+
+ก่อนแก้ guard11-09-33-775Z0/2: businesserrorรายงานfailedแต่ไม่ตรวจreload; controlledcollector503ยังไม่มีpath/diagnostics. เพิ่มQAownedfirst-ingest503 (ไม่businessretry), parse allowlistednumericdelivery/rejection/exportertiming และ opt-in storagetiming, fixed-vocabulary storageerrorcountsสูงสุด16ชนิด. Failedvalidationยังcloseownedcollector/reopenstateและเทียบJSONกับin-memory checkpointที่acceptedจริง เก็บoriginalfailureเสมอ ไม่ลบworkspaceเมื่อfailed
+
+After11-10-28-044Z2/2: business409/collector503 innerทั้งสองfailed/retained แต่reloadexact/ownedcleanupครบ. 503dropReasons.rejectedตรงdropcount/rejection503 และbusinessresponsesถูกทุกครั้ง. Healthysmoke11-10-31-885Z1/1 SDK740/ack740/drop0/reloadexact/met=null. Source11-11-40-109Z1/1ผ่าน. Productioncapacity/deadline/durability unchanged; เพิ่มtimingเฉพาะownedQAprocess/collector ไม่เปลี่ยนdefault
+
+Original675fafafailedcheckpoint read11-11-39-617Z1/1: reopened100graphs/validateGraph100/statebytes187016/SHA587c09340654182bbd430623d6dda6733b14062934d68bfad60f942b916fd9bbตรงก่อนและหลัง/lockremoved. นี่พิสูจน์schema/readabilityของcheckpointที่เหลือ ไม่สร้าง19lostspansกลับหรือพิสูจน์originalin-memoryequality. 19lossrootcauseยังunknown; ต่อไปfull diagnostic workloadบนsourceใหม่ที่เก็บcauseได้ ห้ามใส่reasonย้อนกลับใน675fafa

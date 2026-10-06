@@ -158,3 +158,7 @@ Branch `fix/exporter-flush-slot-refill` ต่อจาก4f5f5ac/[PR16](https:/
 ## รอบ77ล่าสุด
 
 Branch `test/reorder-by-fixture-batch` ต่อจาก5dd816b/PR18 แก้controlledQAใช้senderbatchidentityแทนarrivalordinal พร้อมreverse-arrivalbefore1/2/after2/2 และcomponentnormal/control/rejectionผ่าน. Full30minรุ่น675fafaยังFAILED19lossหลัง4m25s; ขั้นถัดไปdropReasons/storage/failedreloaddiagnosticsเพื่อแยกcauseก่อนproductionrepair. ไม่มีrealpilot/performancepass
+
+## รอบ78ล่าสุด
+
+Branch `diag/sustained-drop-recovery` ต่อจากfd55371/PR19 เพิ่มnumericdropReasons/rejectionstatuses/exporter+storage timing และfixedstorageerrorcounts bounded16. Failedrunsตรวจdurablereopenเทียบacceptedin-memorycheckpointแม้captureไม่ครบ. Beforeguard0/2 หลัง2/2/healthysmoke740spans1/source1ผ่าน. Original675fafafailedcheckpointreopens100validgraphsด้วยbytesเดิม แต่19spansยังสูญเสียและcauseunknown. ถัดไปfull diagnostic workload unchangedlimits/deadlinesเพื่อหาcause; ยังไม่รับรอง30min/performance/pilot/users/release

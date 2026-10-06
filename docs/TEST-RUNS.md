@@ -3889,3 +3889,80 @@ Round76 manual evidence: full failed report reconciles48078business/SDK=48059ack
 - Environment: win32/x64; OS 10.0.26200; Node v24.19.0
 - commit: 5dd816b36f35b800e6ae48a4eaec3537eee006d6; dirty: true
 - หลักฐาน: `reports/tests/2026-10-06T11-06-03-877Z.tap` และ `.json`
+
+## 2026-10-06T11-09-34-056Z
+
+- จุดประสงค์: Controlled sustained reference business-status must fail measurement
+- ผล: ไม่ผ่าน — 0/1; failed 1; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: fd553715935ad2d7232545c25d5070bddbe5a66a; dirty: true
+- หลักฐาน: `reports/tests/2026-10-06T11-09-34-056Z.tap` และ `.json`
+- ไม่ผ่าน: bounded sustained reference HTTP workload uses actual SDK and durable reload, never pilot acceptance
+
+## 2026-10-06T11-09-35-420Z
+
+- จุดประสงค์: Controlled sustained reference collector-reject must fail measurement
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: fd553715935ad2d7232545c25d5070bddbe5a66a; dirty: true
+- หลักฐาน: `reports/tests/2026-10-06T11-09-35-420Z.tap` และ `.json`
+
+## 2026-10-06T11-09-33-775Z
+
+- จุดประสงค์: Round78 before failed reload and drop/storage diagnostics
+- ผล: ไม่ผ่าน — 0/2; failed 2; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: fd553715935ad2d7232545c25d5070bddbe5a66a; dirty: true
+- หลักฐาน: `reports/tests/2026-10-06T11-09-33-775Z.tap` และ `.json`
+- ไม่ผ่าน: controlled business-status fails the sustained reference and preserves durable failure evidence
+- ไม่ผ่าน: controlled collector-reject fails the sustained reference and preserves durable failure evidence
+
+## 2026-10-06T11-10-28-363Z
+
+- จุดประสงค์: Controlled sustained reference business-status must fail measurement
+- ผล: ไม่ผ่าน — 0/1; failed 1; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: fd553715935ad2d7232545c25d5070bddbe5a66a; dirty: true
+- หลักฐาน: `reports/tests/2026-10-06T11-10-28-363Z.tap` และ `.json`
+- ไม่ผ่าน: bounded sustained reference HTTP workload uses actual SDK and durable reload, never pilot acceptance
+
+## 2026-10-06T11-10-29-812Z
+
+- จุดประสงค์: Controlled sustained reference collector-reject must fail measurement
+- ผล: ไม่ผ่าน — 0/1; failed 1; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: fd553715935ad2d7232545c25d5070bddbe5a66a; dirty: true
+- หลักฐาน: `reports/tests/2026-10-06T11-10-29-812Z.tap` และ `.json`
+- ไม่ผ่าน: bounded sustained reference HTTP workload uses actual SDK and durable reload, never pilot acceptance
+
+## 2026-10-06T11-10-28-044Z
+
+- จุดประสงค์: Round78 after numeric drop storage and failed durable reload evidence
+- ผล: ผ่าน — 2/2; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: fd553715935ad2d7232545c25d5070bddbe5a66a; dirty: true
+- หลักฐาน: `reports/tests/2026-10-06T11-10-28-044Z.tap` และ `.json`
+
+## 2026-10-06T11-10-31-885Z
+
+- จุดประสงค์: Round78 short healthy reference with numeric timing and reload
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: fd553715935ad2d7232545c25d5070bddbe5a66a; dirty: true
+- หลักฐาน: `reports/tests/2026-10-06T11-10-31-885Z.tap` และ `.json`
+
+## 2026-10-06T11-11-39-617Z
+
+- จุดประสงค์: Round78 read original failed 675fafa checkpoint without changing bytes
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: fd553715935ad2d7232545c25d5070bddbe5a66a; dirty: true
+- หลักฐาน: `reports/tests/2026-10-06T11-11-39-617Z.tap` และ `.json`
+
+## 2026-10-06T11-11-40-109Z
+
+- จุดประสงค์: Round78 final isolated source regression
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: fd553715935ad2d7232545c25d5070bddbe5a66a; dirty: true
+- หลักฐาน: `reports/tests/2026-10-06T11-11-40-109Z.tap` และ `.json`
