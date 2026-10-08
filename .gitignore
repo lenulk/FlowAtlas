@@ -12,3 +12,4 @@ data/
 apps/
 flowatlas.config.json
 reports/adapter-backups/
+reports/diagnostics/

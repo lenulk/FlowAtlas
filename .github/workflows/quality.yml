@@ -46,6 +46,11 @@ jobs:
         env:
           FLOWATLAS_TEST_PURPOSE: CI main regression
         run: node scripts/run-tests.mjs
+      - name: Controlled CLI startup phase evidence
+        if: ${{ !cancelled() }}
+        env:
+          FLOWATLAS_TEST_PURPOSE: CI controlled delayed target startup retains10s failure and owned phase evidence
+        run: node scripts/run-tests.mjs scripts/cli-startup-phase-failure-check.mjs
       - name: Isolated source regression
         if: ${{ !cancelled() }}
         env:
@@ -208,6 +213,7 @@ jobs:
           retention-days: 14
           path: |
             reports/tests/
+            reports/diagnostics/cli-startup/
             reports/vm/inspector-browser-*/
             reports/browser/independent-browser-*/
             reports/browser/otel-runtime-*/

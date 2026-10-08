@@ -4267,3 +4267,127 @@ Round79 initial tests: sandbox run2026-10-07T17-37-22-862Z0/7 failedbeforeassert
 - Initialfailed diagnostic readback usednativefetch Response.status() incorrectly; movedtosameboundedPlaywrightrequestAPIusedhealthyjourney. Earlierartifactreadbackfailedไม่พิสูจน์absenceofgraph. Finalcontrolsreadback404/action-startrefused or200/runningafterhandleracceptedถูกต้อง
 - FinalEdgepositive+failureguards+sourceafter successpublicationandchildclosechecks passed. Failedinnerreportskept; noresult.jsonpublishedforfailedguards. bodyReadfieldmeanssuccessfulJSONdecode, notproofthat0receivedbytes
 - Newguardwatchdog70s/outer75s onlywrapexistingbrowser60s+boundedteardown; productmetadata500ms/target10s/wrapper12sunchanged
+
+## 2026-10-08T10-13-42-797Z
+
+- จุดประสงค์: Round80 focused SDK owner-kill startup milestones, unchanged readiness deadline
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: d0427a79ec1422b0f41d4245d43ec645d7b4d8d4; dirty: true
+- หลักฐาน: `reports/tests/2026-10-08T10-13-42-797Z.tap` และ `.json`
+
+## 2026-10-08T10-17-11-147Z
+
+- จุดประสงค์: Round80 helper privacy and controlled delayed target preserve unchanged10s failure
+- ผล: ผ่าน — 7/7; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: d0427a79ec1422b0f41d4245d43ec645d7b4d8d4; dirty: true
+- หลักฐาน: `reports/tests/2026-10-08T10-17-11-147Z.tap` และ `.json`
+
+## 2026-10-08T17-39-07-365Z
+
+- จุดประสงค์: Round80 complete CLI owner lifecycle and bounded startup parser
+- ผล: ไม่ผ่าน — 6/7; failed 1; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: d0427a79ec1422b0f41d4245d43ec645d7b4d8d4; dirty: true
+- หลักฐาน: `reports/tests/2026-10-08T17-39-07-365Z.tap` และ `.json`
+- ไม่ผ่าน: test\\cli-owner.test.mjs
+
+## 2026-10-08T17-40-14-931Z
+
+- จุดประสงค์: Round80 final isolated source regression
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: d0427a79ec1422b0f41d4245d43ec645d7b4d8d4; dirty: true
+- หลักฐาน: `reports/tests/2026-10-08T17-40-14-931Z.tap` และ `.json`
+
+### Round80 manual evidence review (9 ตุลาคม 2026)
+
+- Git fetch origin สำเร็จ; branch diag/cli-startup-milestones มีงานรอบ80ค้าง จึงไม่ pull ทับงาน เริ่มจาก d0427a7/PR21
+- gh pr checks21: push37761227880ผ่าน4/4; PR37761234298ผ่าน3/4 ล้มเหลว Ubuntu24 Node24 ใน Controlled collector commit order. เป็น API/step status เท่านั้น ยังไม่รับรอง source-matched artifact audit
+- CLI focused17-39-07-365Z helper6ผ่าน แต่ cli-owner test fileจบผิดปกติ exit3221226505; runnerรายงาน6/7 ไม่ใช้แทนจำนวน nested lifecycle tests
+- Artifact17-39-21-061Z-owner-kill-plain: elapsed12043ms/stdout397/stderr0/lockfalse; observed wrapper spawn และ collector-start-requested เท่านั้น ไม่พิสูจน์ว่า startServers ค้างแน่นอนหรือเป็นสาเหตุ native exit
+- Reviewพบ failure cleanup อาจลบ workspace เมื่อไม่ทราบ descendant identities และไม่ได้รอ owned wrapper close; แยกแก้การเก็บหลักฐานก่อน ไม่อ้างว่านี่เป็นสาเหตุ startup/native failure
+- Source17-40-14-931Zผ่าน1/1 แยกรันจาก snapshot tests ตามกฎ
+
+## 2026-10-08T17-43-59-980Z
+
+- จุดประสงค์: Round80 final delayed-target failure and shared conservative retention
+- ผล: ผ่าน — 7/7; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: d0427a79ec1422b0f41d4245d43ec645d7b4d8d4; dirty: true
+- หลักฐาน: `reports/tests/2026-10-08T17-43-59-980Z.tap` และ `.json`
+
+## 2026-10-08T17-44-24-825Z
+
+- จุดประสงค์: Round80 final CLI owner lifecycle after failure retention and QA sink isolation
+- ผล: ผ่าน — 9/9; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: d0427a79ec1422b0f41d4245d43ec645d7b4d8d4; dirty: true
+- หลักฐาน: `reports/tests/2026-10-08T17-44-24-825Z.tap` และ `.json`
+
+### Round80 final focused checks and hosted failure detail
+
+- Helper+actual delayedtarget/shared retention17-43-59-980Z7/7ผ่าน. GuardworkspaceRetainedtrue/childClosedtrue/lockAbsenttrue/unknownPIDไม่มีprobe; original10s readinessfailureยังอยู่
+- CLI lifecycle17-44-24-825Z9/9ผ่านหลังcleanupและQA sinkisolation แต่ก่อนย้ายphase assertionไปหลังcloseเพื่อไม่พึ่งIPC-vs-stdoutdeliveryorder; mainรอบถัดไปตรวจsourceสุดท้าย
+- Rootอ่านrawjoblog PR21Ubuntu24ใน reports/releases/round79-pr-ubuntu24-job.log: failedassertion benchmark-collector-cost.mjs203/component_capture_or_reload_failed ไม่ใช่ข้อสรุปว่าลำดับreversalผิด. Diskround1 delivered160/drop891/sync1393.382609ms, round2delivered128/drop923/sync1103.457216ms; reloadVerifiedtrueทั้งสอง. Round3ครบ1051/drop0. เป็นsimulatedreplay/observationaltiming ไม่ใช่pilotหรือหลักฐานสาเหตุsameกับCLI. ยังไม่wholematrixsourceaudit
+
+## 2026-10-08T17-45-26-681Z
+
+- จุดประสงค์: Round80 final main regression default two file workers after milestone ordering and cleanup
+- ผล: ผ่าน — 171/171; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: d0427a79ec1422b0f41d4245d43ec645d7b4d8d4; dirty: true
+- หลักฐาน: `reports/tests/2026-10-08T17-45-26-681Z.tap` และ `.json`
+
+## 2026-10-08T17-46-55-096Z
+
+- จุดประสงค์: Round80 final actual SDK and Edge after CLI diagnostics and shared cleanup
+- ผล: ผ่าน — 2/2; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: d0427a79ec1422b0f41d4245d43ec645d7b4d8d4; dirty: true
+- หลักฐาน: `reports/tests/2026-10-08T17-46-55-096Z.tap` และ `.json`
+
+## 2026-10-08T17-47-27-993Z
+
+- จุดประสงค์: Round80 final controlled failure retention on final CLI source
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: d0427a79ec1422b0f41d4245d43ec645d7b4d8d4; dirty: true
+- หลักฐาน: `reports/tests/2026-10-08T17-47-27-993Z.tap` และ `.json`
+
+## 2026-10-08T17-47-50-637Z
+
+- จุดประสงค์: Round80 final actual SDK plus explicit Edge viewer check
+- ผล: ผ่าน — 2/2; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: d0427a79ec1422b0f41d4245d43ec645d7b4d8d4; dirty: true
+- หลักฐาน: `reports/tests/2026-10-08T17-47-50-637Z.tap` และ `.json`
+
+### Round80 verification scope clarification
+
+- Main17-45-26-681Z171/171ผ่าน default2workers/skip0 sourceสุดท้าย ไม่มีการเพิ่มdeadline/skip
+- ActualSDK17-46-55-096Z2/2ผ่าน แต่ยังไม่ได้ตั้ง FLOWATLAS_OTEL_BROWSER_CHECK=1 จึงไม่มีEdgecheckในrunนี้ แม้purposeกล่าวถึงEdge; ไม่อ้างเป็นbrowserpass ต้องใช้runexplicitflagถัดไป
+- Finalcontrolledguard17-47-27-993Z1/1ผ่านบนCLIQAlogisolation/sourceสุดท้าย; unknownidentitiesretained/originalfailure/close+lockchecksถูกต้อง
+- LunaตรวจrawCIjoblogซ้ำ: ordinarycomponentdisk3roundscomplete1051/drop0/reloadtrue; controlledr1/r2captureincomplete/reloadtrue. Projectionไม่แสดงfullworkerhealth/reorder/shutdown จึงยังไม่พิสูจน์fsynccause ต้องอ่านsource-matchedbenchmarkartifactรอบ81
+
+## 2026-10-08T17-48-17-992Z
+
+- จุดประสงค์: Round80 final isolated source after cleanup helper and milestone ordering
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: d0427a79ec1422b0f41d4245d43ec645d7b4d8d4; dirty: true
+- หลักฐาน: `reports/tests/2026-10-08T17-48-17-992Z.tap` และ `.json`
+
+### Round80 final publication review
+
+- SDK+explicitEdge17-47-50-637Z2/2/source17-48-17-992Z1/1ผ่าน; CJS+ESMbrowserartifactsเก็บแล้ว
+- Manual currentSHA256เทียบmain17-45-26-681Z inventoryครบ105 filesไม่มีdifference; git diff --checkผ่าน. ไม่เพิ่มtests/coverageclaimจากmanualhashcheck
+- DraftPRต่อจากPR21; ผลfailednativeexit6/7ไม่ลบ/ไม่แก้immutableTAP. Next81source-matchedCIcollectorartifactanalysisก่อนproductionfix
+
+
+### Round80 publication
+
+- Tested source commit c7617e4c8e4388f22b6409f63bf246af7863b8b9 pushed diag/cli-startup-milestones; DraftPR22 basePR21 attached; gitstatuscleanเมื่อเช็กหลังpublication
+- CIc7617e4 PR37819515653in_progress/push37819507590queuedตอนตรวจ; ยังไม่อ้างCIpassed. เอกสารpublicationcommitถัดไปไม่เปลี่ยนprogramsourceที่ทดสอบ
+
