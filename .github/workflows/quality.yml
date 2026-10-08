@@ -61,6 +61,11 @@ jobs:
         env:
           FLOWATLAS_TEST_PURPOSE: CI Chromium independent browser journey
         run: node scripts/run-tests.mjs scripts/independent-browser-check.mjs
+      - name: Independent metadata failed assertion evidence
+        if: ${{ !cancelled() }}
+        env:
+          FLOWATLAS_TEST_PURPOSE: CI independent metadata failure phases retain original browser assertion and cleanup
+        run: node scripts/run-tests.mjs scripts/independent-metadata-failure-check.mjs
       - name: OpenTelemetry runtime and viewer
         if: ${{ !cancelled() }}
         env:

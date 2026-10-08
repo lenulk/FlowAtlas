@@ -4020,3 +4020,250 @@ Round76 manual evidence: full failed report reconciles48078business/SDK=48059ack
 - ตรวจ CI artifacts 13 ชุด รวม 317 runner reports: ไฟล์โปรแกรม 98 ไฟล์ตรง Git fd55371 หรือ 0daabf0 ตามแต่ละชุด; audit ผ่านไม่ใช่การรับรอง browser/performance
 - Full local0daabf0 sourceDirtyfalse/sourceinventory98ตรงGit ตรวจsummary/drop/rejectionทุกเหตุ0/resource limits/reload/ownedcleanupครบ. เก็บfirst19lossและnegativeinnerreports ไม่rerun unchangedเพื่อซ่อนfailure
 - บันทึกexactbrowserfailureจากrawTAP: CIUbuntu22 send-message HTTP200 แต่incompleteข้อความปรากฏที่scripts/independent-browser-check.mjs:86, หลังview-message viewer/sourceผ่าน. สาเหตุยังunknown
+
+### Round79 initial inspection (8 ตุลาคม 2026)
+
+- Git statusสะอาด; git fetch originสำเร็จ. Currentheadbe4a823/PR20latestpush37458944407successและPR37458949116failure ตรวจjobsแยกก่อนสรุป
+- ตรวจpathที่ไม่มี src/adapter-runtime.mjs และ examples/independent-app/public/app.mjs จึงอ่านไม่สำเร็จ; ใช้ไฟล์จริง public/app.js และ src/node-adapter.mjsตามimportsต่อ ไม่มีไฟล์ถูกแก้จากการค้นหาที่ล้มเหลว
+- ผู้ใช้กำหนด Sol ควบคุมคิด/วางแผนและ Luna ช่วยงานย่อย ใช้subagentgpt-6-solเป็นanalysislead ไม่อ้างว่าเปลี่ยนmodelแชตหลัก. Rootประสานtools/verification/PR; ไม่เปลี่ยนruntimeprojectหรือaccountmodelsettings
+
+## 2026-10-07T17-37-22-862Z
+
+- จุดประสงค์: Round79 before opt-in metadata diagnostics, controlled first/later phase failure
+- ผล: ไม่ผ่าน — 0/7; failed 7; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: be4a82365559f1d3b01dbf3bcab49fb6bbeacabc; dirty: true
+- หลักฐาน: `reports/tests/2026-10-07T17-37-22-862Z.tap` และ `.json`
+- ไม่ผ่าน: metadata action-start http-status identifies first loss without changing business response
+- ไม่ผ่าน: metadata action-start body identifies first loss without changing business response
+- ไม่ผ่าน: metadata action-start timeout identifies first loss without changing business response
+- ไม่ผ่าน: metadata outbound-result http-status identifies first loss without changing business response
+- ไม่ผ่าน: metadata outbound-result body identifies first loss without changing business response
+- ไม่ผ่าน: metadata outbound-result timeout identifies first loss without changing business response
+- ไม่ผ่าน: healthy opt-in phases acknowledge actual collector graphs and throwing diagnostic sinks cannot change delivery
+
+## 2026-10-07T17-38-12-563Z
+
+- จุดประสงค์: Round79 before diagnostics controlled metadata paths with authorized owned loopback
+- ผล: ไม่ผ่าน — 0/7; failed 7; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: be4a82365559f1d3b01dbf3bcab49fb6bbeacabc; dirty: true
+- หลักฐาน: `reports/tests/2026-10-07T17-38-12-563Z.tap` และ `.json`
+- ไม่ผ่าน: metadata action-start http-status identifies first loss without changing business response
+- ไม่ผ่าน: metadata action-start body identifies first loss without changing business response
+- ไม่ผ่าน: metadata action-start timeout identifies first loss without changing business response
+- ไม่ผ่าน: metadata outbound-result http-status identifies first loss without changing business response
+- ไม่ผ่าน: metadata outbound-result body identifies first loss without changing business response
+- ไม่ผ่าน: metadata outbound-result timeout identifies first loss without changing business response
+- ไม่ผ่าน: healthy opt-in phases acknowledge actual collector graphs and throwing diagnostic sinks cannot change delivery
+
+Round79 initial tests: sandbox run2026-10-07T17-37-22-862Z0/7 failedbeforeassertions with fetchfailed; ownedloopbackprobe confirmed EACCES. Authorized escalated run17-38-12-563Z0/7 then reproduces actualmissingdiagnostics assertions; businessstatus/body checks passed. Corrected testexpectedbody from a guessedextra statusfield to actual external.mjs `{messageId:'MSG-1'}` before validredrun. ไม่อ้างsandboxfailureเป็นapplicationbug/ไม่ยืดtimeout. เวลาUTC7ต.ค.17:xxตรง8ต.ค.เวลาไทย
+
+## 2026-10-07T17-40-38-342Z
+
+- จุดประสงค์: Round79 phase diagnostics after controlled first/later loss and helper privacy bounds
+- ผล: ผ่าน — 19/19; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: be4a82365559f1d3b01dbf3bcab49fb6bbeacabc; dirty: true
+- หลักฐาน: `reports/tests/2026-10-07T17-40-38-342Z.tap` และ `.json`
+
+## 2026-10-07T17-48-33-195Z
+
+- จุดประสงค์: Round79 normal Edge independent browser phase diagnostics and unchanged graph source assertions
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: be4a82365559f1d3b01dbf3bcab49fb6bbeacabc; dirty: true
+- หลักฐาน: `reports/tests/2026-10-07T17-48-33-195Z.tap` และ `.json`
+
+## 2026-10-07T17-50-45-663Z
+
+- จุดประสงค์: Round79 controlled real Edge later metadata503 must preserve incomplete assertion and diagnostics
+- ผล: ไม่ผ่าน — 0/1; failed 1; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: be4a82365559f1d3b01dbf3bcab49fb6bbeacabc; dirty: true
+- หลักฐาน: `reports/tests/2026-10-07T17-50-45-663Z.tap` และ `.json`
+- ไม่ผ่าน: a second web app works through actual browser clicks and FlowAtlas graph links
+
+## 2026-10-07T17-52-33-700Z
+
+- จุดประสงค์: Round79 classified later metadata503 with bounded Playwright collector readback
+- ผล: ไม่ผ่าน — 0/1; failed 1; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: be4a82365559f1d3b01dbf3bcab49fb6bbeacabc; dirty: true
+- หลักฐาน: `reports/tests/2026-10-07T17-52-33-700Z.tap` และ `.json`
+- ไม่ผ่าน: a second web app works through actual browser clicks and FlowAtlas graph links
+
+## 2026-10-07T17-53-23-119Z
+
+- จุดประสงค์: Controlled independent browser action-start must retain failed completeness assertion
+- ผล: ไม่ผ่าน — 0/1; failed 1; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: be4a82365559f1d3b01dbf3bcab49fb6bbeacabc; dirty: true
+- หลักฐาน: `reports/tests/2026-10-07T17-53-23-119Z.tap` และ `.json`
+- ไม่ผ่าน: a second web app works through actual browser clicks and FlowAtlas graph links
+
+## 2026-10-07T17-53-27-028Z
+
+- จุดประสงค์: Controlled independent browser outbound-result must retain failed completeness assertion
+- ผล: ไม่ผ่าน — 0/1; failed 1; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: be4a82365559f1d3b01dbf3bcab49fb6bbeacabc; dirty: true
+- หลักฐาน: `reports/tests/2026-10-07T17-53-27-028Z.tap` และ `.json`
+- ไม่ผ่าน: a second web app works through actual browser clicks and FlowAtlas graph links
+
+## 2026-10-07T17-53-22-733Z
+
+- จุดประสงค์: Round79 both controlled browser phase failures retain original reports and cleanup
+- ผล: ผ่าน — 2/2; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: be4a82365559f1d3b01dbf3bcab49fb6bbeacabc; dirty: true
+- หลักฐาน: `reports/tests/2026-10-07T17-53-22-733Z.tap` และ `.json`
+
+## 2026-10-07T17-54-12-892Z
+
+- จุดประสงค์: Controlled independent browser action-start must retain failed completeness assertion
+- ผล: ไม่ผ่าน — 0/1; failed 1; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: be4a82365559f1d3b01dbf3bcab49fb6bbeacabc; dirty: true
+- หลักฐาน: `reports/tests/2026-10-07T17-54-12-892Z.tap` และ `.json`
+- ไม่ผ่าน: a second web app works through actual browser clicks and FlowAtlas graph links
+
+## 2026-10-07T17-54-17-552Z
+
+- จุดประสงค์: Controlled independent browser outbound-result must retain failed completeness assertion
+- ผล: ไม่ผ่าน — 0/1; failed 1; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: be4a82365559f1d3b01dbf3bcab49fb6bbeacabc; dirty: true
+- หลักฐาน: `reports/tests/2026-10-07T17-54-17-552Z.tap` และ `.json`
+- ไม่ผ่าน: a second web app works through actual browser clicks and FlowAtlas graph links
+
+## 2026-10-07T17-54-12-555Z
+
+- จุดประสงค์: Round79 final browser guards include send-message failure after successful view/source
+- ผล: ผ่าน — 2/2; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: be4a82365559f1d3b01dbf3bcab49fb6bbeacabc; dirty: true
+- หลักฐาน: `reports/tests/2026-10-07T17-54-12-555Z.tap` และ `.json`
+
+## 2026-10-07T17-55-03-919Z
+
+- จุดประสงค์: Round79 final helper phases outage and callback isolation
+- ผล: ผ่าน — 20/20; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: be4a82365559f1d3b01dbf3bcab49fb6bbeacabc; dirty: true
+- หลักฐาน: `reports/tests/2026-10-07T17-55-03-919Z.tap` และ `.json`
+
+## 2026-10-07T17-55-05-285Z
+
+- จุดประสงค์: Round79 final Edge actual browser journey numeric phase artifacts
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: be4a82365559f1d3b01dbf3bcab49fb6bbeacabc; dirty: true
+- หลักฐาน: `reports/tests/2026-10-07T17-55-05-285Z.tap` และ `.json`
+
+## 2026-10-07T17-55-11-122Z
+
+- จุดประสงค์: Controlled independent browser action-start must retain failed completeness assertion
+- ผล: ไม่ผ่าน — 0/1; failed 1; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: be4a82365559f1d3b01dbf3bcab49fb6bbeacabc; dirty: true
+- หลักฐาน: `reports/tests/2026-10-07T17-55-11-122Z.tap` และ `.json`
+- ไม่ผ่าน: a second web app works through actual browser clicks and FlowAtlas graph links
+
+## 2026-10-07T17-55-14-361Z
+
+- จุดประสงค์: Controlled independent browser outbound-result must retain failed completeness assertion
+- ผล: ไม่ผ่าน — 0/1; failed 1; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: be4a82365559f1d3b01dbf3bcab49fb6bbeacabc; dirty: true
+- หลักฐาน: `reports/tests/2026-10-07T17-55-14-361Z.tap` และ `.json`
+- ไม่ผ่าน: a second web app works through actual browser clicks and FlowAtlas graph links
+
+## 2026-10-07T17-55-10-737Z
+
+- จุดประสงค์: Round79 final controlled browser phase completeness failures and bounded diagnostics
+- ผล: ผ่าน — 2/2; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: be4a82365559f1d3b01dbf3bcab49fb6bbeacabc; dirty: true
+- หลักฐาน: `reports/tests/2026-10-07T17-55-10-737Z.tap` และ `.json`
+
+## 2026-10-07T17-55-38-585Z
+
+- จุดประสงค์: Round79 full main regression with metadata helpers and unchanged default timeouts
+- ผล: ไม่ผ่าน — 155/161; failed 6; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: be4a82365559f1d3b01dbf3bcab49fb6bbeacabc; dirty: true
+- หลักฐาน: `reports/tests/2026-10-07T17-55-38-585Z.tap` และ `.json`
+- ไม่ผ่าน: CLI owner-kill closes owned services and lock (HTTP SDK flush)
+- ไม่ผ่าน: CLI SIGINT closes owned services and lock (HTTP SDK flush)
+- ไม่ผ่าน: CLI SIGTERM closes owned services and lock (plain HTTP)
+- ไม่ผ่าน: copied adapter in a different Git repository captures three actions and survives collector outage
+- ไม่ผ่าน: real OTel preload captures cjs HTTP/Undici fan-out and isolates concurrent requests
+- ไม่ผ่าน: real OTel preload captures mjs HTTP/Undici fan-out and isolates concurrent requests
+
+## 2026-10-07T17-58-24-522Z
+
+- จุดประสงค์: Round79 isolated source regression after fixture source changes
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: be4a82365559f1d3b01dbf3bcab49fb6bbeacabc; dirty: true
+- หลักฐาน: `reports/tests/2026-10-07T17-58-24-522Z.tap` และ `.json`
+
+## 2026-10-08T09-57-52-041Z
+
+- จุดประสงค์: Round79 explicit one-file-worker resource experiment, original product deadlines unchanged
+- ผล: ไม่ผ่าน — 164/165; failed 1; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: be4a82365559f1d3b01dbf3bcab49fb6bbeacabc; dirty: true
+- หลักฐาน: `reports/tests/2026-10-08T09-57-52-041Z.tap` และ `.json`
+- ไม่ผ่าน: CLI owner-kill closes owned services and lock (HTTP SDK flush)
+
+## 2026-10-08T10-01-42-379Z
+
+- จุดประสงค์: Round79 final healthy result publication after metadata and confirmed owned close
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: be4a82365559f1d3b01dbf3bcab49fb6bbeacabc; dirty: true
+- หลักฐาน: `reports/tests/2026-10-08T10-01-42-379Z.tap` และ `.json`
+
+## 2026-10-08T10-01-48-835Z
+
+- จุดประสงค์: Controlled independent browser action-start must retain failed completeness assertion
+- ผล: ไม่ผ่าน — 0/1; failed 1; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: be4a82365559f1d3b01dbf3bcab49fb6bbeacabc; dirty: true
+- หลักฐาน: `reports/tests/2026-10-08T10-01-48-835Z.tap` และ `.json`
+- ไม่ผ่าน: a second web app works through actual browser clicks and FlowAtlas graph links
+
+## 2026-10-08T10-01-52-043Z
+
+- จุดประสงค์: Controlled independent browser outbound-result must retain failed completeness assertion
+- ผล: ไม่ผ่าน — 0/1; failed 1; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: be4a82365559f1d3b01dbf3bcab49fb6bbeacabc; dirty: true
+- หลักฐาน: `reports/tests/2026-10-08T10-01-52-043Z.tap` และ `.json`
+- ไม่ผ่าน: a second web app works through actual browser clicks and FlowAtlas graph links
+
+## 2026-10-08T10-01-48-520Z
+
+- จุดประสงค์: Round79 final phase guard failures cannot publish success and retain cleanup
+- ผล: ผ่าน — 2/2; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: be4a82365559f1d3b01dbf3bcab49fb6bbeacabc; dirty: true
+- หลักฐาน: `reports/tests/2026-10-08T10-01-48-520Z.tap` และ `.json`
+
+## 2026-10-08T10-01-56-111Z
+
+- จุดประสงค์: Round79 final isolated source check
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: be4a82365559f1d3b01dbf3bcab49fb6bbeacabc; dirty: true
+- หลักฐาน: `reports/tests/2026-10-08T10-01-56-111Z.tap` และ `.json`
+
+### Round79 resumed final manual review (8 ตุลาคม 2026)
+
+- Sol usage-limit interruption preserved; resumed account ordinaryUsageAllowedtrue and Solreviewactive. No accountsettings/resetcredit/modelswitch performed. Luna read-only/artifactanalysisและhelperfileownershipตรงขอบเขต; rootรันtestsแบบsequential
+- Default2main155/161failed6 retained; explicitworker1main164/165failed1 retained. Bothstill12sSDKownerreadiness signature; hypothesisresourcepressureยังไม่proof/no timeoutchange/no mainpassclaim
+- Initialfailed diagnostic readback usednativefetch Response.status() incorrectly; movedtosameboundedPlaywrightrequestAPIusedhealthyjourney. Earlierartifactreadbackfailedไม่พิสูจน์absenceofgraph. Finalcontrolsreadback404/action-startrefused or200/runningafterhandleracceptedถูกต้อง
+- FinalEdgepositive+failureguards+sourceafter successpublicationandchildclosechecks passed. Failedinnerreportskept; noresult.jsonpublishedforfailedguards. bodyReadfieldmeanssuccessfulJSONdecode, notproofthat0receivedbytes
+- Newguardwatchdog70s/outer75s onlywrapexistingbrowser60s+boundedteardown; productmetadata500ms/target10s/wrapper12sunchanged
