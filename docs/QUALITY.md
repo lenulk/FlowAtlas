@@ -1,5 +1,15 @@
 # รอบทดสอบและปรับปรุง FlowAtlas
 
+### รอบ79 — independent metadata phase evidence (8 ตุลาคม 2026)
+
+Sol (`gpt-6-sol`) วางแผน/อ่านsource/review, Luna (`gpt-6-luna`) ตรวจhistoricalartifactsและทำpurehelper/tests; rootประสานimplementation/checks. [ขอบเขต](independent-metadata-diagnostics.md): opt-in4phases/status/JSON-read/settled/elapsed/failureenum; ไม่มีrawID/URL/header/body/errorในdiagnosticartifact. Callbackthrow/rejectedPromiseไม่เปลี่ยนcapture. Parser8KiB/100rows; browser start-complete/business-headerแยกกัน; finallyเก็บpartialreadback/storagetiming/ownedcloseและโยนassertionเดิม. Successresultเขียนเมื่อchecksครบ ไม่เปลี่ยน500ms/defaultworkers/retries/SDK/storage policy
+
+Validbefore17-38-12-563Z0/7 missingdiagnostics แต่businessstatus/bodyถูก; earlier17-37-22-862Z0/7เป็นsandboxloopbackEACCES ไม่ใช่applicationbug. Focusedfinal17-55-03-919Z20/20. FinalnormalEdge10-01-42-379Z1/1 ครบview/send/failและsource links; finalcontrolledguard10-01-48-520Z2/2 มีinner10-01-48-835Z/10-01-52-043Z0/1ทั้งสอง (503action-startแรกและ503outboundของsendหลังviewสำเร็จ). Bodyจริงยังตรง/HTTP200/phaseรายงานตรง/readback404หรือpartialrunning200/cleanupครบ ไม่มีresultsuccessfileเมื่อfailed. Source10-01-56-111Z1/1
+
+Maindefault2workers17-55-38-585Z155/161failed6/skip0: CLIowner-killSDK,SIGINTSDK,plainSIGTERMreadiness/lifecycle; copiedadapterstartcompletefalse; CJS/ESMSDKreadiness. Explicit--test-concurrency=1 resourceexperiment09-57-52-041Z164/165failed1/skip0: CLIowner-killSDK~12.05s/childalive/stdout0/stderr622/locktrue. ดังนั้นworkers>1ไม่ใช่คำอธิบายเพียงพอ และไม่ได้พิสูจน์สาเหตุ CPU/port/fsync. ไม่มีunchangedrerunเพื่อกลบอาการหรือเพิ่มdeadline. Snapshotmainก่อนpublicationordering/childcloseQAcheckปรับท้ายรอบ; browser/sourcefinalตรวจส่วนที่เปลี่ยนแล้ว แต่ mainไม่ได้ผ่าน จึงDraft PRและเปิดstartupต่อ
+
+Latestbe4a823CI: push37458944407success4/PR37458949116failureUbuntu24componentnormal+negativeguard; browserstepsล่าสุดผ่าน ไม่ย้ายhistorical0daabf0browserfailureไปอ้างเป็นcurrentfailure. Rawnormaldiskround3 ack832/shutdown219/fsync828.54ms/reloadtrue; faultguarddiskround1/2ack128/shutdown923/fsync1358.48/1181.54ms/reloadtrue. เก็บrawreports/releases/ci-be4a823-pr-ubuntu24; ชุดนี้อ่านcauseตัวเลขแต่ยังไม่sourceauditทุกช่อง. 19loss/pilot/performanceFAILED/stablecapture/releaseยังเปิด
+
 ### ผลล่าสุดรอบ78 — full reference ผ่าน แต่ยังไม่ผ่าน v1
 
 Clean code0daabf0, full runner11-13-22-188Z1/1 และ exact local inventory audit11-45-52-466Z1/1: 20 HTTP workers/100ms fixtureต่อเนื่อง1800100.516ms, business/accepted/SDK/delivered328763เท่ากัน, ทุกdrop reason0, queued/inFlight0, invalid0. Reload JSONตรงก่อนปิด, child+collectorclosedและsuccessfulworkspaceถูกลบ. Memorydriver211144704/target206651392 bytes, peakbuffer40/inflight40/slots2/history100/state187030 bytes. Store25615saves/0failures/maxsync127.713ms; exporter25615ackbatches/0deadline/shutdown6ms. Performance met=null เพราะไม่มี paired baseline และไม่ใช่real app/user pilot. ไม่ปิด675fafa19lossที่ไม่ทราบcauseจาก passing conditionใหม่

@@ -4,6 +4,7 @@ import { readFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createMessageService } from './external.mjs';
+import { createMetadataDiagnostics } from '../../scripts/independent-metadata-diagnostics.mjs';
 
 const directory = dirname(fileURLToPath(import.meta.url));
 const routeSource = 'examples/independent-app/external.mjs';
@@ -47,29 +48,55 @@ function newTraceparent() {
   return `00-${randomBytes(16).toString('hex')}-${randomBytes(8).toString('hex')}-01`;
 }
 
-async function sendEvent(collectorUrl, event, timeoutMs, sessionToken) {
-  const response = await fetch(`${collectorUrl}/flowatlas/ingest`, {
+function observe(capture, method, ...args) {
+  try { capture.diagnostics?.[method](...args); } catch { /* QA diagnostics cannot change capture. */ }
+}
+
+function emitDiagnostic(capture) {
+  if (!capture.diagnostics) return;
+  try { Promise.resolve(capture.onMetadataDiagnostic(capture.diagnostics.snapshot())).catch(() => {}); }
+  catch { /* A diagnostic sink cannot change the business response or capture. */ }
+}
+
+async function sendEvent(collectorUrl, event, timeoutMs, capture) {
+  const started = capture.diagnostics ? performance.now() : null;
+  let failure = 'none';
+  observe(capture, 'attempt', event.kind);
+  try {
+  let response;
+  try { response = await fetch(`${collectorUrl}/flowatlas/ingest`, {
     method: 'POST',
-    headers: { 'content-type': 'application/json', ...(sessionToken === null ? {} : { authorization: `Bearer ${sessionToken}` }) },
+    headers: { 'content-type': 'application/json', ...(capture.sessionToken === null ? {} : { authorization: `Bearer ${capture.sessionToken}` }) },
     body: JSON.stringify(event),
     signal: AbortSignal.timeout(timeoutMs),
     redirect: 'error',
-  });
-  if (!response.ok) {
-    const failure = await response.json().catch(() => ({}));
-    throw new Error(`FlowAtlas collector rejected ${event.kind}: ${failure.error ?? response.status}`);
+  }); } catch (error) {
+    failure = ['TimeoutError', 'AbortError'].includes(error.name) ? 'timeout' : error.name === 'TypeError' ? 'network' : 'unknown';
+    throw error;
   }
-  return response.json();
+  observe(capture, 'status', event.kind, response.status);
+  if (!response.ok) {
+    failure = 'http-status';
+    const rejected = await response.json().then(value => { observe(capture, 'bodyRead', event.kind); return value; }).catch(() => ({}));
+    throw new Error(`FlowAtlas collector rejected ${event.kind}: ${rejected.error ?? response.status}`);
+  }
+  try {
+    const value = await response.json(); observe(capture, 'bodyRead', event.kind); return value;
+  } catch (error) { failure = ['TimeoutError', 'AbortError'].includes(error.name) ? 'timeout' : 'body'; throw error; }
+  } finally {
+    if (started !== null) observe(capture, 'finish', event.kind, Math.max(0, Math.round(performance.now() - started)), failure);
+  }
 }
 
 async function reportEvent(collectorUrl, event, capture, timeoutMs) {
-  if (!capture.complete) return;
+  if (!capture.complete) { observe(capture, 'skip', event.kind); emitDiagnostic(capture); return; }
   try {
-    await sendEvent(collectorUrl, event, timeoutMs, capture.sessionToken);
+    await sendEvent(collectorUrl, event, timeoutMs, capture);
   } catch {
     // Stop this capture after the first loss: later events cannot repair an incomplete run.
     capture.complete = false;
   }
+  emitDiagnostic(capture);
 }
 
 async function runAction(route, actionId, collectorUrl, messageUrl, capture, timeoutMs) {
@@ -125,15 +152,16 @@ async function failMessage(actionId, collectorUrl, messageUrl, capture, timeoutM
 }
 
 export async function startIndependentApp({ port = 4180, externalPort = 4181, collectorUrl = 'http://127.0.0.1:4173', telemetryTimeoutMs = 500,
-  sessionToken = process.env.FLOWATLAS_SESSION_TOKEN ?? null } = {}) {
+  sessionToken = process.env.FLOWATLAS_SESSION_TOKEN ?? null, onMetadataDiagnostic = null } = {}) {
   if (!Number.isInteger(telemetryTimeoutMs) || telemetryTimeoutMs <= 0) throw new Error('Invalid telemetry timeout');
+  if (onMetadataDiagnostic !== null && typeof onMetadataDiagnostic !== 'function') throw new Error('Invalid diagnostic sink');
   const collector = new URL(collectorUrl);
   if (collector.protocol !== 'http:' || !['127.0.0.1', 'localhost', '[::1]'].includes(collector.hostname)
     || collector.username || collector.password || collector.pathname !== '/' || collector.search || collector.hash
     || (sessionToken !== null && (typeof sessionToken !== 'string' || !/^[A-Za-z0-9_-]{43}$/.test(sessionToken)))) {
     throw new Error('Invalid local collector config');
   }
-  const captures = new Map();
+  const captures = new Map(); let diagnosticOrdinal = 0;
   const external = createMessageService();
   const actualExternalPort = await listen(external, externalPort);
   const messageUrl = `http://127.0.0.1:${actualExternalPort}`;
@@ -158,6 +186,12 @@ export async function startIndependentApp({ port = 4180, externalPort = 4181, co
         }
         if (captures.has(body.id)) { sendJson(response, 409, { error: 'Action ID already exists' }); return; }
         const capture = { name: body.name, complete: true, used: false, sessionToken };
+        if (onMetadataDiagnostic) {
+          try {
+            capture.diagnostics = createMetadataDiagnostics({ ordinal: ++diagnosticOrdinal, action: body.name });
+            capture.onMetadataDiagnostic = onMetadataDiagnostic;
+          } catch { /* An unsupported diagnostic record cannot reject an action. */ }
+        }
         captures.set(body.id, capture);
         if (captures.size > 100) captures.delete(captures.keys().next().value);
         await reportEvent(collectorUrl, {
@@ -213,6 +247,8 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === resolve(process.argv[1
     port: Number(process.env.PORT ?? 4180),
     externalPort: Number(process.env.EXTERNAL_PORT ?? 4181),
     collectorUrl: process.env.FLOWATLAS_URL ?? 'http://127.0.0.1:4173',
+    onMetadataDiagnostic: process.env.FLOWATLAS_INDEPENDENT_DIAG === '1'
+      ? value => console.log(`FlowAtlas independent metadata: ${JSON.stringify(value)}`) : null,
   });
   console.log(`Independent app: http://127.0.0.1:${instance.port}`);
 }
