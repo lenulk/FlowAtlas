@@ -4385,3 +4385,9 @@ Round79 initial tests: sandbox run2026-10-07T17-37-22-862Z0/7 failedbeforeassert
 - Manual currentSHA256เทียบmain17-45-26-681Z inventoryครบ105 filesไม่มีdifference; git diff --checkผ่าน. ไม่เพิ่มtests/coverageclaimจากmanualhashcheck
 - DraftPRต่อจากPR21; ผลfailednativeexit6/7ไม่ลบ/ไม่แก้immutableTAP. Next81source-matchedCIcollectorartifactanalysisก่อนproductionfix
 
+
+### Round80 publication
+
+- Tested source commit c7617e4c8e4388f22b6409f63bf246af7863b8b9 pushed diag/cli-startup-milestones; DraftPR22 basePR21 attached; gitstatuscleanเมื่อเช็กหลังpublication
+- CIc7617e4 PR37819515653in_progress/push37819507590queuedตอนตรวจ; ยังไม่อ้างCIpassed. เอกสารpublicationcommitถัดไปไม่เปลี่ยนprogramsourceที่ทดสอบ
+
