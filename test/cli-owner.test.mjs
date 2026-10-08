@@ -9,6 +9,8 @@ import { mkdirSync, mkdtempSync, writeFileSync, readFileSync, existsSync, rmSync
 import { dirname, join, relative, isAbsolute } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { observeOwnedStartup, awaitOwnedReadiness } from '../scripts/cli-owner-startup-diagnostics.mjs';
+import { createQaStartupPhaseParser } from '../scripts/cli-startup-phases.mjs';
+import { finalizeCliOwnerFixture } from '../scripts/qa-fixture-cleanup.mjs';
 
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
 async function waitFor(predicate, milliseconds = 8000) {
@@ -35,7 +37,7 @@ for (const stopMode of ['owner-kill', 'SIGINT', 'SIGTERM']) for (const traced of
   mkdirSync(join(workspace, 'app'));
   writeFileSync(join(workspace, 'app/server.mjs'), `import { createServer } from 'node:http';
 const server=createServer((req,res)=>{res.setHeader('content-type','application/json');
-res.end(JSON.stringify({pid:process.pid,ownerEnvironment:process.env.FLOWATLAS_CLI_OWNER??null}));
+res.end(JSON.stringify({pid:process.pid,ownerEnvironment:process.env.FLOWATLAS_CLI_OWNER??null,qaEnvironment:process.env.FLOWATLAS_QA_STARTUP??null}));
 if(req.url==='/terminate') res.once('finish',()=>process.exit(0));});
 server.listen(Number(process.env.PORT),'127.0.0.1',()=>console.log('Registered app: http://127.0.0.1:'+server.address().port));
 process.stdin.resume();
@@ -49,11 +51,15 @@ if(message==='test:SIGINT'||message==='test:SIGTERM')process.emit(message.slice(
   const child = spawn(process.execPath, [...(stopMode === 'owner-kill' ? [] : ['--import', pathToFileURL(signalDriver).href]),
     join(root, 'scripts/cli.mjs'), '--workspace', workspace, 'inspect', ...(traced ? ['--trace', 'http'] : [])],
     { cwd: root, env: { ...process.env, FLOWATLAS_SESSION_TOKEN: randomBytes(32).toString('base64url'),
-      FLOWATLAS_COLLECTOR_PORT: '0', FLOWATLAS_INVENTORY_PORT: '0' },
+      FLOWATLAS_COLLECTOR_PORT: '0', FLOWATLAS_INVENTORY_PORT: '0', FLOWATLAS_QA_STARTUP: '1' },
       stdio: stopMode === 'owner-kill' ? ['pipe', 'pipe', 'pipe'] : ['pipe', 'pipe', 'pipe', 'ipc'] });
+  let wrapperClosed = false;
+  const wrapperClose = new Promise((resolveClose) => child.once('close', () => { wrapperClosed = true; resolveClose(); }));
   let output = ''; child.stdout.on('data', (part) => { output += part; }); child.stderr.on('data', (part) => { output += part; });
   const startup = observeOwnedStartup(child, () => existsSync(lock));
-  let inspectorPid, targetPid, app;
+  const phases = createQaStartupPhaseParser();
+  const onPhase = chunk => phases.write(chunk); child.stdout.on('data', onPhase);
+  let inspectorPid, targetPid, app, originalFailure;
   try {
     const ready = await awaitOwnedReadiness(() => waitFor(() => {
       if (child.exitCode !== null) throw new Error('Owned CLI exited before readiness');
@@ -67,6 +73,7 @@ if(message==='test:SIGINT'||message==='test:SIGTERM')process.emit(message.slice(
     for (const pid of [inspectorPid, targetPid]) assert.ok(Number.isSafeInteger(pid) && pid > 0 && pid !== process.pid && pid !== child.pid);
     assert.notEqual(inspectorPid, targetPid);
     assert.equal(target.ownerEnvironment, null, 'CLI ownership channel flag does not enter the app');
+    assert.equal(target.qaEnvironment, null, 'QA startup flag does not enter the app');
     const closed = once(child, 'close');
     if (stopMode === 'owner-kill') child.kill('SIGKILL'); else child.send('test:' + stopMode);
     // The descendants inherit stdio; close occurs only when their inherited handles close too.
@@ -80,27 +87,58 @@ if(message==='test:SIGINT'||message==='test:SIGTERM')process.emit(message.slice(
         throw error;
       });
     const [exitCode] = await closed;
+    const milestones = phases.snapshot();
+    assert.equal(milestones.invalidFrames + milestones.overflowFrames, 0);
+    const inspector = milestones.records.filter(record => record.role === 'inspector').map(record => record.phase);
+    const expected = ['collector-start-requested', 'collector-started', 'owner-confirm-requested', 'owner-confirmed',
+      'target-spawn-requested', 'target-spawned', 'target-readiness-observed'];
+    assert.deepEqual(inspector, expected, 'Inspector phase order is independent of wrapper stdout delivery order');
     if (stopMode !== 'owner-kill') assert.equal(exitCode, 0, 'The controlled signal handler completes ordinary shutdown');
     if (traced) {
       const summaries = [...output.matchAll(/FlowAtlas trace summary: (\{[^\n]+\})/g)];
       assert.equal(summaries.length, 1);
       assert.deepEqual(JSON.parse(summaries[0][1]), { httpSpans: 1, invalidSpans: 0, delivered: 1, dropped: 0, queued: 0, inFlight: 0 });
     }
+  } catch (error) {
+    originalFailure = error;
+    const snapshot = phases.snapshot();
+    t.diagnostic('CLI QA startup phases: ' + JSON.stringify(snapshot));
+    try {
+      const directory = join(root, 'reports/diagnostics/cli-startup'); mkdirSync(directory, { recursive: true });
+      const id = new Date().toISOString().replace(/[:.]/g, '-');
+      writeFileSync(join(directory, `${id}-${stopMode}-${traced ? 'sdk' : 'plain'}.json`), JSON.stringify({
+        evidenceKind: 'owned CLI QA startup observation; no app data or process identities',
+        stopMode, traced, owner: startup.snapshot(), phases: snapshot }, null, 2) + '\n', { flag: 'wx' });
+    } catch { t.diagnostic('CLI phase artifact unavailable; original failure preserved'); }
+    throw error;
   } finally {
+    child.stdout.off('data', onPhase);
     startup.dispose();
-    if (child.exitCode === null && child.signalCode === null) child.stdin.end('stop\n');
-    // These identities came only from this generated fixture and its freshly created lock.
-    if (targetPid && alive(targetPid)) {
-      try { await fetch(app + '/terminate', { signal: AbortSignal.timeout(1000) }); } catch { /* Use the known owned PID below. */ }
-      if (alive(targetPid)) process.kill(targetPid, 'SIGKILL');
+    const knownOwnedPid = (pid) => Number.isSafeInteger(pid) && pid > 0 && pid !== process.pid && pid !== child.pid;
+    try {
+      if (child.exitCode === null && child.signalCode === null) child.stdin.end('stop\n');
+      // These identities came only from this generated fixture and its freshly created lock.
+      if (knownOwnedPid(targetPid) && alive(targetPid)) {
+        try { await fetch(app + '/terminate', { signal: AbortSignal.timeout(1000) }); } catch { /* Use the known owned PID below. */ }
+        if (alive(targetPid)) process.kill(targetPid, 'SIGKILL');
+      }
+      if (knownOwnedPid(inspectorPid) && alive(inspectorPid)) process.kill(inspectorPid, 'SIGTERM');
+      if (child.exitCode === null && child.signalCode === null) child.kill('SIGKILL');
+      let closeTimer;
+      const closed = await Promise.race([wrapperClose.then(() => true), new Promise((resolveTimeout) => {
+        closeTimer = setTimeout(() => resolveTimeout(false), 3000);
+      })]).finally(() => clearTimeout(closeTimer));
+      const cleanup = finalizeCliOwnerFixture({ parent, workspace, canonical, lock,
+        wrapperClosed: closed && wrapperClosed, wrapperPid: child.pid,
+        ownedPids: [inspectorPid, targetPid], isAlive: alive });
+      if (!cleanup.removed) {
+        t.diagnostic('Owner cleanup confirmation: ' + JSON.stringify(cleanup));
+        console.log('CLI owner fixture retained because cleanup could not be confirmed.');
+      }
+    } catch (cleanupError) {
+      if (!originalFailure) throw cleanupError;
+      t.diagnostic('Owner cleanup failed; original readiness failure preserved');
     }
-    if (inspectorPid && alive(inspectorPid)) process.kill(inspectorPid, 'SIGTERM');
-    if (child.exitCode === null && child.signalCode === null) child.kill('SIGKILL');
-    const inside = relative(realpathSync(parent), canonical);
-    assert.ok(inside && !inside.startsWith('..') && !isAbsolute(inside) && realpathSync(workspace) === canonical);
-    if (!existsSync(lock) && (!targetPid || !alive(targetPid)) && (!inspectorPid || !alive(inspectorPid))) {
-      rmSync(canonical, { recursive: true, force: true });
-    } else console.log('CLI owner fixture retained because cleanup could not be confirmed.');
   }
 });
 

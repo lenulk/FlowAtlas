@@ -43,3 +43,25 @@ export async function cleanupOwnedFixture({ child, closed, parent, workspace, ca
   for (const stream of [child.stdin, child.stdout, child.stderr]) stream?.unref?.();
   return { ...state, removed: false };
 }
+
+// CLI owner QA: retain the fixture unless the wrapper closed and both lock-derived
+// process identities are known to have stopped. An empty identity list is never proof.
+export function finalizeCliOwnerFixture({ parent, workspace, canonical, lock, wrapperClosed,
+  wrapperPid, ownedPids, isAlive }) {
+  const inside = relative(realpathSync(parent), canonical);
+  if (!inside || inside.startsWith('..') || isAbsolute(inside) || realpathSync(workspace) !== canonical) {
+    throw new Error('QA cleanup workspace escaped its canonical parent');
+  }
+  const lockInside = relative(canonical, lock);
+  if (!lockInside || lockInside.startsWith('..') || isAbsolute(lockInside)) {
+    throw new Error('QA cleanup lock escaped its canonical workspace');
+  }
+  const identitiesKnown = Array.isArray(ownedPids) && ownedPids.length === 2 &&
+    ownedPids.every(pid => Number.isSafeInteger(pid) && pid > 0 && pid !== process.pid && pid !== wrapperPid) &&
+    ownedPids[0] !== ownedPids[1];
+  const ownedStopped = identitiesKnown && ownedPids.every(pid => !isAlive(pid));
+  const writerLockExists = existsSync(lock);
+  const removed = Boolean(wrapperClosed && !writerLockExists && ownedStopped);
+  if (removed) rmSync(canonical, { recursive: true, force: true });
+  return { wrapperClosed: Boolean(wrapperClosed), writerLockExists, identitiesKnown, ownedStopped, removed };
+}

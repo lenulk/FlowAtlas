@@ -1,5 +1,6 @@
 import { spawn } from 'node:child_process';
 import { once } from 'node:events';
+import { performance } from 'node:perf_hooks';
 import { createInterface } from 'node:readline';
 import { createRequire } from 'node:module';
 import { dirname, join, resolve, relative, isAbsolute } from 'node:path';
@@ -9,6 +10,7 @@ import { startServers } from '../src/server.mjs';
 import { readProjectConfig } from '../src/project-sources.mjs';
 import { resolveWorkspace } from '../src/workspace.mjs';
 import { sessionToken, showPairing } from '../src/session-access.mjs';
+import { createQaStartupPhase } from './cli-startup-phases.mjs';
 
 const toolRoot = dirname(dirname(fileURLToPath(import.meta.url)));
 const root = resolveWorkspace(toolRoot);
@@ -98,6 +100,19 @@ function waitForTarget(child, expectedOrigin) {
 }
 
 async function runInspector(args = process.argv.slice(2)) {
+  const managedOwner = process.env.FLOWATLAS_CLI_OWNER === '1';
+  const qaStartup = managedOwner && process.env.FLOWATLAS_QA_STARTUP === '1';
+  const qaStarted = qaStartup ? performance.now() : 0;
+  let targetSpawned = false;
+  const qaPhase = (phase) => {
+    if (!qaStartup || !process.connected || typeof process.send !== 'function') return;
+    try {
+      const record = createQaStartupPhase({ role: 'inspector', phase,
+        elapsedMs: Math.max(0, Math.round(performance.now() - qaStarted)),
+        ownerConnected: process.connected, childSpawned: targetSpawned });
+      process.send(record, () => {});
+    } catch { /* QA milestones cannot alter inspector startup. */ }
+  };
   const flags = parse(args);
   if (flags['--trace'] !== undefined && flags['--trace'] !== 'http') throw new Error('Trace mode must be http');
   const [nodeMajor, nodeMinor] = process.versions.node.split('.').map(Number);
@@ -116,9 +131,11 @@ async function runInspector(args = process.argv.slice(2)) {
     || !lstatSync(entryPath).isFile() || !/\.(mjs|cjs|js)$/.test(entry)) throw new Error('Entry must be a Node source file inside the registered project');
   const dataDir = flags['--data-dir'] ?? 'data/actions';
   const credential = sessionToken(process.env.FLOWATLAS_SESSION_TOKEN);
+  qaPhase('collector-start-requested');
   const servers = await startServers({ port: Number(process.env.FLOWATLAS_COLLECTOR_PORT ?? 4173),
     traceTiming: process.env.FLOWATLAS_TRACE_TIMING === '1',
     inventoryPort: Number(process.env.FLOWATLAS_INVENTORY_PORT ?? 4174), dataDir, projects: config, workspace: root, sessionToken: credential });
+  qaPhase('collector-started');
   const collectorUrl = `http://127.0.0.1:${servers.port}`;
   let target, input;
   let stopping;
@@ -133,7 +150,6 @@ async function runInspector(args = process.argv.slice(2)) {
   })();
   const onSignal = () => stop().catch((error) => { console.error(error); process.exitCode = 1; });
   const onOwnerMessage = (message) => { if (message === 'flowatlas:owner-stop') onSignal(); };
-  const managedOwner = process.env.FLOWATLAS_CLI_OWNER === '1';
   if (managedOwner) {
     // The private parent channel carries only fixed lifecycle messages, without app data.
     process.once('disconnect', onSignal);
@@ -144,14 +160,20 @@ async function runInspector(args = process.argv.slice(2)) {
   process.once('SIGTERM', onSignal);
   try {
     // The CLI may have disappeared while storage/listeners were initializing.
-    if (managedOwner && !(await confirmOwner())) {
-      await stop();
-      throw new Error('CLI ownership confirmation failed');
+    if (managedOwner) {
+      qaPhase('owner-confirm-requested');
+      if (!(await confirmOwner())) {
+        qaPhase('owner-rejected');
+        await stop();
+        throw new Error('CLI ownership confirmation failed');
+      }
+      qaPhase('owner-confirmed');
     }
-    if (managedOwner && (stopping || !process.connected)) { await stop(); return; }
+    if (managedOwner && (stopping || !process.connected)) { qaPhase('owner-rejected'); await stop(); return; }
     const trace = flags['--trace'] === 'http';
     const targetEnv = { ...process.env };
     delete targetEnv.FLOWATLAS_CLI_OWNER;
+    delete targetEnv.FLOWATLAS_QA_STARTUP;
     if (trace) {
       for (const key of Object.keys(targetEnv)) if (key.startsWith('OTEL_')) delete targetEnv[key];
       Object.assign(targetEnv, { OTEL_TRACES_EXPORTER: 'none', OTEL_METRICS_EXPORTER: 'none', OTEL_LOGS_EXPORTER: 'none',
@@ -159,13 +181,17 @@ async function runInspector(args = process.argv.slice(2)) {
     }
     const preload = trace ? ['--experimental-loader', pathToFileURL(createRequire(import.meta.url).resolve('@opentelemetry/instrumentation/hook.mjs')).href,
       '--import', pathToFileURL(join(toolRoot, 'src/otel-preload.mjs')).href] : [];
+    qaPhase('target-spawn-requested');
     target = spawn(process.execPath, [...preload, entryPath], { cwd: projectRoot,
       env: { ...targetEnv, FLOWATLAS_URL: collectorUrl, FLOWATLAS_PROJECT_ID: project.id, FLOWATLAS_SESSION_TOKEN: credential,
         PORT: process.env.FLOWATLAS_APP_PORT ?? '0', EXTERNAL_PORT: process.env.FLOWATLAS_EXTERNAL_PORT ?? '0' },
       stdio: trace ? ['pipe', 'pipe', 'pipe', 'ipc'] : ['pipe', 'pipe', 'pipe'] });
+    if (qaStartup) target.once('spawn', () => { targetSpawned = true; qaPhase('target-spawned'); });
     const targetExited = once(target, 'exit');
     target.stderr.on('data', (chunk) => process.stderr.write(chunk));
-    const readyUrl = await waitForTarget(target, appUrl);
+    let readyUrl;
+    try { readyUrl = await waitForTarget(target, appUrl); qaPhase('target-readiness-observed'); }
+    catch (error) { qaPhase('target-readiness-failed'); throw error; }
     if (target.exitCode !== null || target.signalCode !== null) throw new Error('App exited during startup');
     target.stdout.pipe(process.stdout);
     console.log(`FlowAtlas: ${collectorUrl}`);

@@ -1,6 +1,6 @@
 # ส่งต่องาน FlowAtlas
 
-ตรวจสถานะสำหรับส่งต่องานวันที่ 8 ตุลาคม 2026 เอกสารนี้เป็นจุดเริ่มอ่านงานต่อ ต้องตรวจโค้ด Git และผล CI ปัจจุบันอีกครั้งก่อนเปลี่ยนไฟล์
+ตรวจสถานะสำหรับส่งต่องานวันที่ 9 ตุลาคม 2026 เอกสารนี้เป็นจุดเริ่มอ่านงานต่อ ต้องตรวจโค้ด Git และผล CI ปัจจุบันอีกครั้งก่อนเปลี่ยนไฟล์
 
 ## เป้าหมายของเจ้าของโปรเจกต์
 
@@ -9,12 +9,15 @@
 Repository: https://github.com/lenulk/FlowAtlas; branch หลัก `master` ไม่จำเป็นต้องใช้พาธของเครื่องเดิมบนเครื่องใหม่ อ่าน [AGENTS.md](../AGENTS.md), [PLAN.md](../PLAN.md), [QUALITY.md](QUALITY.md), [TEST-RUNS.md](TEST-RUNS.md), [install.md](install.md), [linux-vm.md](linux-vm.md) ก่อนเริ่ม
 
 ## สถานะที่ตรวจแล้ว
+**ล่าสุดรอบ80:** branch `diag/cli-startup-milestones` ต่อจาก d0427a7/PR21 เพิ่ม [bounded CLI startup phases](cli-startup-phases.md) ผ่าน owner IPC เดิม และรักษา failed fixture เมื่อยังยืนยัน descendant/close ไม่ครบ. ไม่เพิ่ม target10s/wrapper12s/retry. Solนำวางแผน/review, Lunaช่วยhelper/privacy/evidence. Partialplainfailure17-39-07-365Z: native testfileexit3221226505/lastobservedcollector-start-requested/no lock; rootcauseยังไม่ทราบ. Guard7/7และCLI9/9หลังcleanupผ่าน แต่ไม่ใช้ปิดhistoricalstartup. Mainfinal17-45-26-681Z171/171ผ่าน default2workers/no skipped; ไม่ปิดintermittentfailureจากconditionที่ผ่าน FinalactualSDK+Edge17-47-50-637Z2/2/source17-48-17-992Z1/1/guard17-47-27-993Z1/1ผ่าน. รายละเอียดผลทั้งหมดอยู่TEST-RUNS/QUALITY
+
+PR21 latestpush37761227880ผ่าน4/4/PR37761234298ผ่าน3/4; rootอ่านfailedUbuntu24Node24 joblogแล้ว: Controlled collector commit order assertion `component_capture_or_reload_failed` / capture incomplete (reloadVerified=trueทั้งสองรอบ), diskround1ack160/drop891/sync1393.383ms และround2ack128/drop923/sync1103.457ms/reloadtrue. ไม่ใช่การพิสูจน์reversalwrongหรือsamecauseCLI; ยังไม่wholematrixsourceaudit. ถัดไปรอบ81อ่าน source-matched collector-cost benchmark artifact ของ37761234298: health/drop reasons/deadline/ack/reorder metrics ก่อนเลือก production fix. งานstorage/fsyncแยกจากรอบ80
 
 **ล่าสุดรอบ79:** branch `diag/independent-metadata-phases` ต่อจากbe4a823/PR20 เพิ่ม [bounded independent metadata diagnostics](independent-metadata-diagnostics.md) ให้เห็น4phases/status/errorclassและbrowser start-vs-business completeness. Default500ms/no retry/businessstatus/body/strict completeness assertionเดิม. Helper/privacy/outage20ผ่าน, finalEdge10-01-42-379Z1/1, controlledguard10-01-48-520Z2/2 (innerทั้งสองยังfailed/retained/cleanupครบ), finalsource10-01-56-111Z1/1. Resultsuccessเขียนหลังphase/source/closechecksเท่านั้น
 
 **ข้อจำกัดรอบ79:** maindefault2workers17-55-38-585Z155/161failed6; explicitworker1 09-57-52-041Z164/165failedCLIowner-kill HTTPSDKreadiness~12s/stdout0/stderr622/locktrue. ไม่เปลี่ยน defaultworkersหรือdeadlineเพื่อให้ผ่าน และไม่ปิดrootcauseจากresourceexperiment. งานนี้เป็นdiagnostic-only/Draft PR. Latestbe4a823CIpush37458944407success4/PR37458949116failureUbuntu24componentnormal+negativeguard: rawdisk ack832/drop219และack128/drop923/reloadตรง แต่ยังสูญเสียตามshutdown. Historical0daabf0Ubuntu22send-messagecause/19loss/performance/pilotยังเปิด
 
-**ถัดไปรอบ80:** Solเลือกลำดับwrapper→inspectcollector-ready→owner-confirmed→target-spawn→targetready เป็นจุดเก็บQA milestonesเพื่อระบุstartupค้างก่อนแก้ ไม่เพิ่มtarget10s/wrapper12sหรือretry. Lunaช่วยread-only evidence/helperงานย่อยตามผู้ใช้กำหนด. อ่านผลรอบเก่าด้านล่างเป็นhistory ไม่อ้างmain150ของเก่าครอบcandidateใหม่
+**แผนก่อนเริ่มรอบ80 (ประวัติ):** Solเลือกลำดับwrapper→inspectcollector-ready→owner-confirmed→target-spawn→targetready เป็นจุดเก็บQA milestonesเพื่อระบุstartupค้างก่อนแก้ ไม่เพิ่มtarget10s/wrapper12sหรือretry. Lunaช่วยread-only evidence/helperงานย่อยตามผู้ใช้กำหนด. อ่านผลรอบเก่าด้านล่างเป็นhistory ไม่อ้างmain150ของเก่าครอบcandidateใหม่
 
 **ล่าสุด — รอบ78 ตรวจครบแล้ว (6 ตุลาคม 2026):** โค้ด `0daabf0` บน branch `diag/sustained-drop-recovery` / [PR20](https://github.com/lenulk/FlowAtlas/pull/20) ผ่านโหลด HTTP อ้างอิง 20 workers ต่อเนื่อง 30 นาทีใน Windows Node24.19.0: 328,763 คำตอบถูกต้อง/SDK spans/acknowledgements, drop0, pending0, reloadตรง และปิด owned processes/ลบ successful workspace ครบ. RSS สูงสุด driver+collector211,144,704 / target206,651,392 bytes, buffer40, slots2, history100, state187,030 bytes อยู่ใต้ limits ที่ตั้งก่อนรัน. นี่เป็น actual SDK กับแอปจำลอง ไม่ใช่ business pilot/20 business actions หรือ performance acceptance; ดู [ขอบเขตและผล](sustained-reference.md)
 

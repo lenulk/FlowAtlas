@@ -13,6 +13,7 @@ FlowAtlas v1 เป็นเครื่องมือในเครื่อ�
 Node.js เป็น integration ที่กำลังพัฒนาและมีหลักฐานทดสอบอยู่ ระยะและรุ่นในแผนใช้ตรวจความพร้อมระหว่างทาง เป้าหมายของโครงการยังเป็นเครื่องมือที่เรียกใช้เพื่อเห็นการทำงานของแอปตามที่ผู้ใช้ต้องการ และเดินงานต่อจนใช้ได้จริง ความสามารถเพิ่มเติม เช่น ส่วนเสริม IDE/browser หรือภาษาอื่น ให้เลือกจากปัญหาการใช้งานที่พบ พร้อมเกณฑ์ตรวจของแต่ละ integration
 
 ## สถานะเริ่มต้น
+รอบ80เพิ่ม boundedCLIstartupmilestonesและเก็บfailedfixtureเมื่อunknownprocessidentities; deadlineเดิม. Guard7/CLI9ผ่าน; mainfinal171/171ผ่าน default2workers แต่ไม่ปิดintermittenthistoricalfailure; nativefileexitและpartialcollector-start-requestedยังไม่ทราบcause จึงไม่รับรองstartupstableจากpassingcondition. PR21 hostedfailedsimulateddiskack/dropยังเปิด; performance/realpilot/users/releaseไม่ผ่าน. อ่านสถานะใหม่ที่HANDOFF/QUALITYก่อนใช้ผลเก่า
 
 รอบ79เพิ่มper-phase metadata diagnosticsกับprivacy/boundedparser/callbackisolationและfailedassertionartifacts; focused20/browser1/guard2/source1ผ่าน. Maindefault2failed6และexplicit1stillfailedSDKowner readiness1 จึงยังไม่ผ่านrelease/mainทุกเงื่อนไข. ไม่ปิดperformance/19loss/historicalbrowsercause/pilot. ถัดไปรอบ80diagnoseCLIstartupก่อนperformanceตามSolreview โดยใช้Lunaช่วยงานย่อยและคงdeadlinesเดิม
 

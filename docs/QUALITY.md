@@ -1,5 +1,18 @@
 # รอบทดสอบและปรับปรุง FlowAtlas
 
+### รอบ80 — CLI startup milestones และการรักษาหลักฐาน (9 ตุลาคม 2026)
+
+Sol วางแผน/ตรวจการแก้, Luna ช่วย helper/privacy/artifact analysis; root รัน checks และจัดส่ง. เพิ่ม [QA milestones](cli-startup-phases.md) ผ่าน owner IPC เดิม มีเฉพาะ role/phase/time/flags และตัวอ่าน bounded20records/8KiB. QA flag ไม่เข้า target; defaultไม่พิมพ์ milestone ไม่เพิ่ม target10s/wrapper12s/retry หรือเปลี่ยน SDK/storage durability
+
+Focused SDK owner-kill10-13-42-797Z1/1; helper+controlled delay10-17-11-147Z7/7ก่อนแก้ field retainedWorkspace เป็น boolean. ต่อมา complete CLI+helper17-39-07-365Z failed6/7 โดย lifecycle file nativeexit3221226505 ไม่ใช่6nestedcasesผ่าน. Artifact17-39-21-061Z-owner-kill-plain เก็บได้ก่อนtestprocessจบ: wrapper spawned/elapsed12043ms/stdout397/stderr0/lockfalse, last observedcollector-start-requested. ยังไม่ทราบสาเหตุ และ missingmilestoneอาจเป็นdelivery failure; ไม่ปิด SDK-only startup causeจากplainfailureนี้
+
+Reviewพบ fixture deletion เมื่อunknown descendant identities/ไม่รอwrapperclose จึงแก้เฉพาะfailure evidence preservation: ยืนยันcloseและownedidentitiesก่อนลบ, retainเมื่อยืนยันไม่ได้, cleanuperrorไม่แทนoriginalassertion. ไม่อ้างว่าช่องโหว่นี้เป็นต้นเหตุของnativeexit
+
+Finallocalmain17-45-26-681Z171/171ผ่าน default2workers/skip0 หลังย้ายinspectorphaseassertไปหลังwrappercloseเพื่อไม่อาศัยcross-channeldeliveryorder. Guard17-43-59-980Z7/7/CLI17-44-24-825Z9/9ก่อนorderingpatchผ่าน; originalnativeexit/stallยังไม่ทราบcause ไม่ปิดจากgreenconditionนี้
+
+FinalSDK+explicitEdge17-47-50-637Z2/2และsource17-48-17-992Z1/1ผ่าน. Guardfinal17-47-27-993Z1/1ผ่านบนsourceสุดท้าย. EarlierSDK17-46-55-096Z2/2ไม่มีbrowserflag จึงไม่เป็นEdgeevidenceแม้purposeกล่าวถึง; scopecorrectedในTEST-RUNS. ยังเก็บfailed6/7/nativeexitและpartialartifactไว้
+
+PR21 d0427a7 latestAPI push37761227880ผ่าน4/4/PR37761234298ผ่าน3/4; failedUbuntu24Node24Controlled collector commit order. ไม่มีwholematrix sourceauditในรอบนี้; performance/pilot/users/19loss/fsync loss/stablecapture/releaseยังเปิด
 ### รอบ79 — independent metadata phase evidence (8 ตุลาคม 2026)
 
 Sol (`gpt-6-sol`) วางแผน/อ่านsource/review, Luna (`gpt-6-luna`) ตรวจhistoricalartifactsและทำpurehelper/tests; rootประสานimplementation/checks. [ขอบเขต](independent-metadata-diagnostics.md): opt-in4phases/status/JSON-read/settled/elapsed/failureenum; ไม่มีrawID/URL/header/body/errorในdiagnosticartifact. Callbackthrow/rejectedPromiseไม่เปลี่ยนcapture. Parser8KiB/100rows; browser start-complete/business-headerแยกกัน; finallyเก็บpartialreadback/storagetiming/ownedcloseและโยนassertionเดิม. Successresultเขียนเมื่อchecksครบ ไม่เปลี่ยน500ms/defaultworkers/retries/SDK/storage policy
