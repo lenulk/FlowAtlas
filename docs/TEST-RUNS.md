@@ -4479,3 +4479,101 @@ Round79 initial tests: sandbox run2026-10-07T17-37-22-862Z0/7 failedbeforeassert
 - Testedsource8f7d8fd4fbac2f5c85e545e0c0c70ba1720c11cc commit/pushสำเร็จ DraftPR23basePR22attached; gitstatuscleanตอนpublicationcheck
 - CI8f7d8fdpush38379974130/PR38379983602in_progressที่ตรวจ ไม่อ้างCIผ่าน. Publicationdocscommitถัดไปไม่เปลี่ยนtestedprogramsource
 
+
+### Round82 initial review (13 ตุลาคม 2026)
+
+- GitstatuscleanHEAD34b5803ก่อนเริ่ม/gitfetchoriginสำเร็จ; ownbranch test/durable-http-admission ต่อจากPR23
+- CI23latesthead34b5803 push38380056816failedUbuntu24Node24Fixtureloadcaptureaccounting; PR38380062532failedUbuntu24Node24Componentfailureevidenceretention. Ubuntu22passedทั้งสอง/Windowsqueuedขณะตรวจ; APIstepstatusยังไม่rawartifactsourceaudit ไม่ใช่newgroupfeasibilitystepfailure
+- อ่านHANDOFF/AGENTS/PLAN/QUALITY/TEST-RUNSและingest/storeก่อนออกแบบ. Sollead/Lunahelper/controlsตามผู้ใช้กำหนด; QAonlyHTTPadmissiondurableACKprototype ไม่เปลี่ยนproductiondeadlines/durability
+
+### Round82 pre-run review
+
+- Root/Solพบcloseไม่trackbodyreadersและadmissionหลังpostcommitabortอาจเกินin-flightbound; moduleแก้trackreaders/close503และปิดadmissionขณะinFlight
+- Fixturecleanupต้องcloseownedsocketsก่อนboundedawaitreaders/flush, markVerifiedเฉพาะassertionsผ่านเพื่อเก็บfailedworkspace. Paircontrolsเดิมใช้500msขัดQAwindow0..50 แก้ก่อนrun ไม่มีtimeoutextension/redrunclaim
+- Conflictcontrolต้องstagevalidexistingtraceupdateก่อนinvalidmemberและprobecommittedmemoryผ่านduplicate-rootrequest; abortcontrolต้องobserveoriginalresponseเท่านั้นไม่เอา503responseถัดไปมารวมfinish. เป็นstaticreview ยังไม่มีtestresults
+
+
+## 2026-10-13T10-22-24-260Z
+
+- จุดประสงค์: Round82 actual HTTP durable admission pair I/O rollback bounds close and uncertain ACK controls
+- ผล: ไม่ผ่าน — 0/1; failed 1; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 34b58033ddf9319b7e89e5fe82e8b4e68576c8dd; dirty: true
+- หลักฐาน: `reports/tests/2026-10-13T10-22-24-260Z.tap` และ `.json`
+- ไม่ผ่าน: test\\durable-http-admission-prototype.test.mjs
+
+## 2026-10-13T10-23-31-379Z
+
+- จุดประสงค์: Round82 HTTP controls after test syntax correction; preserve first failed load
+- ผล: ไม่ผ่าน — 2/3; failed 1; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 34b58033ddf9319b7e89e5fe82e8b4e68576c8dd; dirty: true
+- หลักฐาน: `reports/tests/2026-10-13T10-23-31-379Z.tap` และ `.json`
+- ไม่ผ่าน: test\\durable-http-admission-prototype.test.mjs
+
+### Round82 failed focused runs and owned stop
+
+- 10-22-24-260Z0/1เกิดSyntaxError async closeServer shorthandก่อนโหลดfile ไม่ได้ทดสอบHTTPsemantics; Lunaแก้closeServerและSolsyntax-onlynode --checkทั้งmodule/testexit0
+- 10-23-31-379Z2/3FAILED: first2HTTPcontrolsผ่านแล้วworkerค้างก่อนcase3รายงาน. ไม่ครบ10cases ไม่มีper-case timeoutเดิม
+- RootCIMยืนยันworker4976(parent8768→runner14764)/commands/creationtimesตรงrunนี้ แล้วStop-Processเฉพาะworker; runnerยังอยู่เพื่อเขียนTAP/JSON exit4294967295. ไม่killproduction/ไม่ลบfailedworkspaceหรือstale lock
+- Case3รอclientresponseขณะClientRequestยังbodyไม่จบ เป็นจุดต้องตรวจ/ปรับfixtureแบบbounded; ยังไม่พิสูจน์สาเหตุเดียวก่อนrerun. เพิ่มQA testtimeout/responseboundsเพื่อให้failureรายงานแทนhang ไม่เพิ่มproductdeadline
+
+
+## 2026-10-13T10-32-22-165Z
+
+- จุดประสงค์: Round82 HTTP controls after bounded reader cancellation and QA timeout repair
+- ผล: ไม่ผ่าน — 9/10; failed 1; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 34b58033ddf9319b7e89e5fe82e8b4e68576c8dd; dirty: true
+- หลักฐาน: `reports/tests/2026-10-13T10-32-22-165Z.tap` และ `.json`
+- ไม่ผ่าน: closing during a held pre-save gate rejects the pair without a late commit
+
+## 2026-10-13T10-33-21-292Z
+
+- จุดประสงค์: Round82 final HTTP controls after correcting owned store reopen sequence
+- ผล: ผ่าน — 10/10; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 34b58033ddf9319b7e89e5fe82e8b4e68576c8dd; dirty: true
+- หลักฐาน: `reports/tests/2026-10-13T10-33-21-292Z.tap` และ `.json`
+
+## 2026-10-13T10-33-55-906Z
+
+- จุดประสงค์: Round82 final main default two workers with QA HTTP admission controls
+- ผล: ไม่ผ่าน — 182/187; failed 5; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 34b58033ddf9319b7e89e5fe82e8b4e68576c8dd; dirty: true
+- หลักฐาน: `reports/tests/2026-10-13T10-33-55-906Z.tap` และ `.json`
+- ไม่ผ่าน: upgraded adapter captures a real HTTP action and retains a previous snapshot graph
+- ไม่ผ่าน: CLI owner-kill closes owned services and lock (HTTP SDK flush)
+- ไม่ผ่าน: CLI SIGINT closes owned services and lock (HTTP SDK flush)
+- ไม่ผ่าน: CLI SIGTERM closes owned services and lock (HTTP SDK flush)
+- ไม่ผ่าน: real OTel preload captures cjs HTTP/Undici fan-out and isolates concurrent requests
+
+### Round82 repaired focused verification
+
+- 10-32-22-165Z9/10FAILED held-presave-closecontrol เพราะfixture.reopenขณะoriginalstoreยังopen/ถือlock ระบบlockปฏิเสธถูกต้อง. LunaรอinFlight0/closeStoreก่อนreopen ไม่ลบlockเอง
+- Final10-33-21-292Z10/10ผ่าน HTTPจริง/pair1save/actualrenamefailure/rollbackmemoryprobe/bodybounds/closeและuncertainACKcontrols. เก็บ0/1syntax,2/3hung,9/10lockmisuseเดิมครบ
+- Readercancelทำให้handlerไม่รอpeerbytesหลังclose แต่socket/readstreamต้องปิดโดยpeerหรือownedfixture; QA response/latch/bodyboundsและ15stesttimeoutใหม่ไม่เปลี่ยนproductdeadline. Case3releasebodyหลังclosedecisionเพื่อตรวจ503 ไม่อ้างearlyclientACKก่อนbodyrelease
+
+
+## 2026-10-13T15-48-10-192Z
+
+- จุดประสงค์: Round82 isolated source regression after QA HTTP admission prototype
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 34b58033ddf9319b7e89e5fe82e8b4e68576c8dd; dirty: true
+- หลักฐาน: `reports/tests/2026-10-13T15-48-10-192Z.tap` และ `.json`
+
+### Round82 final read-only review
+
+- Finalhashes110programfilesตรงmain/focused; module/testmtimeก่อนทั้งสองruns ไม่มีlatepatch. Source15-48-10-192Z1/1ผ่านมาแล้ว
+- Main182/187failed5: adapterupgrade,owner-kill/SIGINT/SIGTERM HTTPSDK,CJSinspector readiness. HTTP10passedinmain; unknowncause ไม่อ้างprototypecausality
+- LatestCI23push/PR3/4หลังWindowsdone; failedUbuntu24stepsเดิม ไม่newgroupstep. Solresumedหลังquota interruption ordinaryallowedtrue ไม่reset/accountsettings
+- Solreviewbenchmarksource: driverbenchmark process/collectorCLIchild/targetchildแยกกันอยู่แล้ว สมมติฐานeventloopblockตรงจากcollectorไปdriverไม่ตรงsource จึงไม่ใช้invalidateperformancefail/ไม่ทำprocess-isolationซ้ำ. Next83paired actualexporter/prototype comparison/slow-I/Oก่อนadoption
+
+
+### Round82 publication (13 ตุลาคม 2026)
+
+- Testedsource df92b2524da5f69e05410737232c2f3677356ae8 commit/pushสำเร็จ DraftPR24basePR23attached; gitstatuscleanตอนpublicationcheck
+- CIdf92b25 push38427749281/PR38427758399in_progressตอนตรวจ ไม่อ้างCIผ่าน. Publicationdocscommitถัดไปไม่เปลี่ยนprogramsourceที่ทดสอบ
+
