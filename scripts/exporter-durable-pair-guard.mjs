@@ -5,6 +5,7 @@ import { createHash } from 'node:crypto';
 import { existsSync, lstatSync, mkdirSync, readFileSync, readdirSync, realpathSync, writeFileSync } from 'node:fs';
 import { dirname, isAbsolute, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { parseSlowSyncMarkers } from './exporter-durable-pair-marker.mjs';
 
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
 const reportDirectory = join(root, 'reports/benchmarks');
@@ -152,7 +153,7 @@ test('controlled slow fsync retains the durable-pair shutdown failures and verif
     assert.ok(pair.order.every(mode => pair[mode].mode === mode));
   }
 
-  const injected = [...tap.matchAll(/^FLOWATLAS_SLOW_SYNC (\{[^\r\n]+\})$/gm)].map(match => JSON.parse(match[1]));
+  const injected = parseSlowSyncMarkers(tap);
   assert.equal(injected.length, 1);
   assert.deepEqual(injected[0], { delayMs: 120, calls: saves, openDescriptors: 0 });
   assert.equal(typeof report.controlledSync.scope, 'string');
@@ -166,6 +167,7 @@ test('controlled slow fsync retains the durable-pair shutdown failures and verif
     innerReport: reportName,
     innerReportDigest: sha256(reportPath),
     guardDigest: sha256(fileURLToPath(import.meta.url)),
+    markerParserDigest: sha256(join(root, 'scripts/exporter-durable-pair-marker.mjs')),
     preloadDigest: sha256(join(root, 'scripts/slow-fsync-preload.mjs')),
     injected: injected[0],
     conditions: orderRows,

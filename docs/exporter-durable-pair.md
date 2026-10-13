@@ -30,3 +30,11 @@ Keep the prototype QA-only. Fewer writes improve this controlled comparison but 
 Next inspect source-matched hosted evidence and measure actual SDK/target cost against the existing paired application workload before choosing a production optimization. The existing HTTP benchmark already separates driver, collector and target processes; another process-isolation experiment would not address the refuted same-event-loop hypothesis.
 
 Rollback removes these two QA scripts and their CI steps; no data migration or production configuration change is needed. Retain failed evidence.
+
+## Round84: Node22 TAP marker repair (14 ตุลาคม 2026)
+
+Hosted round83 source-matched audit covers push5a40465 and PR merge4cac158: eight artifacts, 264 runner reports, exact112 program hashes each. All main runs passed187 and all48 ordinary comparison conditions captured1051 spans without drops. All48 controlled conditions retained shutdown losses and verified reload; these remain synthetic evidence, not performance or pilot acceptance.
+
+Node22 formats the preload exit marker as `# FLOWATLAS_SLOW_SYNC ...` in TAP; Node24 emits a bare line. The original guard matched only bare lines and failed exactly-one-marker on all four Node22 artifacts. The repair accepts those two precise forms with bounded input/line sizes, fixed numeric schema and duplicate rejection. It retains inner exit1, actual injected calls equal successful saves, zero open descriptors, shutdown accounting and reload assertions. Evidence now includes the parser digest. No production or preload bytes, deadline, retry or acceptance threshold changed.
+
+Local focused tests5/5 and actual controlled guard1/1 passed on Node24.19.0. The inner comparison still FAILED0/1 as expected, with productionACK192/drop859 and QAACK320/drop731 in each pair, 42 actual120ms delays and verified reload. Hosted replacement Node22 execution remains to verify. Main/source final results and publication are in TEST-RUNS.md. Roll back the QA parser/guard/test changes if needed; no storage migration is involved.
