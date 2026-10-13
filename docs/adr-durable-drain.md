@@ -12,6 +12,8 @@ Exact6d08a53 hosted verification: PR37343310494 passed4/4; push37343288536 passe
 
 ## Decision
 
+Round83 [same exporter comparison](exporter-durable-pair.md) keeps the round82 prototype outside production. Ordinary local paired conditions used33 versus17 saves and acknowledged all1051 synthetic spans. Under controlled120ms pre-fsync delay, production acknowledged192 and QA320, with859/731 shutdown drops in each of three pairs. Reload remained exact. This supports reduced-write feasibility, but rejects any claim that two-request grouping guarantees lossless900ms drain. Do not adopt it from this experiment; actual application p95, SDK creation cost, hosted evidence and remaining lifecycle/recovery requirements still apply.
+
 Retain current900ms shutdown,1000ms upload,2048capacity,two slots,batch32 and acknowledgement after existing write/fsync/rename for this round. Keep ordinary/component failures visible. The controlled inner capture check must fail, while the outer reproduction passes only when accounting,deadline,scope,realfsync,retained data and controls agree. Injection is an explicit QA preload, scoped to canonical reports/storage/collector-cost-* state temporary files. It is never loaded by the production CLI or ordinary benchmark.
 
 Do not remove fsync, acknowledge before persistence or silently extend shutdown to obtain passing evidence. A fixed short drain and arbitrary slow durable writes cannot guarantee lossless bursts; a repair must state its workload and failure bound rather than promise that a backend alone removes every timeout.

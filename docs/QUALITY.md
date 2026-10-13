@@ -1,5 +1,13 @@
 # รอบทดสอบและปรับปรุง FlowAtlas
 
+### รอบ83 — same exporter / durable pair (13 ตุลาคม 2026)
+
+Sol คุมแผน/implementation/review, Luna ช่วย guard/ตรวจตัวเลข, root ทดสอบและส่ง PR. [ขอบเขต](exporter-durable-pair.md): production exporter จริงใน child เดียวกันทั้งสอง mode แต่1051 spans เป็น fixture ไม่ใช่ actual SDK creation/pilot. Aggregate collector protocols ต่างกัน จึงไม่อ้าง grouping-only isolation. Capacity2048/slots2/batch32/upload1000/shutdown900ms และ realfsync/history100 ไม่เปลี่ยน; post-save observer ไม่โยน error หลัง durable save
+
+Ordinary final16-29-24-948Z1/1: ACK1051/drop0/accepted1051/reload/ownedcleanupครบทั้ง6conditions, saves33→17. Controlled guard16-32-04-844Z1/1 เก็บ innerFAILED0/1: production ACK192/drop859 เทียบQA ACK320/drop731ทั้ง3pairs; ทุกdropเป็นshutdown/reloadตรง. Actual120ms pre-fsync42calls/descriptors0. Failedworkspaces retained/locksabsent/processesclosed. Orderdigestเป็นsave-state/reload consistency ไม่ใช่independentrequest-orderproof; deliveredlossไม่เท่ากับabsentdisk
+
+วิเคราะห์: ลดจำนวนsaveช่วยเงื่อนไขนี้แต่ไม่ผ่าน900ms lossless drain จึงยังไม่adoptในproduction. Controlled accepted256/384มากกว่าACK64ทั้งสองmode ไม่เท่ากับlost-from-disk. Performance met=nullเฉพาะexperiment; actualHTTPp95FAILED/pilot/users/CLIstartup/historicalloss/releaseยังเปิด. ไม่เพิ่มdeadline/retry/skip หรือใช้outerguardผ่านกลบinnerfailed. Parentc4cd5e2 push38428082908/PR38428091765 API4/4ทั้งคู่ ไม่ใช่fullartifactaudit. Finalmain16-34-43-469Z187/187/default2workers/skip0, source16-36-10-553Z1/1ผ่าน และ112programhashesตรงcurrent. ไม่ใช้passingconditionนี้ปิดintermittentstartup และไม่อ้างnewEdgepassเพราะไม่ได้รันซ้ำ
+
 ### รอบ82 — QA durable HTTP admission (13 ตุลาคม 2026)
 
 Sol วางแผน/implementation/review, Luna HTTP controls, root tests/docs/publication. [ต้นแบบ](durable-http-admission.md) รับ actual loopback HTTP สองคำขอรวม body readers; stage บนสำเนา committed graphs และใช้ production validator ก่อน real snapshot save ครั้งเดียวแล้วตอบ202. Busy503/invalid group400/I/O failure503 ไม่เปลี่ยน production collector/exporter/durability/deadline. Body buffer≤16KiB แต่ยัง drain ส่วนเกินจนจบ ไม่จำกัด network bytes/time; inFlight ปิด admission ใหม่. Reader cancellation ป้องกัน late enqueue/save หลัง close; socket ยังเป็นหน้าที่ peer/fixture owner. Fixed snapshots แยก serverResponseFinished(ทุกสถานะ) จาก uncertainAfterCommit ไม่อ้าง client ACK
