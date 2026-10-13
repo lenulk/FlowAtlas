@@ -4696,3 +4696,9 @@ Round79 initial tests: sandbox run2026-10-07T17-37-22-862Z0/7 failedbeforeassert
 - Finalmain20-55-29-968Z190/192 FAILED2/skip0/default2workers: CLI SIGINT plain HTTP readiness12s และ CJS actual OTel inspector readiness (~13.64s). CLI observedcollector-started11148ms/targetspawn11176ms; wrapperClosedtrue/lockfalseแต่identitiesKnownfalse/ownedStoppedfalse/removedfalse จึง retain fixture. Rootcauseยังเปิด ไม่พิสูจน์ parser เป็นสาเหตุ ไม่rerununchangedmain/ไม่เพิ่มdeadline
 - Isolatedsource20-57-31-660Z1/1ผ่าน. Candidate114program hashesตรงfinalmain/currentทั้งหมด; src/public/examplesไม่มีdiff. gitdiffcheckผ่าน. ไม่รัน Edge ใหม่เพราะbrowserproduction sourceเดิม และไม่อ้างnewEdgepass
 - Sol readonly final review ไม่มี blockerสำหรับ Draft QA parser fix; ไม่อ้างmainทั้งหมดผ่านหรือproductionready. Source/code frozenระหว่างtests; historicalfailureและ controlledinnerFAILEDยังอยู่
+
+### Round84 publication
+
+- Source2b7bced8617128b159aa67b71083c4a29db17855 commit/pushสำเร็จบน fix/durable-pair-tap-marker ต่อจาก5a40465; Draft PR26 https://github.com/lenulk/FlowAtlas/pull/26 base test/exporter-durable-pair. PRแนบกับchatแล้ว; ไม่merge/forcepush
+- CI source2b7bced push38467000481/PR38467025419 in_progress ตอนตรวจหลังpublication ยังไม่อ้างNode22 replacement pass. Gitstatusสะอาดก่อนเพิ่มpublication note; เอกสารท้ายรอบไม่เปลี่ยนtestedprogram
+- Automatic approval review ของรอบก่อนที่ติดusage limit ไม่เกิดซ้ำในการcommit/pushรอบนี้; pendinground83 HANDOFF publicationถูกบันทึกรวมในbranchรอบ84แล้ว. รายงานล้มเหลวเก่าและretainedworkspacesยังอยู่
