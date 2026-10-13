@@ -1,5 +1,18 @@
 # รอบทดสอบและปรับปรุง FlowAtlas
 
+### รอบ82 — QA durable HTTP admission (13 ตุลาคม 2026)
+
+Sol วางแผน/implementation/review, Luna HTTP controls, root tests/docs/publication. [ต้นแบบ](durable-http-admission.md) รับ actual loopback HTTP สองคำขอรวม body readers; stage บนสำเนา committed graphs และใช้ production validator ก่อน real snapshot save ครั้งเดียวแล้วตอบ202. Busy503/invalid group400/I/O failure503 ไม่เปลี่ยน production collector/exporter/durability/deadline. Body buffer≤16KiB แต่ยัง drain ส่วนเกินจนจบ ไม่จำกัด network bytes/time; inFlight ปิด admission ใหม่. Reader cancellation ป้องกัน late enqueue/save หลัง close; socket ยังเป็นหน้าที่ peer/fixture owner. Fixed snapshots แยก serverResponseFinished(ทุกสถานะ) จาก uncertainAfterCommit ไม่อ้าง client ACK
+
+Focused final10-33-21-292Z10/10: pair1save, partial-body bound, close incomplete/pending/pre-save gate, invalid group, body overflow privacy, staged valid updateก่อนconflict+duplicate-root memory probe, real rename obstruction และ client disconnect หลังcommit/thirdbusy. Reopen I/O controlหลังrestore preserved backupและcloseownerแล้วตรงpreviousstate ไม่ใช่power-loss/crash/reloadขณะobstructed
+
+Failure historyเก็บครบ: 10-22-24-260Z0/1 syntaxก่อนload; 10-23-31-379Z2/3hungก่อนcase3ต้องstop verifiedworker4976(parent8768→runner14764)ให้runnerเก็บTAP/JSON ไม่killunowned/ลบlock; 10-32-22-165Z9/10 fixtureพยายามreopenขณะstoreopen/lockอยู่ ระบบปฏิเสธถูกต้อง. แก้syntax, reader cancel, boundedQA waits/15stesttimeout, closeownerก่อนreopen; productdeadlineเดิม. Failedworkspacesretainด้วยmarkVerifiedเฉพาะassertionsผ่านและcleanupconfirmed
+
+Main10-33-55-906Z182/187FAILED5/skip0: upgradedadapter readiness, CLIowner-kill/SIGINT/SIGTERM HTTPSDKreadiness และ CJS tracedinspector readiness. HTTP controls10ผ่านในmain; ไม่มีหลักฐานว่าprototypeเป็นสาเหตุของreadinessfailures. Source15-48-10-192Z1/1ผ่าน. All110maininventory hashesตรงcurrentprogram source; no src/public/examplesdiff. ไม่unchangedmainrerun/ไม่เพิ่มdeadline/no newEdgeclaimเพราะproductionbrowserbytesไม่เปลี่ยน. DraftPRไม่รับรองrelease/mainทุกเงื่อนไข
+
+LatestPR23head34b5803 APIหลังWindowsเสร็จ: push38380056816และPR38380062532ผ่าน3/4ทั้งคู่; Ubuntu24Node24 failedFixtureloadcaptureaccounting(push)/Componentfailureevidenceretention(PR), ไม่ใช่newgroupstepfailure. ยังไม่อ่านsource-matchedfullartifactชุดนี้. UsageinterruptionของSolระหว่างตรวจเก็บตามจริง; resumed ordinaryUsageAllowedtrue ไม่มีreset/accountsettings change. FinalSolread-onlyreviewไม่มีblockerต่อDraft และยืนยันfilemtimeก่อนfinaltests
+
+Solตรวจbenchmark-http-trace sourceยืนยันdriver/CLI-inspectorcollector/targetแยกprocessอยู่แล้ว; สมมติฐานcollectorblockdriver eventloopโดยตรงไม่ตรงsource จึงไม่ทำisolationซ้ำหรือหักล้างperformanceFAILED. ถัดไปpairedactual-exporter/prototype comparisonและslow-I/O/deadline controlsก่อนproductionadoption; SDKtargetcost/sharedhostcontentionยังเป็นhypothesesต้องวัดแยกสำหรับp95. Intermittentstartup/nativeexit/19loss/pilot/users/releaseยังเปิด ไม่อ้างtoolเสร็จจากQAprototype
 ### รอบ81 — durable group feasibility (13 ตุลาคม 2026)
 
 Solวางแผน/script/review, Lunahelper/unit/evidence, rootchecks/docs/publication. [ขอบเขต](durable-group-commit.md) QA-only snapshots35states (1051traces+64updates/history100) baseline35save/pairs18save ใช้realJsonActionStore/fsync/reload. ไม่เปลี่ยนproductionstore/exporter/ACK/deadlines ไม่ใช่HTTPcoordinator/pilot. Helperbounded35states/synchronoussaveเท่านั้น; asyncreturnไม่publishและconsume rejection; reportผูกscript/helper/fixture/coredigests. EncodedbytesderivedจากstatesและsyncCallsอนุมานsuccessfulsaves; finalbytes/reloadแยกตรวจจริง

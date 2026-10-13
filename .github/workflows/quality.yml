@@ -134,6 +134,11 @@ jobs:
         env:
           FLOWATLAS_TEST_PURPOSE: CI isolated synthetic two-state durable grouping and failed save publication
         run: node scripts/run-tests.mjs scripts/benchmark-durable-group-commit.mjs
+      - name: Isolated QA durable HTTP admission
+        if: ${{ !cancelled() }}
+        env:
+          FLOWATLAS_TEST_PURPOSE: CI isolated QA HTTP admission durable save failure and cancellation controls
+        run: node scripts/run-tests.mjs test/durable-http-admission-prototype.test.mjs
       - name: Actual SDK HTTP component cost
         if: ${{ !cancelled() }}
         env:
