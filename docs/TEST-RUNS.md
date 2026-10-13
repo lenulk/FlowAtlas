@@ -4473,3 +4473,9 @@ Round79 initial tests: sandbox run2026-10-07T17-37-22-862Z0/7 failedbeforeassert
 
 - Finalmaininventory108files SHA256ตรงworkingprogramfilesทุกไฟล์; gitdiffsrc/public/examplesว่าง/diffcheckผ่าน. ไม่มีnewEdgeclaim. DraftPRเพราะmainfailed174/177 ไม่ใช่การผ่านrelease gate
 
+
+### Round81 publication (13 ตุลาคม 2026)
+
+- Testedsource8f7d8fd4fbac2f5c85e545e0c0c70ba1720c11cc commit/pushสำเร็จ DraftPR23basePR22attached; gitstatuscleanตอนpublicationcheck
+- CI8f7d8fdpush38379974130/PR38379983602in_progressที่ตรวจ ไม่อ้างCIผ่าน. Publicationdocscommitถัดไปไม่เปลี่ยนtestedprogramsource
+
