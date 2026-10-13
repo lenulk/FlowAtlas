@@ -1,5 +1,7 @@
 # รอบทดสอบและปรับปรุง FlowAtlas
 
+**รอบ84 — 14 ตุลาคม 2026:** แก้ QA durable-pair guard อ่าน marker ของ Node22 TAP ที่มี `# ` นำหน้า โดยรับ Node24 bare เช่นเดิม. Parser จำกัด input/line ตรวจ schema/counters และ reject duplicate; guard ยังบังคับ innerFAILED/calls=saves/fd0/reload/cleanup เดิม. Sol คุมงานยากและ Luna ทำ regression tests. Auditรอบ83ครบ8artifacts/264runnerreports/112hashesต่อชุดตรง source push5a40465/PRmerge4cac158; main187ทุกชุด แต่ guardNode22 FAILEDทั้ง4เพราะ parser ไม่รับ comment prefix. Ordinaryทุก48conditionsครบ; controlledยังshutdownloss ไม่ใช่production repair/performance/pilot pass. Focused5/5/local actualguard1/1ผ่าน แต่ยังต้อง hostedNode22 replacement execution. Finalmain20-55-29-968Z190/192FAILED2 (CLI SIGINT plain/CJS OTel readiness), source20-57-31-660Z1/1ผ่าน/114hashesตรง; ไม่ปิด startup rootcause. Publication ดู TEST-RUNS ล่าสุด
+
 ### รอบ83 — same exporter / durable pair (13 ตุลาคม 2026)
 
 Sol คุมแผน/implementation/review, Luna ช่วย guard/ตรวจตัวเลข, root ทดสอบและส่ง PR. [ขอบเขต](exporter-durable-pair.md): production exporter จริงใน child เดียวกันทั้งสอง mode แต่1051 spans เป็น fixture ไม่ใช่ actual SDK creation/pilot. Aggregate collector protocols ต่างกัน จึงไม่อ้าง grouping-only isolation. Capacity2048/slots2/batch32/upload1000/shutdown900ms และ realfsync/history100 ไม่เปลี่ยน; post-save observer ไม่โยน error หลัง durable save

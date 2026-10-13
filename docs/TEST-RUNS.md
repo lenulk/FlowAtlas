@@ -4633,3 +4633,66 @@ Round79 initial tests: sandbox run2026-10-07T17-37-22-862Z0/7 failedbeforeassert
 - Sol final read-only review ไม่มี blocker: ordinary ACK1051/accepted1051ทั้ง6; controlled production accepted256/ACK192/saves8 vs QA accepted384/ACK320/saves6 ทุก3pairs. Persisted-but-unacknowledged64ใน fixture ไม่พิสูจน์ lost-from-disk/ไม่ใช้เพิ่ม retry
 - โปรแกรม112files hashesตรง finalmain/current และไม่มี src/public/examples diff; git diff --checkผ่าน. Ordinary finalshutdown production278.071/375.9481/345.6385ms vsQA284.9874/271.4410/329.566ms ไม่รับรอง SDKp95 หรือ grouping-only benefit
 - QA source/timing/deadlines frozenระหว่างtests; CIเพิ่มordinaryและcontrolledguard serialsteps หลังisolatedHTTPprototype. Failedinner reports/workspacesยังอยู่ ไม่มีลบหลักฐานหรือเปลี่ยน product deadline
+
+### Round83 publication และตรวจต่อ (14 ตุลาคม 2026)
+
+- Source 5a40465 ส่งแล้วใน Draft PR25 https://github.com/lenulk/FlowAtlas/pull/25; branch test/exporter-durable-pair ต่อจาก c4cd5e2. รอบก่อน final docs commit/push ไม่ได้ทำงาน: automatic approval review ล้มเหลวเพราะ usage limit ไม่ใช่การตัดสินว่า action unsafe; HANDOFF ยังเป็น local modification ขณะเริ่มตรวจต่อ
+- ตรวจ CI ล่าสุดด้วย gh run list: source 5a40465 push38432014181 / PR38432023846 completed/failure ทั้งคู่ ไม่ใช้สถานะ in_progress เดิมรับรองผ่าน
+- gh run view PR สำเร็จ แต่คำสั่งอ่าน push jobs ครั้งแรก exit1 / HTTP502 GitHub API. เป็น read-only service failure; ตรวจ API ต่อแบบแยก ไม่เปลี่ยน source/deadline หรือรันทดสอบซ้ำเพื่อกลบ CI failure
+- ตรวจ push jobs สำเร็จ: Node22 Windows/Linux failed durable-pair guard; Node24 ผ่านทั้งสอง. PR jobs API ครั้งถัดไป HTTP502 อีกครั้ง และ rg wildcard path บน Windows os123; ไม่ตีความ null jobs เป็น CI pass. Fetch origin สำเร็จ
+- อ่าน raw Ubuntu22 push TAP: guard failed line156 injected.length0 แต่ inner TAP มี '# FLOWATLAS_SLOW_SYNC {"delayMs":120,"calls":51,"openDescriptors":0}'. Regex เดิมรับเฉพาะ bare marker จึงไม่รับ TAP comment prefix; ต้อง source-match และตรวจทุก artifact ก่อนแก้. Inner capture failure ยังคงอยู่และไม่ใช้ parser fix รับรอง lossless delivery
+
+## 2026-10-13T20-54-16-449Z
+
+- จุดประสงค์: Round84 source-matched round83 hosted artifact audit
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 5a40465ea9d848cb2ee4006ed4f8d6ecec210451; dirty: true
+- หลักฐาน: `reports/tests/2026-10-13T20-54-16-449Z.tap` และ `.json`
+
+## 2026-10-13T20-54-52-526Z
+
+- จุดประสงค์: Round84 TAP marker Node22 archived and Node24 bare regression
+- ผล: ผ่าน — 5/5; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 5a40465ea9d848cb2ee4006ed4f8d6ecec210451; dirty: true
+- หลักฐาน: `reports/tests/2026-10-13T20-54-52-526Z.tap` และ `.json`
+
+## 2026-10-13T20-54-52-901Z
+
+- จุดประสงค์: Round84 actual controlled fsync guard after TAP parser fix
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 5a40465ea9d848cb2ee4006ed4f8d6ecec210451; dirty: true
+- หลักฐาน: `reports/tests/2026-10-13T20-54-52-901Z.tap` และ `.json`
+
+### Round84 audit และ focused checks (14 ตุลาคม 2026)
+
+- Sol คุม scope/review/parser; Luna ทำ regression tests งานย่อย. Freeze source ก่อน tests; ไม่แก้ production/preload/deadline/threshold
+- Hosted audit20-54-16-449Z1/1: 8 artifacts (push5a40465 และ PR merge4cac158), 264 runner reports, 112 program hashesตรง Git ทุกชุด. Main187/187ทุกชุด; ordinary pairทั้ง48conditions ACK1051/drop0/reloadครบ. Controlledทั้ง48conditionsยัง shutdownloss/reloadตรง; actual marker callsตรง sum saves/fd0. Node22ทั้ง4ชุดเป็น TAP comment '# ' และ guardFAILED; Node24ทั้ง4ชุดเป็น bare markerและguardผ่าน. ไม่อ้าง artifacts มี retained workspace เพราะ workflowไม่upload storage
+- Focused20-54-52-526Z5/5: Node22 archived marker/Node24 bare+CRLF, malformed/duplicate/prefix/counter/bounds controls. Local Node24.19.0 เท่านั้น ไม่อ้างรัน Node22จริง
+- Actual guard20-54-52-901Z1/1; inner exporter comparison FAILED0/1ตามคาดและเก็บ TAP/JSON/workspaces: productionACK192/drop859 vsQA320/drop731ทุก3pairs, reloadตรง6conditions; real injected120ms42calls/fd0. Parser fixไม่แก้ slow-disk delivery หรือทำให้ performance ผ่าน
+
+## 2026-10-13T20-55-29-968Z
+
+- จุดประสงค์: Round84 final main regression after TAP marker fix
+- ผล: ไม่ผ่าน — 190/192; failed 2; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 5a40465ea9d848cb2ee4006ed4f8d6ecec210451; dirty: true
+- หลักฐาน: `reports/tests/2026-10-13T20-55-29-968Z.tap` และ `.json`
+- ไม่ผ่าน: CLI SIGINT closes owned services and lock (plain HTTP)
+- ไม่ผ่าน: real OTel preload captures cjs HTTP/Undici fan-out and isolates concurrent requests
+
+## 2026-10-13T20-57-31-660Z
+
+- จุดประสงค์: Round84 isolated source regression after TAP marker repair
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 5a40465ea9d848cb2ee4006ed4f8d6ecec210451; dirty: true
+- หลักฐาน: `reports/tests/2026-10-13T20-57-31-660Z.tap` และ `.json`
+
+### Round84 final verification
+
+- Finalmain20-55-29-968Z190/192 FAILED2/skip0/default2workers: CLI SIGINT plain HTTP readiness12s และ CJS actual OTel inspector readiness (~13.64s). CLI observedcollector-started11148ms/targetspawn11176ms; wrapperClosedtrue/lockfalseแต่identitiesKnownfalse/ownedStoppedfalse/removedfalse จึง retain fixture. Rootcauseยังเปิด ไม่พิสูจน์ parser เป็นสาเหตุ ไม่rerununchangedmain/ไม่เพิ่มdeadline
+- Isolatedsource20-57-31-660Z1/1ผ่าน. Candidate114program hashesตรงfinalmain/currentทั้งหมด; src/public/examplesไม่มีdiff. gitdiffcheckผ่าน. ไม่รัน Edge ใหม่เพราะbrowserproduction sourceเดิม และไม่อ้างnewEdgepass
+- Sol readonly final review ไม่มี blockerสำหรับ Draft QA parser fix; ไม่อ้างmainทั้งหมดผ่านหรือproductionready. Source/code frozenระหว่างtests; historicalfailureและ controlledinnerFAILEDยังอยู่
