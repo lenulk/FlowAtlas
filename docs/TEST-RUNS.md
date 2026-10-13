@@ -4571,3 +4571,9 @@ Round79 initial tests: sandbox run2026-10-07T17-37-22-862Z0/7 failedbeforeassert
 - LatestCI23push/PR3/4หลังWindowsdone; failedUbuntu24stepsเดิม ไม่newgroupstep. Solresumedหลังquota interruption ordinaryallowedtrue ไม่reset/accountsettings
 - Solreviewbenchmarksource: driverbenchmark process/collectorCLIchild/targetchildแยกกันอยู่แล้ว สมมติฐานeventloopblockตรงจากcollectorไปdriverไม่ตรงsource จึงไม่ใช้invalidateperformancefail/ไม่ทำprocess-isolationซ้ำ. Next83paired actualexporter/prototype comparison/slow-I/Oก่อนadoption
 
+
+### Round82 publication (13 ตุลาคม 2026)
+
+- Testedsource df92b2524da5f69e05410737232c2f3677356ae8 commit/pushสำเร็จ DraftPR24basePR23attached; gitstatuscleanตอนpublicationcheck
+- CIdf92b25 push38427749281/PR38427758399in_progressตอนตรวจ ไม่อ้างCIผ่าน. Publicationdocscommitถัดไปไม่เปลี่ยนprogramsourceที่ทดสอบ
+
