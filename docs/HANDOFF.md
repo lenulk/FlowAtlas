@@ -1,6 +1,6 @@
 # ส่งต่องาน FlowAtlas
 
-ตรวจสถานะสำหรับส่งต่องานวันที่ 9 ตุลาคม 2026 เอกสารนี้เป็นจุดเริ่มอ่านงานต่อ ต้องตรวจโค้ด Git และผล CI ปัจจุบันอีกครั้งก่อนเปลี่ยนไฟล์
+ตรวจสถานะสำหรับส่งต่องานวันที่ 13 ตุลาคม 2026 เอกสารนี้เป็นจุดเริ่มอ่านงานต่อ ต้องตรวจโค้ด Git และผล CI ปัจจุบันอีกครั้งก่อนเปลี่ยนไฟล์
 
 ## เป้าหมายของเจ้าของโปรเจกต์
 
@@ -9,6 +9,9 @@
 Repository: https://github.com/lenulk/FlowAtlas; branch หลัก `master` ไม่จำเป็นต้องใช้พาธของเครื่องเดิมบนเครื่องใหม่ อ่าน [AGENTS.md](../AGENTS.md), [PLAN.md](../PLAN.md), [QUALITY.md](QUALITY.md), [TEST-RUNS.md](TEST-RUNS.md), [install.md](install.md), [linux-vm.md](linux-vm.md) ก่อนเริ่ม
 
 ## สถานะที่ตรวจแล้ว
+**ล่าสุดรอบ81:** branch `diag/collector-deadline-evidence` ต่อจาก28d0972/PR22. [QA durable group feasibility](durable-group-commit.md): focused7/7/12conditions+2validationcontrolsผ่าน, saves35→18และlocalstorageelapsedลด แต่ไม่ใช่HTTPcoordinator/SDKp95/drainpass. Main09-52-54-212Z174/177FAILEDCLIstartup3/skip0; source09-54-57-615Z1/1ผ่าน. Failurephases/fixturesretained/cleanupunknown; ไม่เพิ่มdeadline/rerunเพื่อกลบfailure. Draftงานนี้productionbytesไม่เปลี่ยน
+
+**ถัดไปรอบ82:** boundedHTTPadmissionและdurableACK semantics ในQAprototypeก่อนproduction: validate2actualrequests/persistonceก่อน202ทั้งคู่, realI/O-faultrejectทั้งคู่/previousstateตรง, abortหลังcommitแยกuncertainACK, close/late-single/order/bounds. ไม่ใช้local35→18timingรับรองslowdisk900ms. IntermittentCLIstartup rootcauseแยกและยังเปิด; performance/pilot/users/releaseยังไม่ผ่าน
 **ล่าสุดรอบ80:** โค้ด `c7617e4` ส่งแล้วใน [Draft PR22](https://github.com/lenulk/FlowAtlas/pull/22); branch `diag/cli-startup-milestones` ต่อจาก d0427a7/PR21 เพิ่ม [bounded CLI startup phases](cli-startup-phases.md) ผ่าน owner IPC เดิม และรักษา failed fixture เมื่อยังยืนยัน descendant/close ไม่ครบ. ไม่เพิ่ม target10s/wrapper12s/retry. Solนำวางแผน/review, Lunaช่วยhelper/privacy/evidence. Partialplainfailure17-39-07-365Z: native testfileexit3221226505/lastobservedcollector-start-requested/no lock; rootcauseยังไม่ทราบ. Guard7/7และCLI9/9หลังcleanupผ่าน แต่ไม่ใช้ปิดhistoricalstartup. Mainfinal17-45-26-681Z171/171ผ่าน default2workers/no skipped; ไม่ปิดintermittentfailureจากconditionที่ผ่าน FinalactualSDK+Edge17-47-50-637Z2/2/source17-48-17-992Z1/1/guard17-47-27-993Z1/1ผ่าน. รายละเอียดผลทั้งหมดอยู่TEST-RUNS/QUALITY
 
 PR21 latestpush37761227880ผ่าน4/4/PR37761234298ผ่าน3/4; rootอ่านfailedUbuntu24Node24 joblogแล้ว: Controlled collector commit order assertion `component_capture_or_reload_failed` / capture incomplete (reloadVerified=trueทั้งสองรอบ), diskround1ack160/drop891/sync1393.383ms และround2ack128/drop923/sync1103.457ms/reloadtrue. ไม่ใช่การพิสูจน์reversalwrongหรือsamecauseCLI; ยังไม่wholematrixsourceaudit. ถัดไปรอบ81อ่าน source-matched collector-cost benchmark artifact ของ37761234298: health/drop reasons/deadline/ack/reorder metrics ก่อนเลือก production fix. งานstorage/fsyncแยกจากรอบ80

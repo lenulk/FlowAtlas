@@ -4391,3 +4391,85 @@ Round79 initial tests: sandbox run2026-10-07T17-37-22-862Z0/7 failedbeforeassert
 - Tested source commit c7617e4c8e4388f22b6409f63bf246af7863b8b9 pushed diag/cli-startup-milestones; DraftPR22 basePR21 attached; gitstatuscleanเมื่อเช็กหลังpublication
 - CIc7617e4 PR37819515653in_progress/push37819507590queuedตอนตรวจ; ยังไม่อ้างCIpassed. เอกสารpublicationcommitถัดไปไม่เปลี่ยนprogramsourceที่ทดสอบ
 
+
+### Round81 initial review (9 ตุลาคม 2026)
+
+- CleanHEAD28d0972; gitfetchoriginสำเร็จ ไม่pullทับbranchown. รอบ81branch diag/collector-deadline-evidence ต่อจากPR22
+- LatestPR22SHA28d0972 push37819582423pass4/4, PR37819589984pass3/4: Ubuntu24Node24failedCollector component cost(simulated replay only). StatusAPIไม่ใช่sourceaudit
+- DownloadPR21ชื่อheadSHA d0427a7ไม่พบartifact; correctedAPIพบartifactใช้mergeSHA3f8d1cb ไม่ใช่headSHA. PR22artifactmergeSHA40cfccf. ต้องตรวจsourceinventoryก่อนใช้claim; กำลังดาวน์โหลดselectedUbuntu24ทั้งสอง ไม่มีการเปลี่ยนproductcode/deadline
+
+## 2026-10-08T18-06-12-573Z
+
+- จุดประสงค์: Round81 selected Ubuntu24 CI exact source audit preserves collector failures
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 28d0972c6bfd6c9d4a4b67836ec47eef20bbee72; dirty: true
+- หลักฐาน: `reports/tests/2026-10-08T18-06-12-573Z.tap` และ `.json`
+
+### Round81 selected exact CI audit
+
+- Runner18-06-12-573Z1/1ผ่าน: selectedUbuntu24 artifacts PR21/PR22 exactGit inventories102/105filesและ28/29runnerreportsตรงรุ่น, skipped0; main165/171passed. ตรวจcomponentcoreDigest/diagnosticScriptDigest/reorderFixtureDigest/deadlines900/1000แล้ว ไม่อ้างwholematrixaudit
+- FailedPR21controlleddisk1/2: shutdown891/923, timeout/rejected/transport0, deadlineFired1, accepted224/192 vsACK160/128, orderdigestตรง/reloadtrue; reorderrequests7/6/releases0(ยังไม่ถึงpairedbatch31/32)
+- FailedPR22ordinarydisk2/3: shutdown795/859, timeout/rejected/transport0, accepted320/256 vsACK256/192, orderdigestตรง/reloadtrue. shutdown~901ms; ไม่มีหลักฐานว่าทั้ง64acceptedที่ยังไม่ACKสูญจากdisk แต่deliveryuncertain ต้องแยกจากqueuedneverreceived
+- Artifactdownloadสำเร็จทั้งสองหลังรอ; initialrgpathผิดเพราะartifactrootมีreports subdir แก้pathแล้ว. Rawและaudit summaryอยู่ reports/releases/ci-* และround81-selected-summary.json; ไม่แก้rawartifacts
+
+### Round81 experiment decision
+
+- SolเลือกQA-only boundedgroup2 durablefeasibility: baseline35save/group18save, identical35states (1051synthetictraces+64updates/history100), realJsonActionStore/fsync/reload/3rotatedpairs. Lunaช่วยpuregroup/receiptafter-successcontrol; rootchecks/docs
+- ไม่เปลี่ยนproductionstore/exporter/ACK/deadlines. ไม่ทดแทนHTTPcoordinator/pilot/SDKp95; hostedfsyncaverageไม่ใช่การทำนายperformance การลดsave countยังไม่guarantee900ms
+
+### Round81 resumed review (13 ตุลาคม 2026)
+
+- รับช่วงหลัง Sol usage-limit interruption; ไม่เปลี่ยนmodel/accountsettingsหรืออ้างว่าได้รับSolreviewระหว่างinterruption. Solกลับมารับช่วงวางแผน/reviewตามผู้ใช้สั่ง
+- Gitfetchสำเร็จ/ownbranchdiag/collector-deadline-evidenceยังงานค้าง; PR22head28d0972ยังOPEN. LatestCI APIเดิมpush4/PR3failordinarycomponentUbuntu24Node24. ไม่ใช้historicalgreenปิดfailure
+- NewQAexperiment/helper/testsยังไม่เคยรันก่อนresume; ตรวจsourceก่อนrun รวมprovenancehelper/derivedwrites/freshvalidation/failurecontrolscope. Productionsourceไม่แก้และnoDeadline/noRetrychange
+
+### Round81 pre-run integration review
+
+- RootและSolพบhelperhardenedmax18groups/singletonเฉพาะท้ายขัดกับbaseline35singlegroupsก่อนrun; Lunaแก้bounded35states/contiguousgroups1or2ให้รองรับcontrolเดิม. ไม่ใช่ผลtestfailedและไม่มีred-runclaim
+
+
+## 2026-10-13T09-52-36-171Z
+
+- จุดประสงค์: Round81 final paired durable storage feasibility and bounded synthetic publication
+- ผล: ผ่าน — 7/7; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 28d0972c6bfd6c9d4a4b67836ec47eef20bbee72; dirty: true
+- หลักฐาน: `reports/tests/2026-10-13T09-52-36-171Z.tap` และ `.json`
+
+### Round81 paired report review
+
+- Focused09-52-36-171Z7/7ผ่าน; reportdurable-group-2026-10-13T09-52-40-906Zทั้ง12conditionsและ2validationrejectioncontrolscomplete/reload/finalbytes/cleanuptrue. Publishedindicesครบ35ทุกsuccessfulcondition; failedgroupไม่publish/อนาคตไม่attempt/previousstateตรง
+- Localmedians1file155.3154→84.0647ms,64files281.7293→136.6002ms; saves35→18. Encodedbytesderived6371360→3354132และ25359776→13229004. ไม่ใช้เป็นSDKp95/exporterdrainperformancepass/pilot
+
+
+## 2026-10-13T09-52-54-212Z
+
+- จุดประสงค์: Round81 final main regression default two workers after QA-only durable grouping
+- ผล: ไม่ผ่าน — 174/177; failed 3; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 28d0972c6bfd6c9d4a4b67836ec47eef20bbee72; dirty: true
+- หลักฐาน: `reports/tests/2026-10-13T09-52-54-212Z.tap` และ `.json`
+- ไม่ผ่าน: CLI owner-kill closes owned services and lock (HTTP SDK flush)
+- ไม่ผ่าน: CLI SIGINT closes owned services and lock (plain HTTP)
+- ไม่ผ่าน: CLI SIGINT closes owned services and lock (HTTP SDK flush)
+
+## 2026-10-13T09-54-57-615Z
+
+- จุดประสงค์: Round81 isolated source regression after QA-only group experiment
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 28d0972c6bfd6c9d4a4b67836ec47eef20bbee72; dirty: true
+- หลักฐาน: `reports/tests/2026-10-13T09-54-57-615Z.tap` และ `.json`
+
+### Round81 failed main artifact analysis
+
+- Main09-52-54-212Z174/177failedowner-killSDK/SIGINTplain/SIGINTSDK; no skipped. Source09-54-57-615Z1/1ผ่าน
+- SDKcollectorstarted4833/4902ms/targetspawned4899/4959msก่อนwrapper12sแต่ไม่เห็นready; plainlastobservedcollectorstartrequested. CleanupwrapperClosedfalse/unknownidentities/retained ไม่สรุปcause ไม่killguessedPID
+- NoEdge rerunเพราะsourceproduction/browser/SDKไม่เปลี่ยน; ไม่อ้างnewEdgepass. Sol/Lunafinalreviewscopeก่อนDraftpublication
+
+
+### Round81 final source verification
+
+- Finalmaininventory108files SHA256ตรงworkingprogramfilesทุกไฟล์; gitdiffsrc/public/examplesว่าง/diffcheckผ่าน. ไม่มีnewEdgeclaim. DraftPRเพราะmainfailed174/177 ไม่ใช่การผ่านrelease gate
+

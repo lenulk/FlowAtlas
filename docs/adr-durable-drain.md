@@ -18,6 +18,10 @@ Do not remove fsync, acknowledge before persistence or silently extend shutdown 
 
 ## Alternatives and next experiment
 
+Round81 audits selected PR21/PR22 Ubuntu Node24 artifacts against exact source inventories. The four uninstrumented failing disk conditions report only shutdown drops at the existing900ms deadline, not upload timeout/rejection/transport errors; retained ordering and reload match. Accepted exceeds acknowledged by64spans in each condition, so a dropped delivery is not necessarily absent from disk. This does not establish a single cause for all prior losses.
+
+The next [two-state group experiment](durable-group-commit.md) uses the existing snapshot format and real JsonActionStore saves:35states versus18adjacent-pair terminal states, identical final graph values, synthetic publication after save, and failure preservation. It tests structural write reduction and local storage cost, not a production HTTP coordinator. No backend or deadline change is approved. Fewer syncs cannot guarantee an arbitrary slow disk drains within900ms; ordinary matched performance, crash/close/admission semantics and source-matched CI remain prerequisites.
+
 Round66 adds an [isolated comparison](durable-write-comparison.md). Corrected local fixtures show delta records write about one-third the bytes of snapshots but still perform35syncs and leave a log about9–10.5times the final snapshot size. Raw append timings exclude validation/encoding/locking/compaction/recovery and therefore cannot establish a production backend improvement. Do not adopt the QA format as a store. The existing full-save validation stage is substantial for the64-file synthetic source case; next isolate repeated immutable source-map path/hash checks and consider a bounded optimization that retains fresh graph/claimed-version validation before undertaking a migration. This choice does not claim to fix arbitraryfsync latency or existing shutdown losses. A journal proposal remains conditional on all adoption requirements below.
 
 - Keep snapshot storage: simpler existing recovery and rollback, but every request rewrites and syncs retained history. Capture can remain incomplete during slow writes.
@@ -26,7 +30,7 @@ Round66 adds an [isolated comparison](durable-write-comparison.md). Corrected lo
 - Longer or configurable drain: changes user-visible stop time and still cannot guarantee completion on arbitrary I/O stalls. Requires a separate lifecycle decision and independent stop-time tests; not approved here.
 - Application-side durable retry/spool: can survive collector outages but adds disk cost and private metadata on the app side. Requires bounded retention/privacy/idempotency and restart semantics, not a hidden retry in tests.
 
-Prioritize an isolated journal-versus-snapshot write/sync comparison with identical data and separately labeled controls. Also measure SDK-only cost separately; do not subtract component burst timings from application requestp95. Any backend proposal must specify:
+Historical round65 plan: prioritize an isolated journal-versus-snapshot write/sync comparison with identical data and separately labeled controls. Round66 completed that comparison; use the Round81 experiment above as the current next step. Measure SDK-only cost separately; do not subtract component burst timings from application requestp95. Any backend proposal must specify:
 
 1. Batch atomicity and when memory/ack becomes visible; failed write/sync must preserve previously acknowledged data.
 2. Torn append, truncation, checksum failure, corruption and process termination recovery; never silently accept a damaged acknowledged prefix.
