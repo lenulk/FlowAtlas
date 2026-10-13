@@ -139,6 +139,16 @@ jobs:
         env:
           FLOWATLAS_TEST_PURPOSE: CI isolated QA HTTP admission durable save failure and cancellation controls
         run: node scripts/run-tests.mjs test/durable-http-admission-prototype.test.mjs
+      - name: Same exporter durable pair comparison (synthetic spans)
+        if: ${{ !cancelled() }}
+        env:
+          FLOWATLAS_TEST_PURPOSE: CI same exporter ordinary production versus QA durable pair capture and reload
+        run: node scripts/run-tests.mjs scripts/benchmark-exporter-durable-pair.mjs
+      - name: Durable pair controlled slow fsync evidence
+        if: ${{ !cancelled() }}
+        env:
+          FLOWATLAS_TEST_PURPOSE: CI durable pair controlled slow fsync preserves inner shutdown loss and reload
+        run: node scripts/run-tests.mjs scripts/exporter-durable-pair-guard.mjs
       - name: Actual SDK HTTP component cost
         if: ${{ !cancelled() }}
         env:

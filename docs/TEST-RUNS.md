@@ -4577,3 +4577,59 @@ Round79 initial tests: sandbox run2026-10-07T17-37-22-862Z0/7 failedbeforeassert
 - Testedsource df92b2524da5f69e05410737232c2f3677356ae8 commit/pushสำเร็จ DraftPR24basePR23attached; gitstatuscleanตอนpublicationcheck
 - CIdf92b25 push38427749281/PR38427758399in_progressตอนตรวจ ไม่อ้างCIผ่าน. Publicationdocscommitถัดไปไม่เปลี่ยนprogramsourceที่ทดสอบ
 
+
+## 2026-10-13T16-26-57-887Z
+
+- จุดประสงค์: Round83 ordinary same exporter production versus QA durable-pair comparison
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: c4cd5e2a6a84acba161cd8c8c8f26663958c3f94; dirty: true
+- หลักฐาน: `reports/tests/2026-10-13T16-26-57-887Z.tap` และ `.json`
+
+## 2026-10-13T16-29-24-948Z
+
+- จุดประสงค์: Round83 final ordinary exporter comparison with explicit cleanup evidence
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: c4cd5e2a6a84acba161cd8c8c8f26663958c3f94; dirty: true
+- หลักฐาน: `reports/tests/2026-10-13T16-29-24-948Z.tap` และ `.json`
+
+## 2026-10-13T16-32-04-844Z
+
+- จุดประสงค์: Round83 controlled slow fsync preserves inner shutdown loss and exact reload
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: c4cd5e2a6a84acba161cd8c8c8f26663958c3f94; dirty: true
+- หลักฐาน: `reports/tests/2026-10-13T16-32-04-844Z.tap` และ `.json`
+
+### Round83 manual checks (13 ตุลาคม 2026)
+
+- เริ่มจาก c4cd5e2/PR24; Git status มีเฉพาะ TEST-RUNS และ QA scripts ใหม่สองไฟล์ งาน production ไม่เปลี่ยน Sol คุมแผน/implementation/review และ Luna ช่วย guard/read-only summary ตามคำสั่งผู้ใช้
+- อ่าน workflow/ADR ด้วยชื่อ ci.yml และ adr-durable-write.md ครั้งแรกไม่พบ (tool exit1); rg ยืนยันไฟล์จริง quality.yml / adr-durable-drain.md ไม่มีการแก้ไฟล์หรือสูญเสียหลักฐานจากคำสั่งอ่านที่ล้มเหลว
+- Latest parent c4cd5e2 CI API push38428082908 / PR38428091765 ผ่าน4/4ทั้งคู่; เป็น status/steps verification ไม่ใช่ full artifact audit และไม่ปิด performance/pilot gates
+- Ordinary final16-29-24-948Z1/1. Initial16-26-57-887Z1/1 ก่อนเพิ่ม explicit cleanup booleans เป็นประวัติ ไม่แทน final source
+- Controlled guard16-32-04-844Z1/1 แต่ inner comparison FAILED0/1ตามคาดและเก็บ TAP/JSON/workspacesครบ: production ACK192/drop859, QA ACK320/drop731 ทุก3pairs; reloadตรงทั้ง6conditions. Preload120ms actual42calls/openDescriptors0 ไม่ใช่ disk speed จริงหรือ performance acceptance
+
+## 2026-10-13T16-34-43-469Z
+
+- จุดประสงค์: Round83 final main regression default two file workers
+- ผล: ผ่าน — 187/187; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: c4cd5e2a6a84acba161cd8c8c8f26663958c3f94; dirty: true
+- หลักฐาน: `reports/tests/2026-10-13T16-34-43-469Z.tap` และ `.json`
+
+## 2026-10-13T16-36-10-553Z
+
+- จุดประสงค์: Round83 isolated source regression after exporter comparison
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: c4cd5e2a6a84acba161cd8c8c8f26663958c3f94; dirty: true
+- หลักฐาน: `reports/tests/2026-10-13T16-36-10-553Z.tap` และ `.json`
+
+### Round83 final verification
+
+- Fetch origin สำเร็จ; branch ใหม่ test/exporter-durable-pair ต่อจาก c4cd5e2. PR24 ยัง OPEN/head c4cd5e2/base diag/collector-deadline-evidence ยืนยันผ่าน gh ก่อนสร้าง PR ใหม่ ไม่ merge/forcepush
+- Main16-34-43-469Z187/187ผ่าน default2workers/skip0; sourceแยก16-36-10-553Z1/1ผ่าน. ไม่รัน Edge ซ้ำเพราะ production browser source ไม่เปลี่ยน และไม่อ้าง new Edge evidence
+- Sol final read-only review ไม่มี blocker: ordinary ACK1051/accepted1051ทั้ง6; controlled production accepted256/ACK192/saves8 vs QA accepted384/ACK320/saves6 ทุก3pairs. Persisted-but-unacknowledged64ใน fixture ไม่พิสูจน์ lost-from-disk/ไม่ใช้เพิ่ม retry
+- โปรแกรม112files hashesตรง finalmain/current และไม่มี src/public/examples diff; git diff --checkผ่าน. Ordinary finalshutdown production278.071/375.9481/345.6385ms vsQA284.9874/271.4410/329.566ms ไม่รับรอง SDKp95 หรือ grouping-only benefit
+- QA source/timing/deadlines frozenระหว่างtests; CIเพิ่มordinaryและcontrolledguard serialsteps หลังisolatedHTTPprototype. Failedinner reports/workspacesยังอยู่ ไม่มีลบหลักฐานหรือเปลี่ยน product deadline

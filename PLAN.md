@@ -1,5 +1,7 @@
 # แผนพัฒนา FlowAtlas ไปถึงรุ่นใช้งานจริง
 
+**อัปเดตรอบ83 — 13 ตุลาคม 2026:** [Same exporter / QA durable pair](docs/exporter-durable-pair.md) ordinary1051syntheticspans ACKครบทั้ง6conditions/saves33→17; controlled120ms pre-fsync productionACK192 vsQA320ยังdrop859/731ภายใน900msเดิม. Outerguardผ่านเพราะเก็บinnerFAILEDและreload/cleanupหลักฐานครบ ไม่ใช่performance/captureacceptance. ยังไม่adoptproduction; ถัดไปsource-matched hosted comparison และactualSDK/targetcostก่อนเลือกoptimization. Main/sourceรอบนี้บันทึกในTEST-RUNS/QUALITY; performance≤10%/realpilot/usertrial/releaseเกณฑ์เดิมยังเปิด
+
 ปรับแผนวันที่ 1 ตุลาคม 2026 จากโค้ดฐาน `56346f2` และผลทดสอบใน [TEST-RUNS.md](docs/TEST-RUNS.md) แผนนี้กำหนดงานและเกณฑ์รับรองในอนาคต ตัวเลขเป้าหมายด้านเวลา ประสิทธิภาพ และคุณค่าต่อผู้ใช้ยังเป็นเป้าหมายที่ต้องทดลอง ไม่ใช่ผลที่ทำได้แล้ว
 
 ## ผลิตภัณฑ์ที่จะส่งมอบ
