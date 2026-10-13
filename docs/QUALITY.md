@@ -1,5 +1,16 @@
 # รอบทดสอบและปรับปรุง FlowAtlas
 
+### รอบ81 — durable group feasibility (13 ตุลาคม 2026)
+
+Solวางแผน/script/review, Lunahelper/unit/evidence, rootchecks/docs/publication. [ขอบเขต](durable-group-commit.md) QA-only snapshots35states (1051traces+64updates/history100) baseline35save/pairs18save ใช้realJsonActionStore/fsync/reload. ไม่เปลี่ยนproductionstore/exporter/ACK/deadlines ไม่ใช่HTTPcoordinator/pilot. Helperbounded35states/synchronoussaveเท่านั้น; asyncreturnไม่publishและconsume rejection; reportผูกscript/helper/fixture/coredigests. EncodedbytesderivedจากstatesและsyncCallsอนุมานsuccessfulsaves; finalbytes/reloadแยกตรวจจริง
+
+SelectedexactCIaudit18-06-12-573Z1/1: PR21/22Ubuntu24 artifacts102/105Gitfiles,28/29runnerreports/main165/171passed. Fourdiskfailuresเป็นshutdownloss/deadlineFired1 ไม่มีtimeout/rejected/transportdrops. acceptedมากกว่าACK64spansแต่ละกรณี, order/reloadตรง; PR21reorderยังไม่ถึงbatch31/32. ไม่ใช่orderbug/ไม่สรุปlostfromdiskทั้งหมดและไม่ปิดrootcauseจากfsynctimingcorrelation. Wholematrixไม่ได้audit
+
+Focused09-52-36-171Z7/7: all12conditions/2validationrejectioncontrolscomplete/reload/finalbytes/cleanuptrue, failedpair/futureunpublished/previousstateตรง. Localmedian1file155.315→84.065ms/64files281.729→136.600ms, saves35→18. ไม่ใช่SDKp95/performancepass/drainunder900ms. Pre-runintegrationreviewพบmax18pairs-onlyvalidationขัดbaseline35singles แก้ก่อนrunและไม่อ้างredtest
+
+Main09-52-54-212Z174/177FAILED3/skip0: owner-killSDK, SIGINTplain, SIGINTSDKreadiness. SDKcollector-started4833/4902ms→target-spawned4899/4959ms (inspectorlocalclock) แต่ก่อนwrapper12sยังไม่เห็นready; plainlastobservedcollector-start-requested/no lock. Startupinitกินเวลาแต่ไม่พิสูจน์targetSDK/CPU/fsync/IPCcause. Failureartifacts09-53-16-047Z/09-53-31-171Z/09-53-47-185Z retained; cleanupwrapperClosedfalse/unknownidentities/removedfalse. ไม่killguessedPID/ไม่ลบretainedworkspaces. Source09-54-57-615Z1/1passed. No unchangedmainrerun/deadlineextension; DraftPR. Productionbrowser/SDKbytesunchangedจึงไม่รันEdgeซ้ำหรืออ้างnewEdgepass
+
+ถัดไปรอบ82boundedHTTPadmission/durableACK QA prototype พร้อมrealI/O failureที่groupboundaryก่อนproductionadoption; แยกintermittentCLIstartup investigationsจากstorage. ActualSDKperformance/stablecapture/19loss/pilot/users/releaseยังเปิด ผู้ใช้ยังไม่มีbusinessappจึงไม่ขอซ้ำ
 ### รอบ80 — CLI startup milestones และการรักษาหลักฐาน (9 ตุลาคม 2026)
 
 Sol วางแผน/ตรวจการแก้, Luna ช่วย helper/privacy/artifact analysis; root รัน checks และจัดส่ง. เพิ่ม [QA milestones](cli-startup-phases.md) ผ่าน owner IPC เดิม มีเฉพาะ role/phase/time/flags และตัวอ่าน bounded20records/8KiB. QA flag ไม่เข้า target; defaultไม่พิมพ์ milestone ไม่เพิ่ม target10s/wrapper12s/retry หรือเปลี่ยน SDK/storage durability
