@@ -4702,3 +4702,83 @@ Round79 initial tests: sandbox run2026-10-07T17-37-22-862Z0/7 failedbeforeassert
 - Source2b7bced8617128b159aa67b71083c4a29db17855 commit/pushสำเร็จบน fix/durable-pair-tap-marker ต่อจาก5a40465; Draft PR26 https://github.com/lenulk/FlowAtlas/pull/26 base test/exporter-durable-pair. PRแนบกับchatแล้ว; ไม่merge/forcepush
 - CI source2b7bced push38467000481/PR38467025419 in_progress ตอนตรวจหลังpublication ยังไม่อ้างNode22 replacement pass. Gitstatusสะอาดก่อนเพิ่มpublication note; เอกสารท้ายรอบไม่เปลี่ยนtestedprogram
 - Automatic approval review ของรอบก่อนที่ติดusage limit ไม่เกิดซ้ำในการcommit/pushรอบนี้; pendinground83 HANDOFF publicationถูกบันทึกรวมในbranchรอบ84แล้ว. รายงานล้มเหลวเก่าและretainedworkspacesยังอยู่
+
+### Round85 เริ่มตรวจ (14 ตุลาคม 2026)
+
+- HEAD25b5240/branchfix/durable-pair-tap-marker Gitclean; fetchoriginสำเร็จ. อ่าน AGENTS/PLAN/HANDOFF/QUALITY/TEST-RUNSและSDK/ordinary benchmark ก่อนแก้
+- Source2b7bced push38467000481/PR38467025419 cancelledหลังdocscommit ไม่ใช้รับรอง. Latest25b5240 push38467098327/PR38467104243ยังinprogressตอนแรก; Ubuntu22 push/PR success, Ubuntu24 push success/PR failure, Windowsยังrunning. Jobs snapshotอ่าน markerStepได้null จึงไม่อ้างguardpassจากช่องว่าง ต้องอ่านartifactจริง
+- gh run view --jq ครั้งถัดไป exit1 HTTP502 GitHub jobs API. Read-only service failure ไม่ใช่test failure; artifactsdownloadแยกกำลังดำเนินเพื่อเก็บหลักฐาน ไม่เปลี่ยนเกณฑ์หรือretrytests
+- SolคุมpairedactualSDK sink-versus-durable diagnostic scope; Lunaช่วยsinkchild. Productionpolicy/deadlines/เกณฑ์10%เดิม; ยังไม่มีbusinessappหรือผู้ทดลองจึงไม่ปิดpilot/usergates
+- Read scripts/sdk-cost-probe.mjs ครั้งแรกไม่พบ (exit1); เป็นชื่อไฟล์ที่คาดผิด ไม่ใช่testหรือproductfailure. ใช้ rg --files หาไฟล์จริงก่อนอ่านต่อ ไม่มี mutation จากคำสั่งนี้
+
+## 2026-10-13T21-06-48-462Z
+
+- จุดประสงค์: Round85 selected Ubuntu round84 hosted marker repair source audit
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 25b52404b44897af6d31c5b9c8ddc94049e5c79e; dirty: true
+- หลักฐาน: `reports/tests/2026-10-13T21-06-48-462Z.tap` และ `.json`
+- Selected Ubuntu PR26 audit21-06-48-462Z1/1: mergefbc63ebe/114files各hashes/66runnerreports, main192/192สองช่อง; guard/markerParser/preload/innerreport hashesตรง. Node22 TAPcommentและNode24bare guardผ่านจริง; actual46/51calls/fd0/controlledlossยังอยู่. Ubuntu24 PR failure เป็น simulated collector component cost ไม่ใช่parser; Windowsยังไม่อ่านartifactชุดนี้ ไม่อ้างwholematrixpass
+- Ubuntu24 PR原simulated disk failure: ACK128/drop923/accepted192/sync1059.619ms และ ACK160/drop891/accepted224/sync1214.223ms; dropทั้งหมดshutdown/reloadVerifiedtrue ไม่มีoverflow/invalid/rejected/timeout/transport. เป็นsource-matchedordinarycomponent failure ไม่ใช่newparserfailureหรือlost-from-diskทั้งหมด; stablecapture/historicalfailureยังเปิด
+- Jobs API snapshotครั้งต่อไป HTTP502/exit1อีกครั้ง จึงหยุด pollingjobsซ้ำ; runlistยังinprogressและselectedartifactauditเป็นหลักฐานที่ใช้ได้. ไม่อ่านnullหรือtruncatedjobsเป็นpass; ไม่เปลี่ยนaccount/networksettingsเพื่อแก้servicefailure
+
+## 2026-10-13T21-09-45-476Z
+
+- จุดประสงค์: Round85 full PR26 matrix source audit including Windows Node22 marker
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 25b52404b44897af6d31c5b9c8ddc94049e5c79e; dirty: true
+- หลักฐาน: `reports/tests/2026-10-13T21-09-45-476Z.tap` และ `.json`
+- Full PR26 matrix audit21-09-45-476Z1/1: 4artifacts/132runnerreports/114exactfilesต่อชุดตรงmergefbc63ebe; main192/192ทุกช่อง. Guard/parser/preload/innerreport hashesตรงและguardผ่านทั้งWindows/Linux Node22/24. Auditชื่อsubtestยังใช้selectedUbuntuจากscriptเดิมแต่assertentries4/summary4ยืนยันscopeครบPRmatrix ไม่ใช่pushmatrix. Controlled24conditionsยังloss/reloadตรง; ordinary24conditionsACKครบ. Source-matchedNode22parserrepairยืนยันจริงแล้ว ไม่ปิดproductiondelivery/performance. Solsyntaxchecknew3scripts exit0(ไม่ใช่testpass)
+
+## 2026-10-13T21-10-43-842Z
+
+- จุดประสงค์: Round85 paired actual SDK sink versus real durable collector
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 25b52404b44897af6d31c5b9c8ddc94049e5c79e; dirty: true
+- หลักฐาน: `reports/tests/2026-10-13T21-10-43-842Z.tap` และ `.json`
+
+### Round85 paired SDK focused verification
+
+- Focused21-10-43-842Z1/1 report sdk-durable-pair-21-10-44-133Z: all6conditions actualSDKspans1051/clientACK1051/drop0; businessresponses1050+metrics1ตรง; peakrequests≤2/server202finished=exporterbatches; target/servicecloseexit0/ownedworkspacesremoved. Durable3conditionshistory100/reloadfullsavedstateตรง/failures0 ไม่ใช่independentrequest-orderproof
+- Sinkp95 9.717/8.064/9.324ms vs durable13.618/16.294/23.071ms ตามpairedrounds. Durablesaves34/37/35/realsync35.645/38.996/43.678ms. TargetCPUuser+system sink593/579/609ms vsdurable500/703/719ms; maxRSSรายงานnumeric. เป็นsameactualSDK syntheticworkloadแต่receivingpathsต่างทั้งnormalization/validation/storage/observer ไม่ใช้ลบmediansข้ามbenchmarkหรืออ้างcausalstorage-onlycost/performance≤10%pass
+- Scripts3 frozenก่อนfocused; staticreviewแก้เก็บservicecountersแม้capturefailและexact-once summary/202batchaccountingก่อนrunแรก ไม่มีprod/preload/deadlinechange. CIเพิ่มpaired diagnostic serialstepก่อนexistingSDKbenchmark. Rootsourcecheckแยกหลังmain; no newEdgeclaim
+- Read-only CIM process inventoryในsandboxถูกปฏิเสธ access; ค่าศูนย์จากpipelineหลังerrorใช้ไม่ได้ ไม่ตีความว่าไม่มีprocess. ตรวจซ้ำแบบapprovedreadพร้อมErrorActionStop/ตัวเลขเท่านั้น ไม่แสดงcommandlineหรือkillprocess
+
+## 2026-10-13T21-11-43-275Z
+
+- จุดประสงค์: Round85 final main regression with paired SDK diagnostic source frozen
+- ผล: ไม่ผ่าน — 179/192; failed 13; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 25b52404b44897af6d31c5b9c8ddc94049e5c79e; dirty: true
+- หลักฐาน: `reports/tests/2026-10-13T21-11-43-275Z.tap` และ `.json`
+- ไม่ผ่าน: test\\adapter-update.test.mjs
+- ไม่ผ่าน: CLI owner-kill closes owned services and lock (plain HTTP)
+- ไม่ผ่าน: CLI owner-kill closes owned services and lock (HTTP SDK flush)
+- ไม่ผ่าน: CLI SIGINT closes owned services and lock (plain HTTP)
+- ไม่ผ่าน: CLI SIGINT closes owned services and lock (HTTP SDK flush)
+- ไม่ผ่าน: CLI SIGTERM closes owned services and lock (plain HTTP)
+- ไม่ผ่าน: CLI SIGTERM closes owned services and lock (HTTP SDK flush)
+- ไม่ผ่าน: startup owner disconnected prevents target launch and releases storage
+- ไม่ผ่าน: CLI doctor checks registered entry, matching adapters, ports and storage without creating state
+- ไม่ผ่าน: doctor reports syntax, adapter mismatch and lock without changing owner files
+- ไม่ผ่าน: app crash after readiness fails the CLI and releases collector port and lock
+- ไม่ผ่าน: real OTel preload captures cjs HTTP/Undici fan-out and isolates concurrent requests
+- ไม่ผ่าน: real OTel preload captures mjs HTTP/Undici fan-out and isolates concurrent requests
+- Resume15Oct: main21-11-43-275Zจบแล้ว179/192FAILED13/skip0. write_stdin session54041เดิม Unknownprocessidเพราะsessionเก่าหาย ไม่ใช่testใหม่หรือหลักฐานผลหาย; ใช้runnerJSON/TAPบนdiskยืนยันผล. ไม่รันmainซ้ำ. CIMapprovedreadก่อนพักพบ13Nodeprocesses/406.68MiB แต่CommandLinefilterไม่ยืนยันownership จึงไม่อ้างว่าไม่มีFlowAtlasprocessหรือkillใคร
+
+## 2026-10-15T05-43-06-973Z
+
+- จุดประสงค์: Round85 isolated source regression after resumed main failure audit
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 25b52404b44897af6d31c5b9c8ddc94049e5c79e; dirty: true
+- หลักฐาน: `reports/tests/2026-10-15T05-43-06-973Z.tap` และ `.json`
+
+### Round85 final audit (15 ตุลาคม2026)
+
+- Main21-11-43-275Z179/192FAILED13, default2workers/skip0; actualsource15Oct05-43-06-973Z1/1ผ่าน. โปรแกรม117filesในfocused/main/current hashesตรงทั้งหมด; src/public/examplesไม่มีdiff. ไม่rerunmain/no deadlineextension/newEdgeclaim
+- Main failuresเก็บTAP/JSON/fixturesตามจริง: adapter-update nativeexit3221226505; CLIowner-kill/SIGINT/SIGTERM plain+SDK6; unconfirmedownerdisconnected; doctor2; appcrashafterready; CJS/MJSactualOTel2. CleanupบางกรณีwrapperClosedfalse/identitiesunknown/retained; ไม่อ้างcleanupcompleteหรือdeleteunknownlocks
+- Solreadonlyreviewก่อนinterruptionไม่พบblockerต่อQA Draft; usage limitทำให้turnถัดไปของSolหยุด ไม่มีการเปลี่ยนaccount/reset. Rootตรวจsource/hash/docsต่อโดยไม่เปลี่ยนfrozenQAโปรแกรมหลังtests. CIserialstepเพิ่มpairedcomparisonก่อนexistingSDKcost
+- Parent25b5240 latestAPI push38467098327success/PR38467104243failure; source-matchedPRartifactauditยืนยันmarkerpassed4ช่อง/main192ทุกช่อง แต่Ubuntu24ordinarysimulateddiskACK128/drop923และACK160/drop891/reloadตรง จึงไม่ปิดslowdiskdelivery

@@ -149,6 +149,11 @@ jobs:
         env:
           FLOWATLAS_TEST_PURPOSE: CI durable pair controlled slow fsync preserves inner shutdown loss and reload
         run: node scripts/run-tests.mjs scripts/exporter-durable-pair-guard.mjs
+      - name: Actual SDK sink versus durable collector pair
+        if: ${{ !cancelled() }}
+        env:
+          FLOWATLAS_TEST_PURPOSE: CI actual SDK paired sink and durable collector diagnostic
+        run: node scripts/run-tests.mjs scripts/benchmark-sdk-durable-pair.mjs
       - name: Actual SDK HTTP component cost
         if: ${{ !cancelled() }}
         env:
