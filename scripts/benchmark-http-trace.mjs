@@ -10,6 +10,7 @@ import { performance } from 'node:perf_hooks';
 import { release } from 'node:os';
 import { percentile, comparePairPerformance, aggregatePerformance } from './benchmark-statistics.mjs';
 import { parseTiming, exporterTimingFields, storageTimingFields } from './trace-timing-report.mjs';
+import { observeBenchmarkStartup } from './benchmark-startup-evidence.mjs';
 
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
 const storageRoot = join(root, 'reports', 'storage');
@@ -228,8 +229,12 @@ async function runCondition(condition, runIndex, manifest, profileDirectory = nu
   delete childEnv.FLOWATLAS_TRACE_TIMING;
   if (diagnosticTiming) childEnv.FLOWATLAS_TRACE_TIMING = '1';
   delete childEnv.NODE_OPTIONS;
+  delete childEnv.FLOWATLAS_QA_STARTUP;
   delete childEnv.FLOWATLAS_BENCHMARK_TARGET_PROFILE;
-  if (profileScope === 'target') childEnv.FLOWATLAS_BENCHMARK_TARGET_PROFILE = join(profileDirectory, `round-${runIndex}-${condition}.cpuprofile`);
+  if (profileScope === 'target') {
+    childEnv.FLOWATLAS_BENCHMARK_TARGET_PROFILE = join(profileDirectory, `round-${runIndex}-${condition}.cpuprofile`);
+    childEnv.FLOWATLAS_QA_STARTUP = '1';
+  }
   for (const key of Object.keys(childEnv)) if (key.startsWith('OTEL_')) delete childEnv[key];
   const options = ['--project', 'benchmark-http', '--entry', 'server.mjs'];
   const args = profileScope === 'collector' ? [join(root, 'scripts', 'inspect.mjs'), ...options]
@@ -240,6 +245,9 @@ async function runCondition(condition, runIndex, manifest, profileDirectory = nu
     `--cpu-prof-name=round-${runIndex}-${condition}.cpuprofile`);
   const child = spawn(process.execPath, args, { cwd: root, env: childEnv, stdio: ['pipe', 'pipe', 'pipe'] });
   const closePromise = new Promise((resolveClose) => child.once('close', (code, signal) => resolveClose({ code, signal })));
+  const startupObserver = profileScope === 'target'
+    ? observeBenchmarkStartup(child, () => existsSync(join(workspace, 'data', 'actions', '.writer.lock')))
+    : null;
   const conditionController = new AbortController();
   const conditionTimer = setTimeout(() => conditionController.abort(), 30000);
   const outputRef = { value: '' };
@@ -252,7 +260,8 @@ async function runCondition(condition, runIndex, manifest, profileDirectory = nu
     expectedHttpSpans: condition === 'traced' ? expectedTraceSpans : 0,
     warmup: null, measurement: null, app: null, trace: null, dropReasons: null, rejectionStatuses: null, transport: null, storageDiagnostics: [], metricsEndpoint: null,
     gracefulShutdown: false, processCleanupConfirmed: false, workspaceRemoved: false, retainedWorkspace: null,
-    valid: false, failure: null };
+    valid: false, failure: null,
+    startupEvidence: startupObserver ? { atFailure: null, afterCleanupAttempt: null } : null };
   let stopSent = false;
   try {
     const ready = await waitForReady(child, outputRef, conditionController.signal);
@@ -284,6 +293,7 @@ async function runCondition(condition, runIndex, manifest, profileDirectory = nu
   } catch (error) {
     result.failure = ['inspector_readiness_timeout', 'inspector_exited_before_ready', 'condition_deadline'].includes(error.message)
       ? error.message : 'workload_or_inspector_error';
+    if (startupObserver) result.startupEvidence.atFailure = startupObserver.snapshot();
   } finally {
     clearTimeout(conditionTimer);
     if (child.exitCode === null && child.signalCode === null) {
@@ -338,6 +348,10 @@ async function runCondition(condition, runIndex, manifest, profileDirectory = nu
         result.retainedWorkspace = relative(root, actualWorkspace).replaceAll('\\', '/'); }
     } else {
       result.retainedWorkspace = relative(root, actualWorkspace).replaceAll('\\', '/');
+    }
+    if (startupObserver) {
+      result.startupEvidence.afterCleanupAttempt = startupObserver.snapshot();
+      startupObserver.dispose();
     }
   }
   return result;

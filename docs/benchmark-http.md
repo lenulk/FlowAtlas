@@ -1,5 +1,11 @@
 # Fixture HTTP trace overhead benchmark
 
+## Target-profile startup evidence
+
+Target profiling (`FLOWATLAS_BENCHMARK_PROFILE=target`) also enables the existing QA startup phases in its owned CLI. Each condition records `startupEvidence.atFailure` when the readiness/workload block throws and `startupEvidence.afterCleanupAttempt` after shutdown and workspace handling. Each snapshot contains the existing allowlisted owner lifecycle counters/exit code/signal/lock observation and at most 32 validated phase records with invalid/overflow counters. Ordinary and collector-profile runs have `startupEvidence=null`; an inherited `FLOWATLAS_QA_STARTUP` is removed from the child environment unless target profiling is selected.
+
+No raw stdout/stderr, error text, PID, port, URL or token enters these snapshots. `closed` describes the observed CLI child; it does not prove descendant cleanup. A missing writer lock does not establish a safe cleanup by itself. The existing failure, deadlines and workspace-retention criteria still apply. See [round88 evidence](round88-target-profile.md) for the incomplete profile run that motivated this reporting change; it has no retrospective exit/phase evidence.
+
 ## Opt-in shutdown/storage diagnostics
 
 For investigation only, set `FLOWATLAS_BENCHMARK_TIMING=1` and run `node scripts/run-tests.mjs scripts/benchmark-http-trace.mjs`. PowerShell: `$env:FLOWATLAS_BENCHMARK_TIMING='1'`; clear it with `Remove-Item Env:FLOWATLAS_BENCHMARK_TIMING` before an ordinary measurement. The same workload and capture gates apply, but performance is unassessable (`diagnostic_run`, `met=null`). CI runs ordinary and diagnostic benchmarks separately.
