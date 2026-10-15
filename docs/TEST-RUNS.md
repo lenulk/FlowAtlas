@@ -5185,3 +5185,8 @@ Round79 initial tests: sandbox run2026-10-07T17-37-22-862Z0/7 failedbeforeassert
 - commit: 948336e363e5ba1d258ca95327183807e6488564; dirty: true
 - หลักฐาน: `reports/tests/2026-10-15T13-40-54-795Z.tap` และ `.json`
 - Correctedfinalinventory13-40-54-795Z1/1:123rawprogramhashes match finalparity/main/source. Gitbaselinecomparison rawdifferences onlytwo testfiles (git-metadata-child/startup-phase-isolation); UTF8roundtrip+LF-normalizedtext equal and Gitdiff src/public/examples/test/package empty. Do notclaimrawGitbyteequalityallfiles. No EOLfileschanged; source/tests stillfrozen. Source13-39-23-584Z1/1; Solfinalreadonlyreview noblocker, QA contains no privatepayload.
+
+### Round89 publication
+- QAcode0758611d81d33729c4a484ee8bbfa347eab2da99 committed/pushed on ownbranchdiag/sdk-normalization-allocation; DraftPR31 https://github.com/lenulk/FlowAtlas/pull/31 base diag/target-cpu-profile attachedtochat. No productionrefactor remains/no merge/forcepush. LatestcodePR38744997973/push38744986369 inprogress atpublicationcheck. Parent948PR38741953750/push38741944846 success4/4; rawPRauditdone, notrawpushaudit.
+- Finalmain205/parity-only1/source1/inventory1 passed, no costremeasurement; productionadoptionrejected3/5 and originalfailures/EOLauditfailure preserved. Docs-onlyfollowup leaves123testedprogrambytesunchanged. No performance/nativecause/pilot/releaseclaim.
+
