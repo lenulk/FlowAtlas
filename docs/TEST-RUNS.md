@@ -5096,3 +5096,97 @@ Round79 initial tests: sandbox run2026-10-07T17-37-22-862Z0/7 failedbeforeassert
 - Code5385a60079ef794ceed892149e486318bbfd93c0 committed/pushed on own branch diag/target-cpu-profile; Draft PR30 https://github.com/lenulk/FlowAtlas/pull/30 base fix/shared-git-metadata-budget. No merge/forcepush. Commit includes mainFAILED204/205 and all diagnostic/audit failures. PushCI38741838058 queued at publicationcheck; no hostedpassclaim.
 - Sol led design/review/analyzers; Luna owned actualchildprivacy tests; Root auditedCI/ranalltests/docs/publication. Docs-only follow-up does not change122testedprogramfiles. Performance/pilot/users/release remain open.
 
+
+### Round89 initial inspection
+- Clean948336e fetched; own branch diag/cjs-native-startup. LatestPR38741953750/push38741944846 inprogress; earliercode runs cancelled. Read requiredhandoff/plan/quality/ledger and install/linuxnotes. Windows Node24.19.0 uses bundledruntime. Application eventlog read for CJS failure13:16–13:18UTC denied inside sandbox (unauthorized operation), no log records obtained; retry readonly with permission requested, no productrootcause inference.
+
+- Escalated readonlyApplicationEventquery completed: matchingNodeEvents0 in13:16–13:18UTC. No AppName=node.exe record; this does not identify DLL/cause or prove no Windows fault. No logs/ports/PIDs changed.
+- Primary Microsoft NTSTATUS reference maps3221225794=0xC0000142 to STATUS_DLL_INIT_FAILED; no DLL identity or productrootcause proved. Reference https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-erref/596a1078-e883-4972-9bbc-49e60bebca55 . LinuxPRmainstepsfinishedwithoutfailure; WindowsstillChromiuminstall at lastsnapshot, no crosshostpassclaim.
+- Round89 principalwork selected: SDK normalization allocation candidate preserving all timestamp parse/cache semantics. No startupfix justified by DLLlabel/eventquery. Branch renamed diag/sdk-normalization-allocation. PR30merge225c15a065a8439f3bfa9b8602fae35320105b11; latestLinuxjobs2/2completed/success, Windows22progressing/Windows24Chromiuminstall at lastread. DownloadLinuxartifacts pending; not fullmatrixverification.
+- Pre-measure adoption eligibility: strict boundary/getter/Date.parse/cache parity and candidate faster in all five rotated costpairs, with small shared-validation refactor only. Mixed/noisy gains mean no productionadoption in thisround. This is an experimentselection rule, not a release/performance threshold change. Source remains parent948336e; QA-only candidate added; no tests yet.
+
+## 2026-10-15T13-29-35-710Z
+
+- จุดประสงค์: Round89 normalization allocation equivalence and five rotated isolated cost pairs, no HTTP performance verdict
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 948336e363e5ba1d258ca95327183807e6488564; dirty: true
+- หลักฐาน: `reports/tests/2026-10-15T13-29-35-710Z.tap` และ `.json`
+- First normalizationexperiment13-29-35-710Z1/1:22variants/getterorder/3Date.parseoverride modes/cache checks pass. Allfive rotatedpairs candidate faster; reference median128.4007ms/candidate115.4493ms (-10.087%isolatedelapsed), not HTTPp95. Predeclared eligibility met; proceed smallsharedvalidation productionrefactor preserving genericclean freshcopy and parsing semantics. No timingrerun to seekgain. ParentPR30latestjobs4/4success; downloadingall4artifacts complete beforeaudit.
+
+## 2026-10-15T13-30-24-365Z
+
+- จุดประสงค์: Round89 PR30 exact merge-source four-artifact audit preserving prior local CJS failure
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 948336e363e5ba1d258ca95327183807e6488564; dirty: true
+- หลักฐาน: `reports/tests/2026-10-15T13-30-24-365Z.tap` และ `.json`
+- ParentPR30audit13-30-24-365Z1/1: all136runnerreports/122exactprogramfiles/main205all4; metadata16controls/explicitbrowser/packagegatespassed. OrdinaryHTTPperfFAILall4: Linux22+54.714/Linux24+134.587/Windows22+232.404/Windows24+228.785%. Hostedpassdoesnoterase locallastCJS3221225794/nativeunknown. QA allocationcandidate firstmeasurementmeetseligibility; adoptingsharedvalidator afterRootreview.
+
+## 2026-10-15T13-34-17-864Z
+
+- จุดประสงค์: Round89 production normalization versus pinned legacy parity and actual paired cost
+- ผล: ผ่าน — 38/38; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 948336e363e5ba1d258ca95327183807e6488564; dirty: true
+- หลักฐาน: `reports/tests/2026-10-15T13-34-17-864Z.tap` และ `.json`
+- Productionfocused13-34-17-864Z38/38PASS includes exactlegacyparity+exporter/contracts/cache/newfreshcopytest. Root incorrectly combined costscript with other testfiles/default2workers; cost overlaps other QA and is not isolated eligibility evidence. Retain fulltimings; run standalone once for actualproduction cost under predeclared five-pairrule, not rerun for passingresult. Source/tests unchanged.
+
+## 2026-10-15T13-34-44-513Z
+
+- จุดประสงค์: Round89 isolated actual production normalization cost, earlier combined run retained as overlapping QA
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 948336e363e5ba1d258ca95327183807e6488564; dirty: true
+- หลักฐาน: `reports/tests/2026-10-15T13-34-44-513Z.tap` และ `.json`
+- Isolatedactualproduction13-34-44-513Z1/1 parityPASS but only3/5pairs faster, median126.4169→116.7318ms (-7.661%isolated) with rounds1/2slower. Fails predeclaredallfiveadoptionrule; REJECTproductionrefactor and restoreonlyownsrc2files/newtest to initialclean948baseline. EarlierQAclone5/5 cannotcertifyactualrefactor. No more timingattempts for adoption; retainQAexperiment/negativefinding, no HTTPspeedclaim.
+
+## 2026-10-15T13-37-45-822Z
+
+- จุดประสงค์: Round89 final rejected-candidate parity and restored production provenance only, no cost remeasurement
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 948336e363e5ba1d258ca95327183807e6488564; dirty: true
+- หลักฐาน: `reports/tests/2026-10-15T13-37-45-822Z.tap` และ `.json`
+- FinalQAparity13-37-45-822Z1/1: restoredproduction sourceall3files matches948baseline; pinnedreference/localrejectedcandidate/production boundaryparitypass; costMeasuredfalse/costnull/rejecteddecision retained. No further cost attempt. Finalmain running default2workers source/tests frozen; production src and originaltests diffempty.
+
+## 2026-10-15T13-37-53-630Z
+
+- จุดประสงค์: Round89 final main regression after rejecting allocation refactor and restoring production baseline
+- ผล: ผ่าน — 205/205; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 948336e363e5ba1d258ca95327183807e6488564; dirty: true
+- หลักฐาน: `reports/tests/2026-10-15T13-37-53-630Z.tap` และ `.json`
+
+## 2026-10-15T13-39-23-584Z
+
+- จุดประสงค์: Round89 standalone source regression on restored production and final QA inventory
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 948336e363e5ba1d258ca95327183807e6488564; dirty: true
+- หลักฐาน: `reports/tests/2026-10-15T13-39-23-584Z.tap` และ `.json`
+- Finalmain13-37-53-630Z205/205PASS/failed0/skip0/default2workers, including CJS/MJS actualSDK in thiscondition. No nativeabort observed here; not a repair/rootcauseproof of historicalDLL/nativeerrors. Productionthreefiles/originaltest restoredbeforemain; earlier38/38 testedrejectedrefactor and is not finalsourceproof. No newbrowserflag used locally; hostedparentexplicitbrowser passed.
+
+## 2026-10-15T13-39-58-766Z
+
+- จุดประสงค์: Round89 final inventory equality and restored production byte audit
+- ผล: ไม่ผ่าน — 0/1; failed 1; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 948336e363e5ba1d258ca95327183807e6488564; dirty: true
+- หลักฐาน: `reports/tests/2026-10-15T13-39-58-766Z.tap` และ `.json`
+- ไม่ผ่าน: Round89 final QA main source inventories match and production remains baseline
+- Initialfinalinventoryaudit13-39-58-766Z FAILED0/1: all3 finalrunnerinventories matchcurrent, but rawGitcomparison differs test/git-metadata-child.test.mjs despiteGitstatusclean. Investigate EOL before claiming baselinebyteequality; do not change source or test to hidefailure. Prior3srcQAhashchecks stillpass.
+
+## 2026-10-15T13-40-54-795Z
+
+- จุดประสงค์: Round89 corrected final inventory and explicit UTF8 CRLF-only baseline comparison
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 948336e363e5ba1d258ca95327183807e6488564; dirty: true
+- หลักฐาน: `reports/tests/2026-10-15T13-40-54-795Z.tap` และ `.json`
+- Correctedfinalinventory13-40-54-795Z1/1:123rawprogramhashes match finalparity/main/source. Gitbaselinecomparison rawdifferences onlytwo testfiles (git-metadata-child/startup-phase-isolation); UTF8roundtrip+LF-normalizedtext equal and Gitdiff src/public/examples/test/package empty. Do notclaimrawGitbyteequalityallfiles. No EOLfileschanged; source/tests stillfrozen. Source13-39-23-584Z1/1; Solfinalreadonlyreview noblocker, QA contains no privatepayload.
+
+### Round89 publication
+- QAcode0758611d81d33729c4a484ee8bbfa347eab2da99 committed/pushed on ownbranchdiag/sdk-normalization-allocation; DraftPR31 https://github.com/lenulk/FlowAtlas/pull/31 base diag/target-cpu-profile attachedtochat. No productionrefactor remains/no merge/forcepush. LatestcodePR38744997973/push38744986369 inprogress atpublicationcheck. Parent948PR38741953750/push38741944846 success4/4; rawPRauditdone, notrawpushaudit.
+- Finalmain205/parity-only1/source1/inventory1 passed, no costremeasurement; productionadoptionrejected3/5 and originalfailures/EOLauditfailure preserved. Docs-onlyfollowup leaves123testedprogrambytesunchanged. No performance/nativecause/pilot/releaseclaim.
+

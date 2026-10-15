@@ -1,5 +1,13 @@
 # รอบทดสอบและปรับปรุง FlowAtlas
 
+## รอบ89 — ปฏิเสธ normalization allocation refactor จากหลักฐานจริง
+
+Final parity-only13-37-45-822Z1/1/main13-37-53-630Z205/205/source13-39-23-584Z1/1ผ่าน. Inventoryinitial13-39-58-766ZFAILED rawGitbytesdiff2testfiles; corrected13-40-54-795Z1/1พิสูจน์UTF8roundtrip/LFequivalence/Gitdiffempty และ123rawprogramhashesตรงสามfinalruns ไม่ใช้LFnormalizationเพื่อกลบfunctionalchange. ไม่แก้สองEOLfiles; productionrefactorไม่มีเหลือ/ไม่มีlocalbrowserflag/no costrerun
+
+ดู [experiment/limits](sdk-normalization-allocation.md). ParentPR30audit13-30-24-365Z1/1ครบ136reports/122exactfiles/main205ทุก4channels แต่performance FAILED+54.714–232.404%. MainlocalCJSรอบ88ยังrootcauseunknown; WindowsSTATUS_DLL_INIT_FAILEDเป็นเพียงstatuslabel ไม่ชี้DLLและไม่ใช่เหตุผลเปลี่ยนruntime
+
+กำหนดก่อนวัดว่า parityต้องผ่านและcandidateเร็วทั้ง5rotatedpairs. FirstQAclone13-29-35-710Z1/1 parity22/getter/parseoverride/cacheผ่าน และmedian-10.087%/5of5. Actualsharedvalidatorrefactorfocused13-34-17-864Z38/38ผ่าน แต่Rootรวมcostกับtestfilesทำให้overlap (เก็บ2of5/medianช้าลง8.092% ไม่ใช้eligibility). Standaloneที่แก้isolation13-34-44-513Z1/1 parityผ่านแต่actualเร็ว3of5/median-7.661% จึงrejectadoptionตามเกณฑ์ ไม่ใช้cloneหรือmedianอย่างเดียวรับรองactualimplementation. คืนเฉพาะsrc/testที่เราแก้ทั้งหมดเป็น948baseline; เก็บQAexperiment+failures/negativefindings. FinalrestorationchecksในTEST-RUNS ไม่reruncost/ordinaryHTTPเดิมเพื่อหาผลที่ดีขึ้น
+
 ## รอบ88 — target profile ไม่ครบและ QA startup evidence
 
 Final focused18/profile1/source1/inventory1ผ่าน และ122filesตรงทุกrun; **main FAILED204/205** CJS OTel target exit3221225794ก่อนready (ต่างจาก historical3221226505/rootcauseunknown); MJSผ่าน. No rerun/skip/deadlinechange. Newprofileครบ6conditions/26phases/exit0/lockfalse/3153capture0drops แต่ metnull. CompleteprofileauditinitialFAILED unsortedexpectedkeysแล้วแก้เฉพาะanalyzer/corrected1/1; originalprofilefailureยังเก็บ. FullprofileพบnormalizeSdkHttpSpanร่วมกับOTel/Node/profilerเป็นcandidate ยังไม่productionoptimization/p95proof
