@@ -4782,3 +4782,9 @@ Round79 initial tests: sandbox run2026-10-07T17-37-22-862Z0/7 failedbeforeassert
 - Main failuresเก็บTAP/JSON/fixturesตามจริง: adapter-update nativeexit3221226505; CLIowner-kill/SIGINT/SIGTERM plain+SDK6; unconfirmedownerdisconnected; doctor2; appcrashafterready; CJS/MJSactualOTel2. CleanupบางกรณีwrapperClosedfalse/identitiesunknown/retained; ไม่อ้างcleanupcompleteหรือdeleteunknownlocks
 - Solreadonlyreviewก่อนinterruptionไม่พบblockerต่อQA Draft; usage limitทำให้turnถัดไปของSolหยุด ไม่มีการเปลี่ยนaccount/reset. Rootตรวจsource/hash/docsต่อโดยไม่เปลี่ยนfrozenQAโปรแกรมหลังtests. CIserialstepเพิ่มpairedcomparisonก่อนexistingSDKcost
 - Parent25b5240 latestAPI push38467098327success/PR38467104243failure; source-matchedPRartifactauditยืนยันmarkerpassed4ช่อง/main192ทุกช่อง แต่Ubuntu24ordinarysimulateddiskACK128/drop923และACK160/drop891/reloadตรง จึงไม่ปิดslowdiskdelivery
+
+### Round85 publication (15 ตุลาคม2026)
+
+- โค้ด4acdc2d commit/pushแล้วบนdiag/sdk-durable-pair ต่อจาก25b5240; Draft PR27 https://github.com/lenulk/FlowAtlas/pull/27 basefix/durable-pair-tap-marker แนบกับchatแล้ว ไม่merge/forcepush. เอกสารfinalส่งพร้อมfocusedpass/mainFAIL13/sourcepassตรงจริง
+- Solfinalreadonlyreviewไม่มีblockerต่อQA Draft; เสนอรอบ86ตรวจpre-lock synchronousstartup window: code-version filehash/Gitmetadata/projectsnapshot/storelock/listenผ่านQA numeric phasesเดิมก่อนrepair. เป็นhypothesisจากลำดับsource/TAP ยังไม่พิสูจน์causeเดียวกับnativeexit ไม่ขยายdeadlineหรือใช้passingfixtureปิดhistoricalfailures
+- HostedCIของรอบ85ยังต้องตรวจsource-matchedผลจริง; docscommitท้ายรอบไม่เปลี่ยน117testedprogramfiles. Performance≤10%/slowdiskdelivery/realbusinesspilot/users/releaseยังเปิด
