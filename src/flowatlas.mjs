@@ -14,7 +14,12 @@ function codeFiles(root, directory) {
   });
 }
 
-export function getCodeVersion(root) {
+export function getCodeVersion(root, onStartupPhase = null) {
+  const phase = (name) => {
+    if (typeof onStartupPhase !== 'function') return;
+    try { onStartupPhase(name); } catch { /* QA milestones do not change the code snapshot. */ }
+  };
+  phase('version-file-hash-started');
   const files = {};
   for (const file of [...codeFiles(root, 'src'), ...codeFiles(root, 'public'), ...codeFiles(root, 'examples')].sort()) {
     files[file] = createHash('sha256').update(readFileSync(join(root, file))).digest('hex');
@@ -22,8 +27,10 @@ export function getCodeVersion(root) {
   const digest = createHash('sha256')
     .update(Object.entries(files).map(([file, hash]) => `${file}\0${hash}`).join('\n'))
     .digest('hex');
+  phase('version-file-hash-finished');
   let commit = null;
   let dirty = null;
+  phase('version-git-metadata-started');
   try {
     const gitRoot = execFileSync('git', ['rev-parse', '--show-toplevel'], { cwd: root,
       stdio: ['ignore', 'pipe', 'ignore'] }).toString().trim();
@@ -36,6 +43,7 @@ export function getCodeVersion(root) {
   } catch {
     // A file digest still identifies the running code before the first commit.
   }
+  phase('version-git-metadata-finished');
   return { commit, dirty, digest, files: Object.freeze(files) };
 }
 

@@ -23,6 +23,13 @@ test('QA startup phases validate role-specific milestones and return canonical r
     sample('inspector', 'owner-rejected'), sample('inspector', 'target-spawn-requested'),
     sample('inspector', 'target-spawned'), sample('inspector', 'target-readiness-observed'),
     sample('inspector', 'target-readiness-failed'),
+    sample('inspector', 'version-file-hash-started'), sample('inspector', 'version-file-hash-finished'),
+    sample('inspector', 'version-git-metadata-started'), sample('inspector', 'version-git-metadata-finished'),
+    sample('inspector', 'project-snapshot-started'), sample('inspector', 'project-snapshot-finished'),
+    sample('inspector', 'store-initialize-started'), sample('inspector', 'store-initialize-finished'),
+    sample('inspector', 'store-lock-started'), sample('inspector', 'store-lock-finished'),
+    sample('inspector', 'store-load-started'), sample('inspector', 'store-load-finished'),
+    sample('inspector', 'listeners-started'), sample('inspector', 'listeners-finished'),
   ];
   for (const value of valid) {
     const record = createQaStartupPhase(value);
@@ -76,10 +83,42 @@ test('QA startup parser caps records and validates its limit', () => {
   parser.write(frame(sample('inspector', 'target-spawned')));
   assert.equal(parser.snapshot().records.length, 2);
   assert.equal(parser.snapshot().overflowFrames, 1);
-  for (const limit of [0, 21, 1.5, NaN]) {
+  for (const limit of [0, 33, 1.5, NaN]) {
     assert.throws(() => createQaStartupPhaseParser({ limit }), TypeError);
   }
-  assert.doesNotThrow(() => createQaStartupPhaseParser({ limit: 20 }));
+  assert.doesNotThrow(() => createQaStartupPhaseParser({ limit: 32 }));
+});
+
+test('default parser admits all 29 phases, drops extras, and counts malformed and overflow frames', () => {
+  const phases = [
+    'inspector-spawn-requested', 'inspector-spawned', 'owner-check-received',
+    'owner-reply-sent', 'inspector-error', 'inspector-exited',
+    'collector-start-requested', 'collector-started', 'owner-confirm-requested',
+    'owner-confirmed', 'owner-rejected', 'target-spawn-requested', 'target-spawned',
+    'target-readiness-observed', 'target-readiness-failed',
+    'version-file-hash-started', 'version-file-hash-finished',
+    'version-git-metadata-started', 'version-git-metadata-finished',
+    'project-snapshot-started', 'project-snapshot-finished',
+    'store-initialize-started', 'store-initialize-finished',
+    'store-lock-started', 'store-lock-finished', 'store-load-started', 'store-load-finished',
+    'listeners-started', 'listeners-finished',
+  ];
+  const parser = createQaStartupPhaseParser();
+  for (let index = 0; index < phases.length; index++) {
+    const role = index < 6 ? 'wrapper' : 'inspector';
+    const extra = index === 20 ? { canary: 'private-dropped-value' } : {};
+    parser.write(frame(sample(role, phases[index], extra)));
+  }
+  parser.write(`${QA_STARTUP_PREFIX}{broken}\n`);
+  for (let index = 0; index < 4; index++) {
+    parser.write(frame(sample('wrapper', 'inspector-spawned')));
+  }
+  const result = parser.snapshot();
+  assert.equal(result.records.length, 32);
+  assert.equal(result.invalidFrames, 1);
+  assert.equal(result.overflowFrames, 1);
+  assert.equal(result.records[20].phase, 'project-snapshot-finished');
+  assert.equal(JSON.stringify(result).includes('private-dropped-value'), false);
 });
 
 test('QA startup parser counts malformed known frames and drops extra canary fields', () => {

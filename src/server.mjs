@@ -62,26 +62,37 @@ function placeOrder(inventoryUrl, actionId) {
 }
 
 export async function startServers({ port = 4173, inventoryPort = 4174, dataDir = null, actionLimit = 100, projects = [], workspace, sessionToken = null,
-  traceTiming = false,
+  traceTiming = false, onStartupPhase = null,
   onStorageError = (diagnostic) => console.error(`FlowAtlas storage: ${JSON.stringify(diagnostic)}`) } = {}) {
+  const phase = (name) => {
+    if (typeof onStartupPhase !== 'function') return;
+    try { onStartupPhase(name); } catch { /* QA milestones do not change collector startup. */ }
+  };
   const reportStorageError = (error) => {
     if (error.code !== 'FLOWATLAS_STORAGE_ERROR') return;
     try { onStorageError(storageErrorDiagnostic(error)); }
     catch { /* A diagnostic sink must not change the request result or storage cleanup. */ }
   };
-  const version = getCodeVersion(root);
+  const version = getCodeVersion(root, phase);
   if (sessionToken !== null) validateSessionToken(sessionToken);
   const workspaceRoot = resolveWorkspace(root, workspace);
+  phase('project-snapshot-started');
   const projectSources = new ProjectSources(workspaceRoot, projects);
+  phase('project-snapshot-finished');
   let store = null;
   let atlas;
   try {
     if (dataDir !== null) {
+      phase('store-initialize-started');
       const directory = resolveDataDirectory(workspaceRoot, dataDir);
-      store = new JsonActionStore(directory, { timing: traceTiming });
+      store = new JsonActionStore(directory, { timing: traceTiming, onStartupPhase: phase });
+      phase('store-initialize-finished');
     }
+    if (store) phase('store-load-started');
     atlas = new FlowAtlas(version, actionLimit, store, projectSources);
+    if (store) phase('store-load-finished');
   } catch (error) { reportStorageError(error); store?.close(); throw error; }
+  phase('listeners-started');
   const inventory = createInventoryService();
   let actualInventoryPort;
   try { actualInventoryPort = await listen(inventory, inventoryPort); }
@@ -303,6 +314,7 @@ export async function startServers({ port = 4173, inventoryPort = 4174, dataDir 
 
   try {
     const actualPort = await listen(app, port);
+    phase('listeners-finished');
     let closing;
     return {
       app, inventory, atlas, port: actualPort, inventoryPort: actualInventoryPort,

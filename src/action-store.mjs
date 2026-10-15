@@ -103,7 +103,11 @@ function validateSavedAction(action) {
 }
 
 export class JsonActionStore {
-  constructor(directory, { timing = false } = {}) {
+  constructor(directory, { timing = false, onStartupPhase = null } = {}) {
+    const phase = (name) => {
+      if (typeof onStartupPhase !== 'function') return;
+      try { onStartupPhase(name); } catch { /* QA milestones do not change storage. */ }
+    };
     this.timing = timing === true ? { saves: 0, failures: 0, totalMs: 0, maxMs: 0,
       validateMs: 0, serializeMs: 0, openMs: 0, writeMs: 0, syncMs: 0, closeMs: 0, renameMs: 0,
       validateMaxMs: 0, serializeMaxMs: 0, openMaxMs: 0, writeMaxMs: 0, syncMaxMs: 0, closeMaxMs: 0, renameMaxMs: 0 } : null;
@@ -116,9 +120,11 @@ export class JsonActionStore {
     try {
       mkdirSync(directory, { recursive: true });
       stage = 'lock';
+      phase('store-lock-started');
       const fd = openSync(this.lock, 'wx', 0o600);
       try { writeFileSync(fd, JSON.stringify({ pid: process.pid, host: hostname(), token: this.token })); }
       finally { closeSync(fd); }
+      phase('store-lock-finished');
     } catch (error) {
       throw new StorageError(error.code === 'EEXIST'
         ? 'Storage directory is locked; another collector or a stale lock may exist'
