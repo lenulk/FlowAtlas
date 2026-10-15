@@ -1,8 +1,8 @@
 import { createHash, randomUUID } from 'node:crypto';
-import { execFileSync } from 'node:child_process';
-import { readFileSync, readdirSync, realpathSync } from 'node:fs';
+import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { validateEdge, validateGraph } from './evidence-contract.mjs';
+import { createGitMetadataBudget, readGitMetadata } from './project-sources.mjs';
 
 const allowedStatuses = new Set(['observed', 'inferred', 'unknown']);
 
@@ -14,7 +14,7 @@ function codeFiles(root, directory) {
   });
 }
 
-export function getCodeVersion(root, onStartupPhase = null) {
+export function getCodeVersion(root, onStartupPhase = null, gitBudget = createGitMetadataBudget()) {
   const phase = (name) => {
     if (typeof onStartupPhase !== 'function') return;
     try { onStartupPhase(name); } catch { /* QA milestones do not change the code snapshot. */ }
@@ -28,21 +28,8 @@ export function getCodeVersion(root, onStartupPhase = null) {
     .update(Object.entries(files).map(([file, hash]) => `${file}\0${hash}`).join('\n'))
     .digest('hex');
   phase('version-file-hash-finished');
-  let commit = null;
-  let dirty = null;
   phase('version-git-metadata-started');
-  try {
-    const gitRoot = execFileSync('git', ['rev-parse', '--show-toplevel'], { cwd: root,
-      stdio: ['ignore', 'pipe', 'ignore'] }).toString().trim();
-    if (realpathSync(gitRoot) === realpathSync(root)) {
-      commit = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: root, stdio: ['ignore', 'pipe', 'ignore'] }).toString().trim();
-      dirty = execFileSync('git', ['status', '--porcelain', '--', 'src', 'public', 'examples'], {
-        cwd: root, stdio: ['ignore', 'pipe', 'ignore'],
-      }).toString().trim().length > 0;
-    }
-  } catch {
-    // A file digest still identifies the running code before the first commit.
-  }
+  const { commit, dirty } = readGitMetadata(root, ['src', 'public', 'examples'], gitBudget);
   phase('version-git-metadata-finished');
   return { commit, dirty, digest, files: Object.freeze(files) };
 }

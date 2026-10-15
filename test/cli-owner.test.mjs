@@ -90,7 +90,13 @@ if(message==='test:SIGINT'||message==='test:SIGTERM')process.emit(message.slice(
     const milestones = phases.snapshot();
     assert.equal(milestones.invalidFrames + milestones.overflowFrames, 0);
     const inspector = milestones.records.filter(record => record.role === 'inspector').map(record => record.phase);
-    const expected = ['collector-start-requested', 'collector-started', 'owner-confirm-requested', 'owner-confirmed',
+    const expected = ['collector-start-requested',
+      'version-file-hash-started', 'version-file-hash-finished',
+      'version-git-metadata-started', 'version-git-metadata-finished',
+      'project-snapshot-started', 'project-snapshot-finished',
+      'store-initialize-started', 'store-lock-started', 'store-lock-finished', 'store-initialize-finished',
+      'store-load-started', 'store-load-finished', 'listeners-started', 'listeners-finished',
+      'collector-started', 'owner-confirm-requested', 'owner-confirmed',
       'target-spawn-requested', 'target-spawned', 'target-readiness-observed'];
     assert.deepEqual(inspector, expected, 'Inspector phase order is independent of wrapper stdout delivery order');
     if (stopMode !== 'owner-kill') assert.equal(exitCode, 0, 'The controlled signal handler completes ordinary shutdown');
