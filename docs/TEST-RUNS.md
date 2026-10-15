@@ -4876,3 +4876,8 @@ Round79 initial tests: sandbox run2026-10-07T17-37-22-862Z0/7 failedbeforeassert
 - commit: a433bc1e08dbc7524c0de111328675ab1d4903b6; dirty: true
 - หลักฐาน: `reports/tests/2026-10-15T05-59-46-405Z.tap` และ `.json`
 - FullPR27matrixaudit05-59-46-405Z1/1: mergee4bf124/4artifacts/136runnerreports/117exactprogramhashesทุกช่อง; main192/192แต่ละ SDK24conditionsACK1051/drop0/reload/closeครบ/runtime-scriptdigestตรง. Ubuntu22pair1durablep954.012msต่ำกว่าsink4.038ms จึงไม่เหมารวมว่าdurableช้าทุกhost/condition. ไม่ใช่pushartifactauditหรือbaseline-relativeperformanceacceptance
+
+### Round86 publication
+
+- Sourceb466541 commit/pushแล้วบนdiag/collector-startup-subphases ต่อจากa433bc1; Draft PR28 https://github.com/lenulk/FlowAtlas/pull/28 base diag/sdk-durable-pair แนบกับchatแล้ว ไม่merge/forcepush. Solfinalreadonlyreviewไม่มีblockerสำหรับdiagDraft; initialfixture/guard/mainfailureเก็บครบไม่กลบ
+- เอกสารท้ายรอบไม่เปลี่ยน118testedprogramfiles. HostedCIรุ่นใหม่ยังต้องตรวจsource-matched; ไม่ใช้parentPR27greenรับรองround86. NextrepairsharedGitmetadatabudgetยังไม่implement/ไม่มีruntimeupgrade
