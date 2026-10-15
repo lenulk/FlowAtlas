@@ -1,6 +1,6 @@
 # ส่งต่องาน FlowAtlas
 
-ตรวจสถานะสำหรับส่งต่องานวันที่ 14 ตุลาคม 2026 เอกสารนี้เป็นจุดเริ่มอ่านงานต่อ ต้องตรวจโค้ด Git และผล CI ปัจจุบันอีกครั้งก่อนเปลี่ยนไฟล์
+ตรวจสถานะสำหรับส่งต่องานวันที่ 15 ตุลาคม 2026 เอกสารนี้เป็นจุดเริ่มอ่านงานต่อ ต้องตรวจโค้ด Git และผล CI ปัจจุบันอีกครั้งก่อนเปลี่ยนไฟล์
 
 ## เป้าหมายของเจ้าของโปรเจกต์
 
@@ -9,6 +9,10 @@
 Repository: https://github.com/lenulk/FlowAtlas; branch หลัก `master` ไม่จำเป็นต้องใช้พาธของเครื่องเดิมบนเครื่องใหม่ อ่าน [AGENTS.md](../AGENTS.md), [PLAN.md](../PLAN.md), [QUALITY.md](QUALITY.md), [TEST-RUNS.md](TEST-RUNS.md), [install.md](install.md), [linux-vm.md](linux-vm.md) ก่อนเริ่ม
 
 ## สถานะที่ตรวจแล้ว
+**รอบ85 — ตรวจส่งต่อ15 ตุลาคม2026:** โค้ด `4acdc2d` ส่งแล้วใน [Draft PR27](https://github.com/lenulk/FlowAtlas/pull/27). เพิ่ม [paired actual SDK diagnostic](sdk-durable-pair.md) บนbranch `diag/sdk-durable-pair` ต่อจาก25b5240. Solคุมorchestrator/collectorchild/review, Lunaช่วยsinkchild; driver/target/sinkหรือcollectorแยกprocessทั้งสองmode. Focused21-10-43-842Z1/1: 6conditions ACK1051/drop0/businessbytesครบ/durable reloadตรง/ownedcleanupครบ. Sinkp95 9.717/8.064/9.324ms vsdurable13.618/16.294/23.071ms ไม่ใช่storage-onlycausalproofหรือเกณฑ์performancepass. Main21-11-43-275Z179/192FAILED13/skip0 มีnativeexit3221226505(adapter-update)และstartup/doctor/CJS/MJS failures; source15Oct05-43-06-973Z1/1ผ่าน/117programhashesตรง. ไม่rerunmain/ขยายdeadline/อ้างreleaseพร้อม
+
+**ถัดไปหลังรอบ85:** ให้startup/nativeexit reliabilityมาก่อนproductionperformanceoptimization: ตรวจpre-lock synchronouswindow (code-version filehash/Gitmetadata/projectsnapshot/storelock/listen) ผ่านQA numericphasesเดิม และfailedfixture/processownershipบนsourceเดียวกัน; hypothesisยังไม่ใช่causeproof โดยไม่killunknownprocess/ลบlock. ตรวจhostedรอบ85ก่อนเลือกrepairหนึ่งประเด็น; performance≤10%/slowdiskdelivery/realpilot/users/releaseยังเปิด. PR26replacementpush25b5240ผ่าน ส่วนPRfailedUbuntu24 simulateddiskshutdownloss; fullPRartifactaudit4ช่อง132reports/114hashes/markerrepairผ่านทั้งNode22/24Windows/Linux ไม่ปิดdeliveryfailure
+
 **รอบ84 — 14 ตุลาคม 2026:** โค้ด `2b7bced` ส่งแล้วใน [Draft PR26](https://github.com/lenulk/FlowAtlas/pull/26), branch `fix/durable-pair-tap-marker` ต่อจาก5a40465. CI push38467000481/PR38467025419ยังin_progressตอนpublicationcheck. แก้ QA durable-pair guard อ่าน marker ของ Node22 TAP ที่มี `# ` นำหน้า โดยรับ Node24 bare เช่นเดิม. Parser จำกัด input/line ตรวจ schema/counters และ reject duplicate; guard ยังบังคับ innerFAILED/calls=saves/fd0/reload/cleanup เดิม. Sol คุมงานยากและ Luna ทำ regression tests. Auditรอบ83ครบ8artifacts/264runnerreports/112hashesต่อชุดตรง source push5a40465/PRmerge4cac158; main187ทุกชุด แต่ guardNode22 FAILEDทั้ง4เพราะ parser ไม่รับ comment prefix. Ordinaryทุก48conditionsครบ; controlledยังshutdownloss ไม่ใช่production repair/performance/pilot pass. Focused5/5/local actualguard1/1ผ่าน แต่ยังต้อง hostedNode22 replacement execution. Finalmain20-55-29-968Z190/192FAILED2 (CLI SIGINT plain/CJS OTel readiness), source20-57-31-660Z1/1ผ่าน/114hashesตรง; ไม่ปิด startup rootcause. Publication ดู TEST-RUNS ล่าสุด
 **ถัดไป:** ตรวจ hosted CI ของ parser fix ก่อนทำ paired actual SDK sink-versus-durable collector experiment บน fixture/workloadเดียวกัน. Sinkต้องอยู่ owned child แยกจาก driver เช่น collector; ไม่ลบค่า medianข้ามbenchmarkเพื่ออ้าง causal cost. เกณฑ์10%/deadlineเดิม; realpilot/usersยังขาดเพราะยังไม่มี businessapp
 
