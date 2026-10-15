@@ -134,7 +134,8 @@ async function runInspector(args = process.argv.slice(2)) {
   qaPhase('collector-start-requested');
   const servers = await startServers({ port: Number(process.env.FLOWATLAS_COLLECTOR_PORT ?? 4173),
     traceTiming: process.env.FLOWATLAS_TRACE_TIMING === '1',
-    inventoryPort: Number(process.env.FLOWATLAS_INVENTORY_PORT ?? 4174), dataDir, projects: config, workspace: root, sessionToken: credential });
+    inventoryPort: Number(process.env.FLOWATLAS_INVENTORY_PORT ?? 4174), dataDir, projects: config, workspace: root,
+    sessionToken: credential, onStartupPhase: qaStartup ? qaPhase : undefined });
   qaPhase('collector-started');
   const collectorUrl = `http://127.0.0.1:${servers.port}`;
   let target, input;

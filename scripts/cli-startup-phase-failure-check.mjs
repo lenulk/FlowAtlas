@@ -52,8 +52,17 @@ process.stdin.resume();
   assert.equal(existsSync(workspace), true);
   assert.equal(snapshot.invalidFrames + snapshot.overflowFrames, 0);
   const inspector = snapshot.records.filter(record => record.role === 'inspector');
-  assert.deepEqual(inspector.map(record => record.phase), ['collector-start-requested','collector-started','owner-confirm-requested',
-    'owner-confirmed','target-spawn-requested','target-spawned','target-readiness-failed']);
+  assert.deepEqual(inspector.map(record => record.phase), [
+    'collector-start-requested',
+    'version-file-hash-started', 'version-file-hash-finished',
+    'version-git-metadata-started', 'version-git-metadata-finished',
+    'project-snapshot-started', 'project-snapshot-finished',
+    'store-initialize-started', 'store-lock-started', 'store-lock-finished', 'store-initialize-finished',
+    'store-load-started', 'store-load-finished',
+    'listeners-started', 'listeners-finished',
+    'collector-started', 'owner-confirm-requested', 'owner-confirmed',
+    'target-spawn-requested', 'target-spawned', 'target-readiness-failed',
+  ]);
   const spawned = inspector.find(record => record.phase === 'target-spawned'), failed = inspector.at(-1);
   assert.equal(failed.childSpawned, true); assert.ok(failed.elapsedMs - spawned.elapsedMs >= 9500);
   assert.doesNotMatch(JSON.stringify(snapshot), /Bearer|127\.0\.0\.1|sessionToken|"pid"|workspace/);

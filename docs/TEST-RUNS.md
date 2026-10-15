@@ -4788,3 +4788,96 @@ Round79 initial tests: sandbox run2026-10-07T17-37-22-862Z0/7 failedbeforeassert
 - โค้ด4acdc2d commit/pushแล้วบนdiag/sdk-durable-pair ต่อจาก25b5240; Draft PR27 https://github.com/lenulk/FlowAtlas/pull/27 basefix/durable-pair-tap-marker แนบกับchatแล้ว ไม่merge/forcepush. เอกสารfinalส่งพร้อมfocusedpass/mainFAIL13/sourcepassตรงจริง
 - Solfinalreadonlyreviewไม่มีblockerต่อQA Draft; เสนอรอบ86ตรวจpre-lock synchronousstartup window: code-version filehash/Gitmetadata/projectsnapshot/storelock/listenผ่านQA numeric phasesเดิมก่อนrepair. เป็นhypothesisจากลำดับsource/TAP ยังไม่พิสูจน์causeเดียวกับnativeexit ไม่ขยายdeadlineหรือใช้passingfixtureปิดhistoricalfailures
 - HostedCIของรอบ85ยังต้องตรวจsource-matchedผลจริง; docscommitท้ายรอบไม่เปลี่ยน117testedprogramfiles. Performance≤10%/slowdiskdelivery/realbusinesspilot/users/releaseยังเปิด
+
+### Round86 เริ่มตรวจ (15 ตุลาคม2026)
+
+- HEADa433bc1/diag-sdk-durable-pair Gitclean/fetchoriginสำเร็จ; latestPR27 push38688460436/PR38688466167inprogressตอนเริ่ม ไม่อ้างผ่าน. อ่าน HANDOFF/AGENTS/PLAN/QUALITY/TEST-RUNSและsourceจริงก่อนแก้
+- Readครั้งแรกเดาsrc/code-version.mjsและsrc/inspector.mjsผิด (missingfiles); rg--filesยืนยันgetCodeVersionอยู่src/flowatlas.mjsและinspector scripts/inspect.mjs. เป็นread-onlytoolfailureไม่ใช่productfailure ไม่มีmutationจากชื่อที่เดาผิด
+- SourceยืนยันstartServersเรียกgetCodeVersion(filehash+syncGit) และProjectSourcesก่อนnewJsonActionStore/lock. ยังเป็นhypothesisของstartupdelay ไม่ใช่rootcauseproofหรืออธิบายnativeexit3221226505แล้ว. เพิ่มQA-only boundedsubphasesผ่านexistingIPCเพื่อจับstarted-before-blockingโดยคงdeadlineเดิม; Solคุมsource/wiring Lunaช่วยparsercontrols
+
+## 2026-10-15T05-51-37-321Z
+
+- จุดประสงค์: Round86 selected PR27 Ubuntu SDK pair source audit
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: a433bc1e08dbc7524c0de111328675ab1d4903b6; dirty: true
+- หลักฐาน: `reports/tests/2026-10-15T05-51-37-321Z.tap` และ `.json`
+
+## 2026-10-15T05-52-05-385Z
+
+- จุดประสงค์: Round86 startup subphase privacy and throwing diagnostic isolation
+- ผล: ไม่ผ่าน — 9/10; failed 1; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: a433bc1e08dbc7524c0de111328675ab1d4903b6; dirty: true
+- หลักฐาน: `reports/tests/2026-10-15T05-52-05-385Z.tap` และ `.json`
+- ไม่ผ่าน: throwing startup diagnostics preserve HTTP ingestion, durable state and released writer ownership
+
+## 2026-10-15T05-52-06-229Z
+
+- จุดประสงค์: Round86 controlled original target deadline with collector subphase evidence
+- ผล: ไม่ผ่าน — 0/1; failed 1; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: a433bc1e08dbc7524c0de111328675ab1d4903b6; dirty: true
+- หลักฐาน: `reports/tests/2026-10-15T05-52-06-229Z.tap` และ `.json`
+- ไม่ผ่าน: controlled delayed target preserves original10s readiness failure and bounded phase evidence
+- Round86focused05-52-05-385Z9/10FAILED1: Rootfixtureส่งactionname diagnostic equivalenceซึ่งrouteallowlistไม่รับจึง400ถูกต้อง ไม่ใช่callbackisolationbug. Sourceยืนยันrouteรับview-product/check-stock/place-order; failedfixturestartup-sink-yFC80Dretain. แก้เฉพาะtestinputหลังguardจบ โดยคง201assertionและproductionvalidationเดิม; Solsyntax7/7ผ่านก่อนrun (ไม่ใช่producttest)
+- Controlledguard05-52-06-229Z0/1FAILED: wrapperไม่จบภายในQA watchdog24s ถูกSIGKILL/exitCodenullแทน1; reportเขียนก่อนassertionและfixture retained. ไม่เพิ่มwatchdog/targetdeadlineหรือรันunchangedguardซ้ำเพื่อกลบfailure ต้องอ่านsubphasesระบุlastobservedขั้นตอน
+
+## 2026-10-15T05-54-05-859Z
+
+- จุดประสงค์: Round86 corrected valid action input diagnostic isolation and parser
+- ผล: ผ่าน — 10/10; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: a433bc1e08dbc7524c0de111328675ab1d4903b6; dirty: true
+- หลักฐาน: `reports/tests/2026-10-15T05-54-05-859Z.tap` และ `.json`
+- Controlledsubphaseหลักฐานใหม่: version-filehash4→11ms, Gitmetadata11→9311ms(9.3s), project-snapshot9312→13700ms(4.388s), lock13704→13957ms, collector-ready14002ms, targetspawn14019ms. ยืนยันstartupwindowช้าในconditionนี้ ไม่อ้างGitcommandใดช้าหรือnativeexitcause. SolreviewแนะนำdiagDraftก่อนsharedabsoluteGitmetadata budgetrepairในรอบถัดไป(ครอบทุกprojects ไม่percommand500msคูณ16), hash/validatorยังต้องfresh. GuardFAILEDและwatchdogเดิมเก็บครบ ไม่rerununchangedguard
+- Correctedfocused05-54-05-859Z10/10ผ่าน: parser/privacy/bounds และcallbackthrowpreservesexactpackageddigest/HTTP201/durablereload/listenfailure/lockrelease. แก้เพียงfixture actionnameเป็นview-product ไม่ลดassertion. FrozenQA/sourceก่อนfinalmain; controlledguard05-52-06-229ZยังFAILEDตามจริง
+
+## 2026-10-15T05-54-20-931Z
+
+- จุดประสงค์: Round86 final main regression with collector startup subphases
+- ผล: ไม่ผ่าน — 181/192; failed 11; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: a433bc1e08dbc7524c0de111328675ab1d4903b6; dirty: true
+- หลักฐาน: `reports/tests/2026-10-15T05-54-20-931Z.tap` และ `.json`
+- ไม่ผ่าน: test\\adapter-update.test.mjs
+- ไม่ผ่าน: CLI owner-kill closes owned services and lock (plain HTTP)
+- ไม่ผ่าน: CLI owner-kill closes owned services and lock (HTTP SDK flush)
+- ไม่ผ่าน: CLI SIGINT closes owned services and lock (plain HTTP)
+- ไม่ผ่าน: CLI SIGINT closes owned services and lock (HTTP SDK flush)
+- ไม่ผ่าน: CLI SIGTERM closes owned services and lock (plain HTTP)
+- ไม่ผ่าน: CLI SIGTERM closes owned services and lock (HTTP SDK flush)
+- ไม่ผ่าน: test\\doctor.test.mjs
+- ไม่ผ่าน: app crash after readiness fails the CLI and releases collector port and lock
+- ไม่ผ่าน: real OTel preload captures cjs HTTP/Undici fan-out and isolates concurrent requests
+- ไม่ผ่าน: real OTel preload captures mjs HTTP/Undici fan-out and isolates concurrent requests
+
+## 2026-10-15T05-58-04-002Z
+
+- จุดประสงค์: Round86 isolated source regression after collector subphase changes
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: a433bc1e08dbc7524c0de111328675ab1d4903b6; dirty: true
+- หลักฐาน: `reports/tests/2026-10-15T05-58-04-002Z.tap` และ `.json`
+
+### Round86 final verification (15 ตุลาคม2026)
+
+- Main05-54-20-931Z181/192reported FAILED11/skip0/default2workers. Native testfile abort adapter-update และdoctor (3221226505); CLIowner6/appcrash/CJS/MJS readiness failures. Nativeabortทำให้บางsubtestsไม่ถึงขั้นรายงาน จึงไม่อ้างว่ารันครบทุกcaseเพราะskip0. ไม่มีunchangedmainrerun/deadlineextension
+- CLIfailedphaseจริงมีversion-git-metadata-startedแต่ยังไม่finishedที่12swrapperdeadline/lockfalse/cleanupunknownretained. เป็นlastobservedGitmetadatawindow ไม่ได้พิสูจน์ทุกfailureสาเหตุเดียวกัน; controlledreportจับ9.3sGit/4.388sprojectsnapshot/collector14s ชัดเจน
+- Sourceแยก05-58-04-002Z1/1ผ่าน; focusedcorrected10/10และmain118programhashesตรงcurrentทั้งหมด. Callbacktestในmainยังผ่าน ไม่อ้างactualOTel/EdgepassเพราะCJS/MJSfailedในmain. Failedworkspaces/locksที่unknownไม่ลบ/killunknownprocess
+- Sol/Lunareadonlyreviewไม่มีblockerต่อdiagDraft; Nodeprimarysource issuesมีอาการexitcodeคล้ายกันแต่ยังไม่พิสูจน์FlowAtlascauseหรือว่าNode24.21แก้แล้ว จึงไม่มีruntimeupgrade/เปลี่ยนaccountหรือsettings. Nextrepairต้องใช้sharedabsoluteGitmetadata budgetครอบทุกprojectsและdelayedrealchildcontrols ก่อนรับรองelapsedbound
+- Parenta433bc1 latestAPI push38688460436/PR38688466167completed/successทั้งคู่; Ubuntuartifactaudit05-51-37-321Z1/1/68reports117hashes main192สองช่อง SDK12conditionsACKครบ/metnull. Windowsfullartifactauditกำลังรับเพิ่ม ไม่ใช้hostedpassปิดlocalfailure/performancepilot
+
+## 2026-10-15T05-59-46-405Z
+
+- จุดประสงค์: Round86 full PR27 SDK pair matrix exact-source audit
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: a433bc1e08dbc7524c0de111328675ab1d4903b6; dirty: true
+- หลักฐาน: `reports/tests/2026-10-15T05-59-46-405Z.tap` และ `.json`
+- FullPR27matrixaudit05-59-46-405Z1/1: mergee4bf124/4artifacts/136runnerreports/117exactprogramhashesทุกช่อง; main192/192แต่ละ SDK24conditionsACK1051/drop0/reload/closeครบ/runtime-scriptdigestตรง. Ubuntu22pair1durablep954.012msต่ำกว่าsink4.038ms จึงไม่เหมารวมว่าdurableช้าทุกhost/condition. ไม่ใช่pushartifactauditหรือbaseline-relativeperformanceacceptance
+
+### Round86 publication
+
+- Sourceb466541 commit/pushแล้วบนdiag/collector-startup-subphases ต่อจากa433bc1; Draft PR28 https://github.com/lenulk/FlowAtlas/pull/28 base diag/sdk-durable-pair แนบกับchatแล้ว ไม่merge/forcepush. Solfinalreadonlyreviewไม่มีblockerสำหรับdiagDraft; initialfixture/guard/mainfailureเก็บครบไม่กลบ
+- เอกสารท้ายรอบไม่เปลี่ยน118testedprogramfiles. HostedCIรุ่นใหม่ยังต้องตรวจsource-matched; ไม่ใช้parentPR27greenรับรองround86. NextrepairsharedGitmetadatabudgetยังไม่implement/ไม่มีruntimeupgrade

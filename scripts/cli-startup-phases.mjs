@@ -10,6 +10,13 @@ const ROLES = Object.freeze({
     'collector-start-requested', 'collector-started', 'owner-confirm-requested',
     'owner-confirmed', 'owner-rejected', 'target-spawn-requested', 'target-spawned',
     'target-readiness-observed', 'target-readiness-failed',
+    'version-file-hash-started', 'version-file-hash-finished',
+    'version-git-metadata-started', 'version-git-metadata-finished',
+    'project-snapshot-started', 'project-snapshot-finished',
+    'store-initialize-started', 'store-initialize-finished',
+    'store-lock-started', 'store-lock-finished',
+    'store-load-started', 'store-load-finished',
+    'listeners-started', 'listeners-finished',
   ]),
 });
 
@@ -41,8 +48,8 @@ export function sanitizeQaStartupPhase(value) {
   return validRecord(value) ? canonicalRecord(value) : null;
 }
 
-export function createQaStartupPhaseParser({ limit = 20 } = {}) {
-  if (!Number.isSafeInteger(limit) || limit < 1 || limit > 20) {
+export function createQaStartupPhaseParser({ limit = 32 } = {}) {
+  if (!Number.isSafeInteger(limit) || limit < 1 || limit > 32) {
     throw new TypeError('Invalid QA startup record limit');
   }
 
