@@ -4975,3 +4975,8 @@ Round79 initial tests: sandbox run2026-10-07T17-37-22-862Z0/7 failedbeforeassert
 - Firstfocused11/12 missingadapterdependencyและparentCIphaseexpectation regressionเก็บครบ; แก้productionmoduleboundaryกับstrictfull21contract ไม่copyextraเฉพาะfixture/ไม่filterphases. No retry/skip/deadlineextension/sourcehashcache/runtimeupgrade
 - ตรวจbrowsercoverageก่อนส่ง: test/otel-runtimeเปิดviewerเฉพาะFLOWATLAS_OTEL_BROWSER_CHECK=1; mainไม่ได้ตั้งflagและไม่มีHTTP trace browser evidence จึงแก้ledgerไม่อ้างEdgepass. tools/qa/node_modules/playwright และreports/qa-tools dependencypathsไม่มีในเครื่องนี้ ไม่ติดตั้งหรือใช้historicalEdgeผลแทน. CIมีexplicitbrowserstepเดิม; รอบนี้ยืนยันlocalactualSDKและsourceเท่านั้น
 - Solfinalreadonlyreviewไม่พบcodeblocker; ปรับถ้อยคำเอกสารให้ระบุเพิ่มbudget/timeout แทนถ้อยคำที่อาจสื่อhardboundบนWindows. ไม่มีsource/testเปลี่ยนหลังfinalruns
+
+### Round87 publication
+
+- Source d25a84f commit/pushแล้วบนfix/shared-git-metadata-budgetต่อจาก35b374d; Draft PR29 https://github.com/lenulk/FlowAtlas/pull/29 base diag/collector-startup-subphases แนบกับchatแล้ว ไม่merge/forcepush. Main203/203/source1/1/ordinarymeasurement1/1 แต่performanceFAILED+276.977% ระบุครบในPRbody ไม่อ้างproductionready
+- Solคุมdesign/source/review/Lunaunithelpers/Rootrealchild+CLI compatibility+tests/docs/publication. ท้ายรอบdocscommitไม่เปลี่ยน120testedprogramfiles. HostedCIยังรอsource-matchedผลจริง ไม่ใช้parentCIหรือlocalpassรับรองทุกhost/nativeexitcause. Failedfirstfocused11/12และhistoricalfailuresยังเก็บ
