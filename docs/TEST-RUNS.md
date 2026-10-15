@@ -4980,3 +4980,119 @@ Round79 initial tests: sandbox run2026-10-07T17-37-22-862Z0/7 failedbeforeassert
 
 - Source d25a84f commit/pushแล้วบนfix/shared-git-metadata-budgetต่อจาก35b374d; Draft PR29 https://github.com/lenulk/FlowAtlas/pull/29 base diag/collector-startup-subphases แนบกับchatแล้ว ไม่merge/forcepush. Main203/203/source1/1/ordinarymeasurement1/1 แต่performanceFAILED+276.977% ระบุครบในPRbody ไม่อ้างproductionready
 - Solคุมdesign/source/review/Lunaunithelpers/Rootrealchild+CLI compatibility+tests/docs/publication. ท้ายรอบdocscommitไม่เปลี่ยน120testedprogramfiles. HostedCIยังรอsource-matchedผลจริง ไม่ใช้parentCIหรือlocalpassรับรองทุกhost/nativeexitcause. Failedfirstfocused11/12และhistoricalfailuresยังเก็บ
+
+### Round88 initial inspection
+- Git clean at 3ece8c1; fetch succeeded; own branch diag/target-cpu-profile. Latest push38692911967 and PR38692916999 success; PR jobs4/4. Artifacts not yet audited. Initial rg used guessed scripts/http-benchmark.mjs and PowerShell wildcard literal; paths absent/search exit1. No tests run or source changes; correcting with rg --files.
+
+- Follow-up rg included literal scripts/* and exited1 on Windows; explicit files read successfully. Subsequent directory searches use rg scripts directly, no shell wildcard.
+
+## 2026-10-15T13-07-37-481Z
+
+- จุดประสงค์: Round88 opt-in target CPU profile diagnostic only, not performance acceptance
+- ผล: ไม่ผ่าน — 0/1; failed 1; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 3ece8c189ad7f1288a0d3ca6fd1e02e26219fc2d; dirty: true
+- หลักฐาน: `reports/tests/2026-10-15T13-07-37-481Z.tap` และ `.json`
+- ไม่ผ่าน: explicit local HTTP trace overhead benchmark (not in default suite)
+- Round88 targetprofile13-07-37-481Z FAILED0/1; completedPairs2/3; workload/capture false; metnull/profiled_run. All completed rounds and retained workspace recorded in benchmark13-07-38-044Z. Inspect failure before choosing optimization; no retry/deadline change.
+
+## 2026-10-15T13-08-53-956Z
+
+- จุดประสงค์: Round88 PR29 exact merge-source four-artifact audit
+- ผล: ไม่ผ่าน — 0/1; failed 1; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 3ece8c189ad7f1288a0d3ca6fd1e02e26219fc2d; dirty: true
+- หลักฐาน: `reports/tests/2026-10-15T13-08-53-956Z.tap` และ `.json`
+- ไม่ผ่าน: PR29 four hosted artifacts match merge source and preserve startup controls
+- Round88 initialCIaudit13-08-53-956Z FAILED0/1: audit incorrectly assumed every nested runner failed0; CI uploads deliberate negative inner runs. Inspect purpose/failure inventories and assert exact allowlist with outer guards instead; no CI test result changed.
+
+## 2026-10-15T13-09-21-969Z
+
+- จุดประสงค์: Round88 corrected PR29 exact merge-source four-artifact audit preserving negative inner runs
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 3ece8c189ad7f1288a0d3ca6fd1e02e26219fc2d; dirty: true
+- หลักฐาน: `reports/tests/2026-10-15T13-09-21-969Z.tap` และ `.json`
+- CorrectedCIaudit13-09-21-969Z1/1: all4artifacts136runnerreports/120programfiles match merge981f609; main203each; all16metadata controls exact hashes17snapshots/lockreleased/ownedchildstopped. Five deliberate negative runner purposes per artifact preserve expected1failure each; other runners failed0/skipped0. Ordinary performance FAILEDall4 +91.372/+130.38/+196.821/+187.475%. Explicit browser gates passed in hosted runs. Follow-up rg guessed two absent check names exited1; using discovered directory inventory next.
+- Last targeted rg additionally included absent cli-startup-check.mjs; exit1 despite valid matches in cli/inspect/owner files. Correct discovered filename is cli-startup-phase-failure-check.mjs. Read-only tool failure, no test/source effect.
+- Manual retained fixture check: actions directory exists with no listed files/lock; cleanup remains unconfirmed and workspace retained. Get-Content guessed docs/http-benchmark.md absent; discovered docs/benchmark-http.md and read corrected path next. No raw private output retained in report.
+- Read-only rg included absent src/http-trace.mjs; correct normalize function found in src/otel-exporter.mjs. No root-cause conclusion made from this search; using actual discovered filenames only afterward.
+
+## 2026-10-15T13-12-11-138Z
+
+- จุดประสงค์: Round88 exploratory two-pair target CPU profile evidence audit, incomplete run remains failed
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 3ece8c189ad7f1288a0d3ca6fd1e02e26219fc2d; dirty: true
+- หลักฐาน: `reports/tests/2026-10-15T13-12-11-138Z.tap` และ `.json`
+- Round88 partialprofileaudit13-12-11-138Z1/1 validates exactcommit/manifest5profiles/r1tracedmissing and two completepairs. Originalprofilefailed0/1 preserved; analysis is sampled self-time/exploratory, performanceverdictnull. Analyzer initialreview caught baseline trace=null assertion before execution; fixed conditional traced1051/drop0, baseline null.
+- Multi-file docs patch failed verification on guessed QUALITY heading; inspect actual headings and apply exact replacements. No tests affected.
+
+## 2026-10-15T13-15-48-446Z
+
+- จุดประสงค์: Round88 bounded benchmark startup helper owned-child failure privacy and existing parser regressions
+- ผล: ผ่าน — 18/18; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 3ece8c189ad7f1288a0d3ca6fd1e02e26219fc2d; dirty: true
+- หลักฐาน: `reports/tests/2026-10-15T13-15-48-446Z.tap` และ `.json`
+
+## 2026-10-15T13-15-57-039Z
+
+- จุดประสงค์: Round88 target profile after bounded startup evidence repair, diagnostic integration only
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 3ece8c189ad7f1288a0d3ca6fd1e02e26219fc2d; dirty: true
+- หลักฐาน: `reports/tests/2026-10-15T13-15-57-039Z.tap` และ `.json`
+- Sol/Luna source freeze before13-15-48-446Z focused18/18 PASS: actualownedchildexit23/privacy/fixedsignalOTHER/disposedlisteners plus original phase/owner/pairedstatistics guards. New benchmark reporter uses existing bounded observers only in targetprofiling; ordinary removes inheritedQAflag and reports startupEvidencenull. No production src/deadline/durability changes. Actualtargetprofile after instrumentation pending; original13-07failedretained.
+- Afterrepairtargetprofile13-15-57-039Z1/1: three completepairs/allbusinessresponses/capture3153drop0/sixprofiles. Newreport13-15-57-268Z has boundedstartup evidence. Performanceassessablefalse/metnull/profiled_run; passingcondition does not close originalstartupfailure/rootcause. Main now running default2workers; source/tests frozen.
+
+## 2026-10-15T13-16-32-035Z
+
+- จุดประสงค์: Round88 final main regression after QA target-profile startup evidence repair
+- ผล: ไม่ผ่าน — 204/205; failed 1; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 3ece8c189ad7f1288a0d3ca6fd1e02e26219fc2d; dirty: true
+- หลักฐาน: `reports/tests/2026-10-15T13-16-32-035Z.tap` และ `.json`
+- ไม่ผ่าน: real OTel preload captures cjs HTTP/Undici fan-out and isolates concurrent requests
+- Round88 finalmain13-16-32-035Z FAILED204/205/skip0/default2workers. Preserve failure and inspect TAP; no unchanged rerun or deadlineextension. Source/tests still frozen.
+
+## 2026-10-15T13-17-39-297Z
+
+- จุดประสงค์: Round88 standalone source-serving regression after QA evidence helper
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 3ece8c189ad7f1288a0d3ca6fd1e02e26219fc2d; dirty: true
+- หลักฐาน: `reports/tests/2026-10-15T13-17-39-297Z.tap` และ `.json`
+- Mainfailure CJS OTel target exitedbefore readiness3221225794; MJSpassed. This numericexit differs from historical3221226505; no cause assigned. Failurefixture cleanup reports closedtrue/lockRemovedtrue/removedtrue but portsClosed[] because none reported; do not turn that into knownreachableports proof. Source standalone13-17-39-297Z1/1PASS. Fullmainnotgreen; no rerun.
+
+## 2026-10-15T13-18-25-288Z
+
+- จุดประสงค์: Round88 complete target profile and fixed bounded startup-evidence artifact audit
+- ผล: ไม่ผ่าน — 0/1; failed 1; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 3ece8c189ad7f1288a0d3ca6fd1e02e26219fc2d; dirty: true
+- หลักฐาน: `reports/tests/2026-10-15T13-18-25-288Z.tap` และ `.json`
+- ไม่ผ่าน: Round 88 complete target CPU profiles and startup evidence match the fixed six-condition manifest
+- Completeprofileaudit13-18-25-288Z FAILED0/1 due analyzer comparing sortedactual phasekeys with unsortedexpectedkeys. Correct only expectedkeys ordering in ignored analyzer; report/source untouched, strictschema checks retained.
+
+## 2026-10-15T13-18-45-688Z
+
+- จุดประสงค์: Round88 corrected complete target profile schema and startup-evidence artifact audit
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 3ece8c189ad7f1288a0d3ca6fd1e02e26219fc2d; dirty: true
+- หลักฐาน: `reports/tests/2026-10-15T13-18-45-688Z.tap` และ `.json`
+
+## 2026-10-15T13-19-04-785Z
+
+- จุดประสงค์: Round88 final source inventory equality preserving main CJS failure
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 3ece8c189ad7f1288a0d3ca6fd1e02e26219fc2d; dirty: true
+- หลักฐาน: `reports/tests/2026-10-15T13-19-04-785Z.tap` และ `.json`
+- Correctedcompleteprofileaudit13-18-45-688Z1/1 validates6profiles/3pairs/26phases/exit0/lockfalse/cleanupall6; originalinitialauditfailure preserved. Normalization+OTel/Node/profilergroupednames recur, not exactsymbol/causalp95proof. Finalinventory13-19-04-785Z1/1:122programfiles/focused+profile+main+source inventories exact. Source/tests frozen; mainFAILED204/205 remains.
+
+### Round88 publication
+- Code5385a60079ef794ceed892149e486318bbfd93c0 committed/pushed on own branch diag/target-cpu-profile; Draft PR30 https://github.com/lenulk/FlowAtlas/pull/30 base fix/shared-git-metadata-budget. No merge/forcepush. Commit includes mainFAILED204/205 and all diagnostic/audit failures. PushCI38741838058 queued at publicationcheck; no hostedpassclaim.
+- Sol led design/review/analyzers; Luna owned actualchildprivacy tests; Root auditedCI/ranalltests/docs/publication. Docs-only follow-up does not change122testedprogramfiles. Performance/pilot/users/release remain open.
+
