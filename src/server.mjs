@@ -9,7 +9,7 @@ import { createInventoryService } from './inventory-service.mjs';
 import { validateGraph } from './evidence-contract.mjs';
 import { ingestEvent } from './ingest.mjs';
 import { JsonActionStore, storageErrorDiagnostic } from './action-store.mjs';
-import { ProjectSources, readProjectConfig } from './project-sources.mjs';
+import { ProjectSources, createGitMetadataBudget, readProjectConfig } from './project-sources.mjs';
 import { resolveWorkspace, resolveDataDirectory } from './workspace.mjs';
 import { sessionToken as validateSessionToken, sessionAccess, showPairing } from './session-access.mjs';
 
@@ -73,11 +73,12 @@ export async function startServers({ port = 4173, inventoryPort = 4174, dataDir 
     try { onStorageError(storageErrorDiagnostic(error)); }
     catch { /* A diagnostic sink must not change the request result or storage cleanup. */ }
   };
-  const version = getCodeVersion(root, phase);
+  const gitBudget = createGitMetadataBudget();
+  const version = getCodeVersion(root, phase, gitBudget);
   if (sessionToken !== null) validateSessionToken(sessionToken);
   const workspaceRoot = resolveWorkspace(root, workspace);
   phase('project-snapshot-started');
-  const projectSources = new ProjectSources(workspaceRoot, projects);
+  const projectSources = new ProjectSources(workspaceRoot, projects, gitBudget);
   phase('project-snapshot-finished');
   let store = null;
   let atlas;

@@ -4881,3 +4881,102 @@ Round79 initial tests: sandbox run2026-10-07T17-37-22-862Z0/7 failedbeforeassert
 
 - Sourceb466541 commit/pushแล้วบนdiag/collector-startup-subphases ต่อจากa433bc1; Draft PR28 https://github.com/lenulk/FlowAtlas/pull/28 base diag/sdk-durable-pair แนบกับchatแล้ว ไม่merge/forcepush. Solfinalreadonlyreviewไม่มีblockerสำหรับdiagDraft; initialfixture/guard/mainfailureเก็บครบไม่กลบ
 - เอกสารท้ายรอบไม่เปลี่ยน118testedprogramfiles. HostedCIรุ่นใหม่ยังต้องตรวจsource-matched; ไม่ใช้parentPR27greenรับรองround86. NextrepairsharedGitmetadatabudgetยังไม่implement/ไม่มีruntimeupgrade
+
+### Round87 เริ่มตรวจ (15 ตุลาคม2026)
+
+- HEAD35b374d/Gitclean/fetchoriginสำเร็จ; อ่านAGENTS/HANDOFF/PLAN/QUALITY/TEST-RUNSก่อนแก้. ParentPR28 latestpush38689969612/PR38689973503FAILEDทั้งคู่; PRjobs4ช่องFAILEDMain regressionทั้งหมด ต้องอ่านrawsource-matchedfailureก่อนrepair ไม่ใช้historicalgreen
+- PR28artifactmergeSHAefde36444855cf2d33701dac1f6911cf5188afc4 fetched; กำลังเก็บ4artifacts. SolออกแบบsharedGitmetadatabudget/Rootauditdocs/Lunahelpertestsตามคำสั่งผู้ใช้. ไม่มีเปลี่ยนruntimeหรือappdeadlines
+
+## 2026-10-15T06-19-10-101Z
+
+- จุดประสงค์: Round87 PR28 source audit of stale phase assertions across four CI channels
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 35b374d2904d82b781d49b399981277976585cf2; dirty: true
+- หลักฐาน: `reports/tests/2026-10-15T06-19-10-101Z.tap` และ `.json`
+
+## 2026-10-15T06-20-27-535Z
+
+- จุดประสงค์: Round87 shared Git metadata unit real child sixteen-project and compatibility controls
+- ผล: ไม่ผ่าน — 11/12; failed 1; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 35b374d2904d82b781d49b399981277976585cf2; dirty: true
+- หลักฐาน: `reports/tests/2026-10-15T06-20-27-535Z.tap` และ `.json`
+- ไม่ผ่าน: copied adapter in a different Git repository captures three actions and survives collector outage
+- Source-matchedPR28audit06-19-10-101Z1/1: 4artifacts/136reports/118hashesทุกชุด main190/196FAIL6; actualphase21ครบทุก24CLIcasesและถึงassertหลังready+shutdown. สาเหตุCIทั้งหมดคือtest/cli-owner expectedเก่า7ที่เราตกหล่น ไม่ใช่Gitlatency. แก้strictfull21โดยไม่filter/ลดassertion. แยกจากlocalstartup/nativefailures. Solsyntax5/5ผ่าน/helper budget1sรวมlazyabsolute ไม่perprojectreset; ไม่มีtestsจากagent. RootownedNodechildshimจำลองGitdelays+real timeout/kill/17snapshots hashfresh ไม่ใช่physicalGit speed
+
+### Round87 first focused result
+
+- Focused06-20-27-535Z11/12FAILED1: external repository copied adapterอ่านproject-sourcesแล้วไม่พบgit-metadata-budget dependencyใหม่; เป็นintegration regressionจริง ไม่ใช่hostslowness. Unit3/realchild4/codeversion1/callback3ผ่าน; ไม่ลดexternalrepoassertionหรือcopyเพิ่มเฉพาะfixtureเพื่อให้ผ่าน
+- ตรวจsourceพบproductionregister/create-target/update/doctorจัดการเพียงnode-adapter+project-sourcesเป็นself-containedadapterboundary. แก้architectureก่อน: ให้sharedGithelperอยู่ในproject-sourcesเองและexportไปcollector/version เพื่อไม่เพิ่มdependencyที่ต้องmigrationregisteredapps; agentกำลังทำ ยังไม่main
+- Readครั้งแรกเดาscripts/register.mjsและsrc/adapters*ผิด (missingpath/os123); rgทั้งscripts/src/testยืนยันชื่อregister-app.mjs/create-target-app.mjs/update-adapters.mjs/doctor.mjs. Read-onlyfailureไม่ใช่productfailure ไม่มีmutationจากชื่อที่ผิด
+- OwnedNodechilddelay controls4conditionsผ่าน: healthy51metadata calls/17snapshots และdelaycommand1/2/3 timeout/atomicunknownทุก17snapshots/childstopped/digestfresh/lockabsent/verifiedcleanup. เป็นfixtureevidence ไม่ใช่strictWindowsOSboundหรือGitphysicalspeed
+
+## 2026-10-15T06-22-43-266Z
+
+- จุดประสงค์: Round87 corrected self-contained adapter shared metadata and fresh late-project hash controls
+- ผล: ผ่าน — 12/12; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 35b374d2904d82b781d49b399981277976585cf2; dirty: true
+- หลักฐาน: `reports/tests/2026-10-15T06-22-43-266Z.tap` และ `.json`
+- Correctedfocused06-22-43-266Z12/12ผ่านหลังย้ายhelperเข้าself-containedproject-sources ไม่เพิ่มadapterdependency/ไม่เปลี่ยนregistrationfiles. Realchildcontrolsยังผ่านและเพิ่มmutationโปรเจกต์ที่16หลังbaselineก่อนmetadatacallแรก ยืนยันcaptureอ่านhashใหม่แม้budgetหมด. Syntaxaftermove4/4ผ่าน. Source/QA/tests frozenก่อนCLI/guard/main
+
+## 2026-10-15T06-23-09-226Z
+
+- จุดประสงค์: Round87 actual CLI ownership strict twenty-one phase compatibility
+- ผล: ผ่าน — 9/9; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 35b374d2904d82b781d49b399981277976585cf2; dirty: true
+- หลักฐาน: `reports/tests/2026-10-15T06-23-09-226Z.tap` และ `.json`
+
+## 2026-10-15T06-23-26-590Z
+
+- จุดประสงค์: Round87 original target deadline guard after shared metadata repair
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 35b374d2904d82b781d49b399981277976585cf2; dirty: true
+- หลักฐาน: `reports/tests/2026-10-15T06-23-26-590Z.tap` และ `.json`
+
+### Round87 actual CLI and deadline verification
+
+- ActualCLI06-23-09-226Z9/9ผ่าน strict21inspectorphases/actualready/shutdown/lockrelease ทั้งplain+SDK ownerkill/SIGINT/SIGTERMและ3ownerstartupcontrols. CorrectedexpectationจากCIเก่าตรวจครบไม่filterเหตุการณ์
+- Controlledguard06-23-26-590Z1/1ผ่าน: originaltarget10sreadinessfailureยังถูกสังเกต/exit1/childclosed/lockabsent/full21sequence/recordsbounded. UnknowntargetPIDทำให้retainworkspaceตามเดิม ไม่อ้างdescendantcleanupครบ. ไม่ขยาย24swatchdogหรือ10/12deadlines. Reportcontrolled06-23-38-370Z; รอบ86FAILED0/1ยังเก็บครบ
+- Rootเพิ่มCIartifactupload reports/diagnostics/git-budget เพื่อเก็บreal-child evidence; ไม่มีเพิ่มtestconcurrency/retry/skip. Solreadonlyreviewไม่มีblockerก่อนmainและไม่มีagenteditsระหว่างtests
+
+## 2026-10-15T06-24-41-084Z
+
+- จุดประสงค์: Round87 final main regression after shared Git metadata budget repair
+- ผล: ผ่าน — 203/203; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 35b374d2904d82b781d49b399981277976585cf2; dirty: true
+- หลักฐาน: `reports/tests/2026-10-15T06-24-41-084Z.tap` และ `.json`
+
+## 2026-10-15T06-26-51-150Z
+
+- จุดประสงค์: Round87 isolated source regression after shared metadata repair
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 35b374d2904d82b781d49b399981277976585cf2; dirty: true
+- หลักฐาน: `reports/tests/2026-10-15T06-26-51-150Z.tap` และ `.json`
+- Finalmain06-24-41-084Z203/203ผ่าน/default2workers/failed0/skip0 รวมactualCJS/MJS OTel/ownedcleanup. ไม่มีnativeabortในconditionนี้ ไม่ใช้ปิดhistoricalnativeexit/rootcauseหรือstablecaptureทุกhost. ไม่rerunmainซ้ำ. Sourcecheckเดี่ยวกำลังรัน แล้วordinaryHTTPเป็นunresolvedperformancegate assessmentบนsourceใหม่ ไม่ใช้testpassแทนperformanceacceptance
+
+## 2026-10-15T06-26-51-915Z
+
+- จุดประสงค์: Round87 current source ordinary HTTP capture and separate performance assessment
+- ผล: ผ่าน — 1/1; failed 0; skipped 0
+- Environment: win32/x64; OS 10.0.26200; Node v24.19.0
+- commit: 35b374d2904d82b781d49b399981277976585cf2; dirty: true
+- หลักฐาน: `reports/tests/2026-10-15T06-26-51-915Z.tap` และ `.json`
+
+### Round87 final acceptance evidence
+
+- Sourceแยก06-26-51-150Z1/1ผ่าน. OrdinaryHTTP06-26-51-915Z1/1measurement/captureถูกต้อง แต่performance assessabletrue/metfalse: +276.977% aggregatep95 (baseline3.592ms/traced13.541ms/relative threshold10%/3completedpairs). ไม่เปลี่ยนcriterionหรืออ้างtestpassเป็นperformancepass
+- โปรแกรม120files focused06-22-43-266Z/main06-24-41-084Z/ordinaryHTTP06-26-51-915Z/current hashesตรงทั้งหมด. Frozenตั้งแต่correctedfocusedถึงfinalbenchmark; gitdiffcheckผ่าน. ActualCJS/MJS OTelภายในmainผ่านพร้อมownedcleanup; mainไม่ได้เปิดoptionalbrowserflagจึงยังไม่อ้างnewEdgepass แต่ไม่ใช้ลบhistoricalnativeexit/slowdisk/19lossหรือรับรองทุกhost
+- Firstfocused11/12 missingadapterdependencyและparentCIphaseexpectation regressionเก็บครบ; แก้productionmoduleboundaryกับstrictfull21contract ไม่copyextraเฉพาะfixture/ไม่filterphases. No retry/skip/deadlineextension/sourcehashcache/runtimeupgrade
+- ตรวจbrowsercoverageก่อนส่ง: test/otel-runtimeเปิดviewerเฉพาะFLOWATLAS_OTEL_BROWSER_CHECK=1; mainไม่ได้ตั้งflagและไม่มีHTTP trace browser evidence จึงแก้ledgerไม่อ้างEdgepass. tools/qa/node_modules/playwright และreports/qa-tools dependencypathsไม่มีในเครื่องนี้ ไม่ติดตั้งหรือใช้historicalEdgeผลแทน. CIมีexplicitbrowserstepเดิม; รอบนี้ยืนยันlocalactualSDKและsourceเท่านั้น
+- Solfinalreadonlyreviewไม่พบcodeblocker; ปรับถ้อยคำเอกสารให้ระบุเพิ่มbudget/timeout แทนถ้อยคำที่อาจสื่อhardboundบนWindows. ไม่มีsource/testเปลี่ยนหลังfinalruns
+
+### Round87 publication
+
+- Source d25a84f commit/pushแล้วบนfix/shared-git-metadata-budgetต่อจาก35b374d; Draft PR29 https://github.com/lenulk/FlowAtlas/pull/29 base diag/collector-startup-subphases แนบกับchatแล้ว ไม่merge/forcepush. Main203/203/source1/1/ordinarymeasurement1/1 แต่performanceFAILED+276.977% ระบุครบในPRbody ไม่อ้างproductionready
+- Solคุมdesign/source/review/Lunaunithelpers/Rootrealchild+CLI compatibility+tests/docs/publication. ท้ายรอบdocscommitไม่เปลี่ยน120testedprogramfiles. HostedCIยังรอsource-matchedผลจริง ไม่ใช้parentCIหรือlocalpassรับรองทุกhost/nativeexitcause. Failedfirstfocused11/12และhistoricalfailuresยังเก็บ

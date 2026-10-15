@@ -3,6 +3,40 @@ import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import { resolve, relative, isAbsolute, join } from 'node:path';
 
+export const GIT_METADATA_BUDGET_MS = 1000;
+
+export function createGitMetadataBudget() {
+  let deadline = null;
+  const remainingMs = () => {
+    const now = performance.now();
+    deadline ??= now + GIT_METADATA_BUDGET_MS;
+    return Math.max(0, Math.floor(deadline - now));
+  };
+
+  return Object.freeze({
+    runGit(cwd, args) {
+      const timeout = remainingMs();
+      if (timeout < 1) throw new Error('Git metadata budget exhausted');
+      const output = execFileSync('git', args, { cwd, stdio: ['ignore', 'pipe', 'ignore'], timeout });
+      if (remainingMs() < 1) throw new Error('Git metadata budget exhausted');
+      return output.toString().trim();
+    },
+  });
+}
+
+export function readGitMetadata(root, files, budget = createGitMetadataBudget()) {
+  try {
+    const gitRoot = budget.runGit(root, ['rev-parse', '--show-toplevel']);
+    if (realpathSync(gitRoot) !== realpathSync(root)) return { commit: null, dirty: null };
+    const commit = budget.runGit(root, ['rev-parse', 'HEAD']);
+    const dirty = budget.runGit(root, ['status', '--porcelain', '--', ...files]).length > 0;
+    return { commit, dirty };
+  } catch {
+    // Git metadata is optional; the independently hashed file snapshot remains authoritative.
+    return { commit: null, dirty: null };
+  }
+}
+
 export function validSourcePath(file) {
   return typeof file === 'string' && file.length <= 200 && /\.(mjs|cjs|js|ts|tsx|jsx|html|css)$/.test(file)
     && !/[\\:\x00]/.test(file) && file.split('/').every((part) => part && !part.startsWith('.') && part !== 'node_modules');
@@ -25,26 +59,18 @@ function readAllowedSource(root, file) {
   return readFileSync(path);
 }
 
-export function captureProjectVersion(root, files, projectId) {
+export function captureProjectVersion(root, files, projectId, gitBudget = createGitMetadataBudget()) {
   if (typeof projectId !== 'string' || !/^[a-z][a-z0-9_-]{0,63}$/.test(projectId) || !Array.isArray(files)
     || files.length < 1 || files.length > 64 || new Set(files).size !== files.length) throw new Error('Invalid project registration');
   const hashes = Object.fromEntries([...files].sort().map((file) => [file,
     createHash('sha256').update(readAllowedSource(root, file)).digest('hex')]));
   const digest = createHash('sha256').update(Object.entries(hashes).map(([file, hash]) => `${file}\0${hash}`).join('\n')).digest('hex');
-  let commit = null;
-  let dirty = null;
-  try {
-    const gitRoot = execFileSync('git', ['rev-parse', '--show-toplevel'], { cwd: root, stdio: ['ignore', 'pipe', 'ignore'] }).toString().trim();
-    if (realpathSync(gitRoot) === realpathSync(root)) {
-      commit = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: root, stdio: ['ignore', 'pipe', 'ignore'] }).toString().trim();
-      dirty = execFileSync('git', ['status', '--porcelain', '--', ...files], { cwd: root, stdio: ['ignore', 'pipe', 'ignore'] }).toString().trim().length > 0;
-    }
-  } catch { /* Uncommitted projects still have an exact file digest. */ }
+  const { commit, dirty } = readGitMetadata(root, files, gitBudget);
   return { projectId, commit, dirty, digest, files: Object.freeze(hashes) };
 }
 
 export class ProjectSources {
-  constructor(projectRoot, registrations = []) {
+  constructor(projectRoot, registrations = [], gitBudget = createGitMetadataBudget()) {
     if (!Array.isArray(registrations) || registrations.length > 16) throw new Error('Invalid project registrations');
     this.projectRoot = realpathSync(projectRoot);
     this.projects = new Map();
@@ -55,7 +81,7 @@ export class ProjectSources {
       if (!within(this.projectRoot, directory) || ['src', 'public', 'examples', '.git', '.codex', '.agents'].includes(first)) {
         throw new Error('Registered project must be inside the project folder and outside collector code');
       }
-      const version = captureProjectVersion(directory, entry.files, entry.id);
+      const version = captureProjectVersion(directory, entry.files, entry.id, gitBudget);
       this.projects.set(entry.id, { directory, files: [...entry.files], version });
     }
   }

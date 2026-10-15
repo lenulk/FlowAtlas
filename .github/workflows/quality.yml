@@ -239,6 +239,7 @@ jobs:
           path: |
             reports/tests/
             reports/diagnostics/cli-startup/
+            reports/diagnostics/git-budget/
             reports/vm/inspector-browser-*/
             reports/browser/independent-browser-*/
             reports/browser/otel-runtime-*/
